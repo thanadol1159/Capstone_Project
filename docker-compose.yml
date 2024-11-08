@@ -1,0 +1,53 @@
+services:
+  db:
+    container_name: db
+    image: postgres:15.5
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: dbpass
+    networks:
+      - my_network
+    volumes:
+      - db:/var/lib/postgresql/data/
+    
+
+  adminer:
+    container_name: adminer
+    image: adminer
+    networks:
+      - my_network
+    ports:
+      - 8080:8080
+
+  django:
+    container_name: django
+    build:
+      context: backend
+      dockerfile: Dockerfile.Dev
+    ports:
+      - 8000:8000
+    volumes:
+      - .:/app
+    user: 1000:1000
+    depends_on:
+      - db
+    networks:
+      - my_network
+    environment:
+      - SQL_ENGINE=django.db.backends.postgresql
+      - SQL_DATABASE=postgres
+      - SQL_USER=root
+      - SQL_PASSWORD=dbpass
+      - SQL_HOST=db
+      - SQL_PORT=5432
+      - DATABASE=postgres
+    command: "python manage.py runserver 0.0.0.0:8000"
+
+networks:
+  my_network:
+    driver: bridge
+
+volumes:
+  db:
+    driver: local
