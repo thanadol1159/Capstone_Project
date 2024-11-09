@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import (
-    Account, UserDetail, Role, Permission, RoleHasPermission, Venue, TypeOfvanue, 
+    Account, UserDetail, Role, Permission, RoleHasPermission, Venue, TypeOfVenue, 
     VenueRequest, Booking, VenueApproval, CategoryOfEvent, EvnetOfVenue
 )
 
@@ -31,18 +31,17 @@ class RoleHasPermissionAdmin(admin.ModelAdmin):
 
 @admin.register(Venue)
 class VenueAdmin(admin.ModelAdmin):
-    list_display = ('venue_name', 'price', 'min_capacity', 'max_capacity', 'parking_space')
+    list_display = ('venue_name', 'price')
     search_fields = ('venue_name',)
-    list_filter = ('typeOfvanue',)
 
-@admin.register(TypeOfvanue)
+@admin.register(TypeOfVenue)
 class TypeOfvanueAdmin(admin.ModelAdmin):
     list_display = ('type_name', 'type_description')
     search_fields = ('type_name',)
 
 @admin.register(VenueRequest)
 class VenueRequestAdmin(admin.ModelAdmin):
-    list_display = ('venue_name', 'price', 'min_capacity', 'max_capacity', 'parking_space')
+    list_display = ('venue_name', 'price')
     search_fields = ('venue_name',)
 
 @admin.register(Booking)

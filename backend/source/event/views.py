@@ -9,7 +9,7 @@ from .models import (
     Permission,
     RoleHasPermission,
     Venue,
-    TypeOfvanue,
+    TypeOfVenue,
     VenueRequest,
     Booking,
     VenueApproval,
@@ -57,7 +57,7 @@ class VenueViewSet(viewsets.ModelViewSet):
     serializer_class = VenueSerializer
 
 class TypeOfvanueViewSet(viewsets.ModelViewSet):
-    queryset = TypeOfvanue.objects.all()
+    queryset = TypeOfVenue.objects.all()
     serializer_class = TypeOfvanueSerializer
 
 class VenueRequestViewSet(viewsets.ModelViewSet):

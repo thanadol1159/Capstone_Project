@@ -32,32 +32,44 @@ class RoleHasPermission(models.Model):
     role = models.ForeignKey(Role, on_delete=models.CASCADE)
     permission = models.ForeignKey(Permission, on_delete=models.CASCADE)
 
-class Venue(models.Model):
-    venue_name = models.CharField(max_length=50)
-    price = models.IntegerField()
-    min_capacity = models.IntegerField()
-    max_capacity = models.IntegerField()
-    parking_space = models.IntegerField()
-    additional_information = models.TextField()
-    venue_certification = models.CharField(max_length=255, null=True, blank=True)
-    personal_certification = models.CharField(max_length=255, null=True, blank=True)
-    typeOfvanue = models.ForeignKey('TypeOfvanue', on_delete=models.SET_NULL, null=True, blank=True)
-    venue_request = models.ForeignKey('VenueRequest', on_delete=models.SET_NULL, null=True, blank=True)
-
-class TypeOfvanue(models.Model):
+class TypeOfVenue(models.Model):
     type_name = models.CharField(max_length=45)
     type_description = models.CharField(max_length=45)
 
-class VenueRequest(models.Model):
-    venue_name = models.CharField(max_length=50)
-    price = models.IntegerField()
-    min_capacity = models.IntegerField()
-    max_capacity = models.IntegerField()
-    parking_space = models.IntegerField()
-    additional_information = models.TextField()
+class Venue(models.Model):
+    venue_type = models.CharField(max_length=50,null=True, blank=True) 
+    venue_name = models.CharField(max_length=50,null=True, blank=True)  
+    image = models.ImageField(upload_to='images/', null=True, blank=True)
+    location = models.CharField(max_length=100, null=True, blank=True)
+    category = models.CharField(max_length=50, null=True, blank=True)
+    price = models.IntegerField(null=True, blank=True)
+    area_size = models.CharField(max_length=5, null=True, blank=True)  
+    capacity = models.IntegerField(null=True, blank=True)
+    number_of_rooms = models.IntegerField(null=True, blank=True)
+    parking_space = models.IntegerField(null=True, blank=True)
+    outdoor_spaces = models.IntegerField(null=True, blank=True)
+    additional_information = models.TextField(null=True, blank=True)
     venue_certification = models.CharField(max_length=255, null=True, blank=True)
-    personal_certification = models.CharField(max_length=255, null=True, blank=True)
-    typeOfvanue = models.ForeignKey(TypeOfvanue, on_delete=models.SET_NULL, null=True, blank=True)
+    personal_identification = models.CharField(max_length=255, null=True, blank=True)
+    type_of_venue = models.ForeignKey(TypeOfVenue, on_delete=models.SET_NULL, null=True, blank=True)
+
+
+class VenueRequest(models.Model):
+    venue_type = models.CharField(max_length=50,null=True, blank=True) 
+    venue_name = models.CharField(max_length=50,null=True, blank=True)
+    image = models.ImageField(upload_to='images/', null=True, blank=True)
+    location = models.CharField(max_length=100, null=True, blank=True)
+    category = models.CharField(max_length=50, null=True, blank=True)
+    price = models.IntegerField(null=True, blank=True)
+    area_size = models.CharField(max_length=50, null=True, blank=True) 
+    capacity = models.IntegerField(null=True, blank=True)
+    number_of_rooms = models.IntegerField(null=True, blank=True)
+    parking_space = models.IntegerField(null=True, blank=True)
+    outdoor_spaces = models.IntegerField(null=True, blank=True)
+    additional_information = models.TextField(null=True, blank=True)
+    venue_certification = models.CharField(max_length=255, null=True, blank=True)
+    personal_identification = models.CharField(max_length=255, null=True, blank=True)
+    type_of_venue = models.ForeignKey(TypeOfVenue, on_delete=models.SET_NULL, null=True, blank=True)
 
 class Booking(models.Model):
     id_booking = models.CharField(max_length=45)

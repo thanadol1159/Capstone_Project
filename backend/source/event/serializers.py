@@ -6,7 +6,7 @@ from .models import (
     Permission,
     RoleHasPermission,
     Venue,
-    TypeOfvanue,
+    TypeOfVenue,
     VenueRequest,
     Booking,
     VenueApproval,
@@ -51,7 +51,7 @@ class VenueSerializer(serializers.ModelSerializer):
 
 class TypeOfvanueSerializer(serializers.ModelSerializer):
     class Meta:
-        model = TypeOfvanue
+        model = TypeOfVenue
         fields = '__all__'
 
 class VenueRequestSerializer(serializers.ModelSerializer):
