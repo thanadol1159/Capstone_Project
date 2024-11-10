@@ -2,8 +2,11 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import useFetchVenues from "@/hook/Venue";
 
 const AddVenuePage = () => {
+  const { venues } = useFetchVenues();
+
   return (
     <div className="container mx-auto p-6 space-y-6">
       <h1 className="text-xl font-semibold text-black">Manage & Add Venue</h1>
@@ -18,44 +21,48 @@ const AddVenuePage = () => {
       </Link>
 
       {/* Existing Venue Card */}
-      <div className="p-6 bg-gray-100 rounded-lg">
-        <div className="flex justify-between">
-          <p className="font-bold text-black mb-2">บ้านร่ำรวย</p>
-          {/* Detail Button */}
-          <button className="text-[#B67373] underline">Detail</button>
-        </div>
-        <div className="flex justify-between items-start">
-          <div className="flex gap-4">
-            {/* Venue Image */}
-            <div className="relative w-32 h-32 rounded-lg overflow-hidden">
-              <Image
-                src="/mockve.png"
-                alt="บ้านร่าเริง"
-                fill
-                className="object-cover  rounded-lg border-4 border-[#B67373]"
-              />
-            </div>
-
-            {/* Venue Details */}
-            <div className="space-y-2">
-              <div className="space-y-1">
-                <p className="text-sm text-gray-600">
-                  <span className="font-medium">Owner Name:</span> Manee
-                </p>
+      {venues?.map((venue) => (
+        <div key={venue.id} className="p-6 bg-gray-100 rounded-lg">
+          <div className="flex justify-between">
+            <p className="font-bold text-black mb-2">{venue.venue_name}</p>
+            {/* Detail Button */}
+            <Link
+              href={`/venue/${venue.id}`}
+              className="text-[#B67373] underline"
+            >
+              Detail
+            </Link>
+          </div>
+          <div className="flex justify-between items-start">
+            <div className="flex gap-4">
+              {/* Venue Image */}
+              <div className="relative w-32 h-32 rounded-lg overflow-hidden">
+                <img
+                  src={venue.image} // Use first image from array or fallback
+                  alt={venue.venue_name}
+                  className="object-cover rounded-lg border-4 border-[#B67373]"
+                />
               </div>
 
-              <div className="space-y-1 text-sm text-gray-600">
-                <p>
-                  รายละเอียด: บ้าน 2 ชั้น มี 4 ห้องนอน 2 ห้องน้ำ ประตูน้ำ
-                  ตั้งไม้เยอะ
-                </p>
-                <p>เฟอร์นิเจอร์: โต๊ะทีวี 27 นิ้ว, พัดลม, เตาปิ้งบาบีคิว</p>
-                <p>ประเภทกิจกรรม: งานเลี้ยง, งานแต่ง, งานมั่ว</p>
+              {/* Venue Details */}
+              <div className="space-y-2">
+                <div className="space-y-1">
+                  <p className="text-sm text-gray-600">
+                    <span className="font-medium">Owner Name:</span>{" "}
+                    TEST
+                  </p>
+                </div>
+
+                <div className="space-y-1 text-sm text-gray-600">
+                  <p>รายละเอียด: {venue.additional_information}</p>
+                  <p>เฟอร์นิเจอร์: TEST</p>
+                  <p>ประเภทกิจกรรม: {venue.category}</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      ))}
     </div>
   );
 };

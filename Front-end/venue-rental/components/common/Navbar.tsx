@@ -27,11 +27,14 @@ const Navigation = () => {
               <Link
                 key={item.href}
                 href={item.href}
-                className={
-                  pathname === item.href
-                    ? "text-[#74512D] font-bold" // Active color
-                    : "text-[#D6C0B3] font-bold" // Default color
-                }
+                className={`
+                  ${
+                    pathname === item.href
+                      ? "text-[#74512D] font-bold" // Active
+                      : "text-[#D6C0B3] font-bold" // Default
+                  } 
+                  hover:text-[#74512D] delay-75 duration-200
+                `}
               >
                 {item.label}
               </Link>

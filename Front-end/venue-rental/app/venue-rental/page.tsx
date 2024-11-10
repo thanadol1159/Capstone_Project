@@ -1,42 +1,15 @@
-'use client';
+"use client";
+import useFetchVenues from "@/hook/Venue";
 import VenueCard from "@/components/ui/Venuecards";
-import { Venue } from "@/types/venue";
+import { useRouter } from 'next/navigation';
 
 export default function VenueRental() {
+  const router = useRouter();
+  const { venues } = useFetchVenues();
   const categories = ["All", "Meeting", "Film Studio", "Party"];
-  const venues: Venue[] = [
-    {
-      id: 1,
-      name: "บ้านเฮงเฮง",
-      location: "กรุงเทพ, กรุงเทพ",
-      image: "/mockve.png",
-      tags: ["Meeting", "Party"],
-    },
-    {
-      id: 2,
-      name: "บ้านเฮงเฮง",
-      location: "กรุงเทพ, กรุงเทพ",
-      image: "/mockve.png",
-      tags: ["Meeting", "Party"],
-    },
-    {
-      id: 3,
-      name: "บ้านเฮงเฮง",
-      location: "กรุงเทพ, กรุงเทพ",
-      image: "/mockve.png",
-      tags: ["Meeting", "Party"],
-    },
-    {
-      id: 4,
-      name: "บ้านเฮงเฮง",
-      location: "กรุงเทพ, กรุงเทพ",
-      image: "/mockve.png",
-      tags: ["Meeting", "Party"],
-    },
-  ];
 
-  const handleDetailClick = (id: number) => {
-    console.log(`Navigating to venue ${id}`);
+  const handleDetailClick = (id: string) => {
+    router.push(`/venue/${id}`);
   };
 
   return (
@@ -45,7 +18,6 @@ export default function VenueRental() {
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-4 text-black">Category</h2>
         <div className="flex items-center gap-4">
-          {/* Category Box */}
           <div className="flex gap-2">
             {categories.map((category) => (
               <button
@@ -73,7 +45,7 @@ export default function VenueRental() {
 
       {/* Venue Card */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {venues.map((venue) => (
+        {venues.map((venue: any) => (
           <VenueCard
             key={venue.id}
             {...venue}
