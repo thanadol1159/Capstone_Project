@@ -51,7 +51,7 @@ class Venue(models.Model):
     additional_information = models.TextField(null=True, blank=True)
     venue_certification = models.CharField(max_length=255, null=True, blank=True)
     personal_identification = models.CharField(max_length=255, null=True, blank=True)
-    type_of_venue = models.ForeignKey(TypeOfVenue, on_delete=models.SET_NULL, null=True, blank=True)
+    # type_of_venue = models.ForeignKey(TypeOfVenue, on_delete=models.SET_NULL, null=True, blank=True)
 
 
 class VenueRequest(models.Model):
@@ -69,7 +69,7 @@ class VenueRequest(models.Model):
     additional_information = models.TextField(null=True, blank=True)
     venue_certification = models.CharField(max_length=255, null=True, blank=True)
     personal_identification = models.CharField(max_length=255, null=True, blank=True)
-    type_of_venue = models.ForeignKey(TypeOfVenue, on_delete=models.SET_NULL, null=True, blank=True)
+    # type_of_venue = models.ForeignKey(TypeOfVenue, on_delete=models.SET_NULL, null=True, blank=True)
 
 class Booking(models.Model):
     id_booking = models.CharField(max_length=45)

@@ -9,21 +9,20 @@ const ManageVenue: React.FC = () => {
   const router = useRouter();
 
   const [venueData, setVenueData] = useState<Partial<Venue>>({
-    venue_type: null,
+    venue_type: "",
     venue_name: "",
     image: "",
     location: "",
     category: null,
     price: 0,
     area_size: null,
-    capacity: null,
+    capacity: 0,
     number_of_rooms: null,
     parking_space: 0,
     outdoor_spaces: null,
     additional_information: "",
     venue_certification: "",
     personal_identification: "",
-    type_of_venue: null,
   });
 
   const [files, setFiles] = useState({
@@ -229,8 +228,6 @@ const ManageVenue: React.FC = () => {
               />
               <span>Per</span>
               <select
-                name="type_of_venue"
-                value={venueData.type_of_venue|| undefined} 
                 onChange={handleInputChange}
                 className="p-2 border border-gray-300 rounded-md"
               >

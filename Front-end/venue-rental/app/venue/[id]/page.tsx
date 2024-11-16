@@ -2,12 +2,17 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { VenueCardProps } from "@/types/venue";
 
 export default function VenuePage() {
   const params = useParams();
   const [venue, setVenue] = useState<VenueCardProps | null>(null);
+  const router = useRouter();
+
+  const handleEdit = () => {
+    router.push(`/venue/${params.id}/edit`);
+  };
 
   useEffect(() => {
     const fetchVenueDetail = async () => {
@@ -34,10 +39,7 @@ export default function VenuePage() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-6 text-black">
       {/* Venue Title */}
-      <h1 className="text-2xl font-semibold text-center">
-        {venue.venue_name}
-      </h1>
-
+      <h1 className="text-2xl font-semibold text-center">{venue.venue_name}</h1>
 
       <div className="relative w-full aspect-[16/10]">
         <div className="absolute inset-0 flex items-center justify-center">
@@ -66,9 +68,7 @@ export default function VenuePage() {
 
         <div className="flex items-center gap-4">
           <span className="font-semibold">Capacity: </span>
-          <span>
-            {venue.capacity} people
-          </span>
+          <span>{venue.capacity} people</span>
         </div>
 
         <div className="flex items-center gap-4">
@@ -87,7 +87,11 @@ export default function VenuePage() {
           <span className="font-semibold">Type: </span>
           <span>{venue.venue_type}</span>
         </div>
-
+      </div>
+      <div className="flex justify-end ">
+        <button onClick={handleEdit} className="px-6 py-2 bg-gray-200 text-gray-800 rounded-md">
+          Edit
+        </button>
       </div>
     </div>
   );
