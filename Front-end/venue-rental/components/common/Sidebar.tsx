@@ -18,7 +18,7 @@ const Sidebar: React.FC = () => {
     },
     {
       label: "Manage Venue",
-      href: "/venue/manage",
+      href: "#",
       imgurl: "/logo/Manage_icon.png",
     },
     {

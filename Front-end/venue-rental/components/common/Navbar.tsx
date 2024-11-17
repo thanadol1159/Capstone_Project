@@ -9,7 +9,7 @@ const Navigation = () => {
   const navItems = [
     { label: "Dashboard", href: "/dashboard" },
     { label: "Venue Rental", href: "/venue-rental" },
-    { label: "Management", href: "/management" },
+    { label: "Management", href: "/venue/manage" },
   ];
 
   return (

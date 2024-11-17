@@ -41,10 +41,10 @@ export default function VenuePage() {
       {/* Venue Title */}
       <h1 className="text-2xl font-semibold text-center">{venue.venue_name}</h1>
 
-      <div className="relative w-full aspect-[16/10]">
+      <div className="relative w-full aspect-[20/10]">
         <div className="absolute inset-0 flex items-center justify-center">
           {/* Main Image */}
-          <div className="relative w-[80%] aspect-[16/10]">
+          <div className="relative w-[80%] aspect-[20/10]">
             <img
               src={venue.image}
               alt={venue.venue_name}
@@ -87,11 +87,6 @@ export default function VenuePage() {
           <span className="font-semibold">Type: </span>
           <span>{venue.venue_type}</span>
         </div>
-      </div>
-      <div className="flex justify-end ">
-        <button onClick={handleEdit} className="px-6 py-2 bg-gray-200 text-gray-800 rounded-md">
-          Edit
-        </button>
       </div>
     </div>
   );

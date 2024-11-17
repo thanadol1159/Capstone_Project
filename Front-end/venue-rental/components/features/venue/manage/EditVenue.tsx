@@ -191,9 +191,6 @@ export default function VenueEditPage() {
           <select
             name="type_of_venue"
             value={undefined}
-            onChange={(e) =>
-              setVenue({ ...venue, type_of_venue: e.target.value || "" })
-            }
             className="p-2 border border-gray-300 rounded-md"
           >
             <option value="">Select</option>
