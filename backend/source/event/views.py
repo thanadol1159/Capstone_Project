@@ -2,6 +2,10 @@ from django.shortcuts import render
 
 # Create your views here.
 from rest_framework import viewsets
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from .models import (
     Role,
     Account,
@@ -79,3 +83,17 @@ class CategoryOfEventViewSet(viewsets.ModelViewSet):
 class EvnetOfVenueViewSet(viewsets.ModelViewSet):
     queryset = EvnetOfVenue.objects.all()
     serializer_class = EvnetOfVenueSerializer
+
+class Home(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        content = {'message': 'Hello, World!'}
+        return Response(content)
+    
+class PublicAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        return Response({"message": "Public API"})
