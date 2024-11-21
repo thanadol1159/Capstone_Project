@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.authentication import JWTAuthentication
+
 from .models import (
     Role,
     Account,
@@ -92,8 +93,9 @@ class Home(APIView):
         content = {'message': 'Hello, World!'}
         return Response(content)
     
-class PublicAPIView(APIView):
-    permission_classes = [AllowAny]
-
-    def get(self, request):
-        return Response({"message": "Public API"})
+    
+# class SuperuserOnlyAPIView(APIView):
+#     def get(self, request):
+#         if request.user.is_superuser:
+#             return Response({"message": "You are a superuser!"})
+#         return Response({"message": "Access denied"}, status=403)
