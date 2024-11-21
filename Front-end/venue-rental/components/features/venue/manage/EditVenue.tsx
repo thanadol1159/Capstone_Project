@@ -1,8 +1,8 @@
-// app/venue-rental/[id]/edit/page.tsx
 "use client";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { VenueCardProps } from "@/types/venue";
+import axios from "axios";
 
 export default function VenueEditPage() {
   const params = useParams();
@@ -13,15 +13,13 @@ export default function VenueEditPage() {
     venue_certification: null as File | null,
     personal_identification: null as File | null,
   });
-  
 
   useEffect(() => {
     const fetchVenueDetail = async () => {
       try {
-        const response = await fetch(
+        const { data } = await axios.get(
           `http://localhost:8000/venues/${params.id}`
         );
-        const data = await response.json();
         setVenue(data);
       } catch (error) {
         console.error("Error fetching venue:", error);
@@ -76,20 +74,10 @@ export default function VenueEditPage() {
         );
       }
 
-      const response = await fetch(
-        `http://localhost:8000/venues/${params.id}/`,
-        {
-          method: "PUT",
-          body: formData,
-        }
-      );
+      await axios.put(`http://localhost:8000/venues/${params.id}/`, formData);
 
-      if (response.ok) {
-        router.push(`/venue/${params.id}`);
-        router.refresh();
-      } else {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      router.push(`/venue/${params.id}`);
+      router.refresh();
     } catch (error) {
       console.error("Error updating venue:", error);
     }

@@ -4,23 +4,19 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { VenueCardProps } from "@/types/venue";
+import axios from 'axios'
 
 export default function VenuePage() {
   const params = useParams();
   const [venue, setVenue] = useState<VenueCardProps | null>(null);
   const router = useRouter();
 
-  const handleEdit = () => {
-    router.push(`/venue/${params.id}/edit`);
-  };
-
   useEffect(() => {
     const fetchVenueDetail = async () => {
       try {
-        const response = await fetch(
+        const { data } = await axios.get(
           `http://localhost:8000/venues/${params.id}`
         );
-        const data = await response.json();
         setVenue(data);
       } catch (error) {
         console.error("Error fetching venue:", error);
