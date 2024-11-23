@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import api from "@/hook/api";
+import { apiJson } from "@/hook/api";
 import { login } from "@/hook/action";
 
 const LoginPage = () => {
@@ -13,7 +13,10 @@ const LoginPage = () => {
     e.preventDefault();
 
     try {
-      const response = await api.post("/api/token/", { username, password });
+      const response = await apiJson.post("/api/token/", {
+        username,
+        password,
+      });
       const { access, refresh } = response.data;
       dispatch(login(access, refresh));
       console.log("Already logged in");

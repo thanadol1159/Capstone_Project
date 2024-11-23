@@ -3,7 +3,8 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import useFetchVenues from "@/hook/Venue";
 import { Venue } from "@/types/venue";
-import axios from "axios";
+// import axios from "axios";
+import { apiJson } from "@/hook/api";
 
 interface SlidingStates {
   [key: number]: boolean;
@@ -42,8 +43,8 @@ const AddVenuePage = () => {
     }
 
     try {
-      await axios.delete(`http://localhost:8000/venues/${venueId}/`);
-      window.location.reload();
+      await apiJson.delete(`/venues/${venueId}/`);
+      // window.location.reload();
     } catch (error) {
       console.error("Error deleting venue:", error);
     }
@@ -65,7 +66,7 @@ const AddVenuePage = () => {
 
     try {
       const deletePromises = selectedVenues.map((venueId) =>
-        axios.delete(`http://localhost:8000/venues/${venueId}/`)
+        apiJson.delete(`/venues/${venueId}/`)
       );
 
       const responses = await Promise.all(deletePromises);

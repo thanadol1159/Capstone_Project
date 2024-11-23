@@ -1,13 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { VenueCardProps } from "@/types/venue";
-import axios from "axios";
+// import { VenueCardProps } from "@/types/venue";
+import { Venue } from "@/types/venue";
+import { apiFormData } from "@/hook/api";
+import { apiJson } from "@/hook/api";
 
 export default function VenueEditPage() {
   const params = useParams();
   const router = useRouter();
-  const [venue, setVenue] = useState<VenueCardProps | null>(null);
+  const [venue, setVenue] = useState<Venue | null>(null);
   const [files, setFiles] = useState({
     image: null as File | null,
     venue_certification: null as File | null,
@@ -17,9 +19,7 @@ export default function VenueEditPage() {
   useEffect(() => {
     const fetchVenueDetail = async () => {
       try {
-        const { data } = await axios.get(
-          `http://localhost:8000/venues/${params.id}`
-        );
+        const { data } = await apiJson.get(`/venues/${params.id}`);
         setVenue(data);
       } catch (error) {
         console.error("Error fetching venue:", error);
@@ -54,7 +54,7 @@ export default function VenueEditPage() {
       // Append venue data as JSON string
       Object.keys(venue).forEach((key) => {
         if (key !== "image") {
-          formData.append(key, String(venue[key as keyof VenueCardProps]));
+          formData.append(key, String(venue[key as keyof Venue]));
         }
       });
 
@@ -74,7 +74,7 @@ export default function VenueEditPage() {
         );
       }
 
-      await axios.put(`http://localhost:8000/venues/${params.id}/`, formData);
+      await apiFormData.put(`/venues/${params.id}/`, formData);
 
       router.push(`/venue/${params.id}`);
       router.refresh();

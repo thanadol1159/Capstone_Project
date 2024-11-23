@@ -1,19 +1,35 @@
 import axios from "axios";
 import store from "./store";
 
-const apiClient = axios.create({
+// Create an instance for JSON requests
+const apiJson = axios.create({
   baseURL: "http://localhost:8000",
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-apiClient.interceptors.request.use((config) => {
-  const { accessToken } = store.getState().auth;
-  if (accessToken) {
-    config.headers.Authorization = `Bearer ${accessToken}`;
-  }
-  return config;
+// Create an instance for FormData requests
+const apiFormData = axios.create({
+  baseURL: "http://localhost:8000",
+  headers: {
+    "Content-Type": "multipart/form-data",
+  },
 });
 
-export default apiClient;
+// Add interceptors to include the authorization token for both instances
+const addAuthorizationInterceptor = (instance: any) => {
+  instance.interceptors.request.use((config: any) => {
+    const { accessToken } = store.getState().auth;
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+    return config;
+  });
+};
+
+addAuthorizationInterceptor(apiJson);
+addAuthorizationInterceptor(apiFormData);
+
+// Export both instances
+export { apiJson, apiFormData };
