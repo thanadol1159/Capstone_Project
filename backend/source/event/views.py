@@ -93,9 +93,8 @@ class Home(APIView):
         content = {'message': 'Hello, World!'}
         return Response(content)
     
-    
-# class SuperuserOnlyAPIView(APIView):
-#     def get(self, request):
-#         if request.user.is_superuser:
-#             return Response({"message": "You are a superuser!"})
-#         return Response({"message": "Access denied"}, status=403)
+class SuperuserOnlyAPIView(APIView):
+    def get(self, request):
+        if request.user.is_superuser:
+            return Response({"message": "You are a superuser!"})
+        return Response({"message": "Access denied"}, status=403)

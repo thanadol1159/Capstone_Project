@@ -75,6 +75,7 @@ class Booking(models.Model):
     id_booking = models.CharField(max_length=45)
     check_in = models.DateTimeField()
     check_out = models.DateTimeField()
+    # status = models.enums()
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE)
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
 
