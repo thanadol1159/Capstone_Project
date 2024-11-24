@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Venue } from "@/types/venue";
 import axios from "axios";
+import { apiFormData } from "@/hook/api";
 import { useRouter } from "next/navigation";
 
 const ManageVenue: React.FC = () => {
@@ -76,18 +77,10 @@ const ManageVenue: React.FC = () => {
       });
 
       // Make POST request
-      const response = await axios.post(
-        "http://localhost:8000/venues/",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const response = await apiFormData.post("/venues/", formData);
 
       if (response.status === 201 || response.status === 200) {
-        // Success! Redirect to venues list
+        // Success
         router.push("/venue/manage");
       }
     } catch (err) {

@@ -4,7 +4,6 @@ import "./globals.css";
 import Navigation from "@/components/common/Navbar";
 import Sidebar from "@/components/common/Sidebar";
 import ReduxProvider from "@/components/common/ReduxProvider";
-import store from "@/hook/store";
 
 // const geistSans = localFont({
 //   src: "./fonts/GeistVF.woff",
@@ -29,13 +28,13 @@ export default function RootLayout({
 }>) {
   return (
     <html>
-      <body className="bg-white min-h-screen">
+      <body className="bg-white h-screen">
         <ReduxProvider>
-          <div className="min-h-screen bg-white flex flex-col">
+          <div className="h-screen bg-white flex flex-col">
             <Navigation />
-            <div className="flex flex-1">
+            <div className="flex flex-1 h-screen">
               <Sidebar />
-              <main className="flex-1 p-5">{children}</main>
+              <main className="flex-1">{children}</main>
             </div>
           </div>
         </ReduxProvider>
