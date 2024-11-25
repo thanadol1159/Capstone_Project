@@ -77,8 +77,8 @@ class StatusBooking(models.Model):
 class Booking(models.Model):
     check_in = models.DateTimeField()
     check_out = models.DateTimeField()
-    venue = models.ForeignKey(Venue, on_delete=models.CASCADE)
-    # account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    venue = models.ForeignKey(Venue, on_delete=models.CASCADE, null=True,blank=True)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE, null=True,blank=True)
 
     status_booking = models.ForeignKey(StatusBooking, on_delete=models.CASCADE, null=True,blank=True)
 
