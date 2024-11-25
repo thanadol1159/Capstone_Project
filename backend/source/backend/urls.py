@@ -36,7 +36,7 @@ from event.views import (
     VenueApprovalViewSet,
     CategoryOfEventViewSet,
     EvnetOfVenueViewSet,
-    Home,
+    StatusBookingViewSet
 )
 
 # Create a router and register our viewsets with it.
@@ -53,6 +53,7 @@ router.register(r'bookings', BookingViewSet)
 router.register(r'venue-approvals', VenueApprovalViewSet)
 router.register(r'categories-of-event', CategoryOfEventViewSet)
 router.register(r'event-of-venues', EvnetOfVenueViewSet)
+router.register(r'status-bookings', StatusBookingViewSet, basename='status-booking')
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -65,7 +66,7 @@ schema_view = get_schema_view(
 )
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
-    path('', include(router.urls)),
+    path('api/', include(router.urls)),
     path('admin/', admin.site.urls),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),   

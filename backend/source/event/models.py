@@ -23,7 +23,6 @@ class UserDetail(models.Model):
     address = models.CharField(max_length=255)
     dob = models.DateField()
 
-
 class Permission(models.Model):
     permission_name = models.CharField(max_length=50)
     description = models.TextField()
@@ -71,13 +70,17 @@ class VenueRequest(models.Model):
     personal_identification = models.CharField(max_length=255, null=True, blank=True)
     # type_of_venue = models.ForeignKey(TypeOfVenue, on_delete=models.SET_NULL, null=True, blank=True)
 
+class StatusBooking(models.Model):
+    status =  models.CharField(max_length=25, null=True)
+    description = models.TextField(null=True)
+
 class Booking(models.Model):
-    id_booking = models.CharField(max_length=45)
     check_in = models.DateTimeField()
     check_out = models.DateTimeField()
-    # status = models.enums()
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE)
-    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    # account = models.ForeignKey(Account, on_delete=models.CASCADE)
+
+    status_booking = models.ForeignKey(StatusBooking, on_delete=models.CASCADE, null=True,blank=True)
 
 class VenueApproval(models.Model):
     id_venue_approval = models.CharField(max_length=45)
@@ -95,3 +98,4 @@ class EvnetOfVenue(models.Model):
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE)
     venue_request = models.ForeignKey(VenueRequest, on_delete=models.CASCADE)
     CategoryOfEvent = models.ForeignKey(CategoryOfEvent, on_delete=models.CASCADE)
+

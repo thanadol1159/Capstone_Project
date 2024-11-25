@@ -4,7 +4,7 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from .models import (
@@ -20,6 +20,7 @@ from .models import (
     VenueApproval,
     CategoryOfEvent,
     EvnetOfVenue,
+    StatusBooking,
 )
 from .serializers import (
     RoleSerializer,
@@ -34,6 +35,7 @@ from .serializers import (
     VenueApprovalSerializer,
     CategoryOfEventSerializer,
     EvnetOfVenueSerializer,
+    StatusBookingSerializer,
 )
 
 # ViewSets define the view behavior.
@@ -84,6 +86,10 @@ class CategoryOfEventViewSet(viewsets.ModelViewSet):
 class EvnetOfVenueViewSet(viewsets.ModelViewSet):
     queryset = EvnetOfVenue.objects.all()
     serializer_class = EvnetOfVenueSerializer
+
+class StatusBookingViewSet(viewsets.ModelViewSet):
+    queryset = StatusBooking.objects.all()
+    serializer_class = StatusBookingSerializer
 
 class Home(APIView):
     authentication_classes = [JWTAuthentication]

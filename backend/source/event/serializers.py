@@ -12,6 +12,8 @@ from .models import (
     VenueApproval,
     CategoryOfEvent,
     EvnetOfVenue,
+    StatusBooking,
+
 )
 
 class RoleSerializer(serializers.ModelSerializer):
@@ -59,9 +61,15 @@ class VenueRequestSerializer(serializers.ModelSerializer):
         model = VenueRequest
         fields = '__all__'
 
+class StatusBookingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StatusBooking
+        fields = '__all__'
+
 class BookingSerializer(serializers.ModelSerializer):
-    venue = VenueSerializer()
-    account = AccountSerializer()
+    venue = serializers.PrimaryKeyRelatedField(queryset=Venue.objects.all())
+    # account = AccountSerializer(read_only=True)
+    StatusBooking = StatusBookingSerializer(read_only=True)
 
     class Meta:
         model = Booking
@@ -88,3 +96,4 @@ class EvnetOfVenueSerializer(serializers.ModelSerializer):
     class Meta:
         model = EvnetOfVenue
         fields = '__all__'
+
