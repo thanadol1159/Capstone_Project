@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import Navigation from "@/components/common/Navbar";
 import Sidebar from "@/components/common/Sidebar";
+import ReduxProvider from "@/components/common/ReduxProvider";
 
 // const geistSans = localFont({
 //   src: "./fonts/GeistVF.woff",
@@ -25,22 +26,18 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
     <html>
-      <body className="bg-white min-h-screen">
-        <div className="min-h-screen bg-white flex flex-col">
-          {/* Navigation Bar at the top */}
-          <Navigation />
-
-          {/* Sidebar and main content container */}
-          <div className="flex flex-1">
-            <Sidebar/>
-
-            {/* Main content area */}
-            <main className="flex-1 p-5">{children}</main>
+      <body className="bg-white h-screen">
+        <ReduxProvider>
+          <div className="h-screen bg-white flex flex-col">
+            <Navigation />
+            <div className="flex flex-1 h-screen">
+              <Sidebar />
+              <main className="flex-1">{children}</main>
+            </div>
           </div>
-        </div>
+        </ReduxProvider>
       </body>
     </html>
   );

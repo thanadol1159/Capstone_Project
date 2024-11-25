@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import Link from "next/link";
+import Logout from "@/components/auth/LogOut";
 import { usePathname } from "next/navigation";
 
 const Navigation = () => {
@@ -56,6 +57,10 @@ const Navigation = () => {
             <div className="text-sm">
               <span className="text-gray-700">Username</span>
             </div>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Logout />
           </div>
         </div>
       </div>

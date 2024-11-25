@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 const Sidebar: React.FC = () => {
   const pathname = usePathname();
 
-  if (pathname === "/venue-rental" || pathname.match(/([0-9])/g)) {
+  if (pathname === "/venue-rental" || "/login" || pathname.match(/([0-9])/g)) {
     return null;
   }
 
@@ -30,7 +30,7 @@ const Sidebar: React.FC = () => {
   ];
 
   return (
-    <div className="w-20 min-h-screen bg-gray-300 flex flex-col items-center pt-5">
+    <div className="w-20 h-screen bg-gray-300 flex flex-col items-center pt-5">
       {sideItems.map((item) => (
         <Link key={item.href} href={item.href}>
           <div

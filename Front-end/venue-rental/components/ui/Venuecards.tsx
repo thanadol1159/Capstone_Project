@@ -1,5 +1,5 @@
 "use client";
-import { VenueCardProps } from "@/types/venue";
+import { Venue } from "@/types/venue";
 
 export default function VenueCard({
   id,
@@ -17,13 +17,16 @@ export default function VenueCard({
   additional_information,
   venue_certification,
   personal_identification,
-  type_of_venue,
   onDetailClick,
-}: VenueCardProps) {
+}: Venue) {
   return (
     <div className="bg-white rounded-lg shadow-sm border-[2.5px] border-[#000000]">
       <div className="p-4 ">
-        <img src={image} alt={venue_name} className="w-full h-36 object-cover " />
+        <img
+          src={image}
+          alt={venue_name}
+          className="w-full h-36 object-cover "
+        />
         <div className="flex justify-between items-center mb-2 py-2">
           <p className="text-black font-bold ">{venue_name}</p>
           {/* <div className="flex gap-1">
