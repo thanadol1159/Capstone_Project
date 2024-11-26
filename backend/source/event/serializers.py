@@ -86,7 +86,7 @@ class StatusBookingSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class BookingSerializer(serializers.ModelSerializer):
-    account  = serializers.PrimaryKeyRelatedField(queryset=Venue.objects.all())
+    account  = serializers.PrimaryKeyRelatedField(queryset=Account.objects.all())
     venue = serializers.PrimaryKeyRelatedField(queryset=Venue.objects.all())
     StatusBooking = StatusBookingSerializer(read_only=True)
 
