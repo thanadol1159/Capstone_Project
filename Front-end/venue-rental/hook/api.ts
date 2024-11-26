@@ -1,18 +1,18 @@
 import axios from "axios";
-import { jwtDecode } from "jwt-decode"; // Ensure you import this correctly
+import { jwtDecode } from "jwt-decode";
 import { store, persistor } from "@/hook/store";
 import { logout } from "@/hook/action";
 import { useRouter } from "next/navigation";
 
 const apiJson = axios.create({
-  baseURL: "http://localhost:8000",
+  baseURL: "http://localhost:8000/api",
   headers: {
     "Content-Type": "application/json",
   },
 });
 
 const apiFormData = axios.create({
-  baseURL: "http://localhost:8000",
+  baseURL: "http://localhost:8000/api",
   headers: {
     "Content-Type": "multipart/form-data",
   },

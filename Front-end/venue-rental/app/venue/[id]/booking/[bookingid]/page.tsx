@@ -1,13 +1,21 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Venue } from "@/types/venue";
 import { apiJson } from "@/hook/api";
 import { format } from "date-fns";
+import { jwtDecode } from "jwt-decode";
+import { JwtPayload } from "jwt-decode";
+import { RootState } from "@/hook/store";
+import { useSelector } from "react-redux";
 
 interface BookingFormData {
   check_in: string;
   check_out: string;
+}
+
+interface CustomJwtPayload extends JwtPayload {
+  user_id: string;
 }
 
 export default function BookingPage() {
@@ -70,6 +78,21 @@ export default function BookingPage() {
     }));
   };
 
+  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
+
+  const accountId = useMemo(() => {
+    if (!accessToken) return null;
+
+    try {
+      const decoded = jwtDecode<CustomJwtPayload>(accessToken);
+      console.log(decoded);
+      return decoded.user_id;
+    } catch (error) {
+      console.error("Failed to decode token", error);
+      return null;
+    }
+  }, [accessToken]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -80,13 +103,17 @@ export default function BookingPage() {
     try {
       setIsSubmitting(true);
       const bookingData = {
-        venue: venue,
+        account: 1,
+        venue: params.id,
         check_in: new Date(formData.check_in).toISOString(),
         check_out: new Date(formData.check_out).toISOString(),
       };
 
+      console.log(bookingData);
+
       await apiJson.post("/bookings/", bookingData);
-      router.push(`/bookings/${params.id}/confirmation`);
+
+      // router.push(`/bookings/${params.id}/confirmation`);
     } catch (error) {
       console.error("Error creating booking:", error);
       alert("Failed to create booking. Please try again later.");

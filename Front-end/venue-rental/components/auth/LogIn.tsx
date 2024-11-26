@@ -15,7 +15,7 @@ const LoginPage = () => {
     e.preventDefault();
 
     try {
-      const response = await apiJson.post("/api/token/", {
+      const response = await apiJson.post("/token/", {
         username,
         password,
       });
