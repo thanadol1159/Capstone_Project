@@ -41,7 +41,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     # 'rest_framework.authtoken',
-    # 'rest_framework_simplejwt',
+    'rest_framework_simplejwt',
     'corsheaders',
     'drf_yasg',
     'storages',
@@ -49,18 +49,14 @@ INSTALLED_APPS = [
     'event',
 ]
 
-# REST_FRAMEWORK = {
-#     'DEFAULT_PERMISSION_CLASSES': (
-#         'rest_framework.permissions.IsAuthenticated',
-#     ),
-#     'DEFAULT_AUTHENTICATION_CLASSES': (
-#         'rest_framework_simplejwt.authentication.JWTAuthentication',
-#     ),
-# }
-
-# AUTHENTICATION_BACKENDS = [
-#     'event.backends.AccountAuthBackend',
-# ]
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
+}
 
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
@@ -71,13 +67,13 @@ SWAGGER_SETTINGS = {
         }
     }
 }
-# SIMPLE_JWT = {
-#     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
-#     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=30),
-#     'SLIDING_TOKEN_LIFETIME': timedelta(days=30),
-#     'SLIDING_TOKEN_REFRESH_LIFETIME_LATE_USER': timedelta(days=1),
-#     'SLIDING_TOKEN_LIFETIME_LATE_USER': timedelta(days=30),
-# }
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=30),
+    'SLIDING_TOKEN_LIFETIME': timedelta(days=30),
+    'SLIDING_TOKEN_REFRESH_LIFETIME_LATE_USER': timedelta(days=1),
+    'SLIDING_TOKEN_LIFETIME_LATE_USER': timedelta(days=30),
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

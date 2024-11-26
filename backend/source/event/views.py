@@ -6,6 +6,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import User
 
 from .models import (
     Role,
@@ -47,6 +49,39 @@ class RoleViewSet(viewsets.ModelViewSet):
 class AccountViewSet(viewsets.ModelViewSet):
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
+
+    def post(self, request, *args, **kwargs):
+        # รับข้อมูลจาก Request
+        username = request.data.get('username')
+        password = request.data.get('password')
+
+        # เพิ่มข้อมูลใน Account
+        account = Account.objects.create(username=username, password=password)
+
+        # สร้าง User จาก Account
+        user = User.objects.create(username=username)
+        user.set_password(password)
+        user.save()
+
+        return Response({"message": "Account and User created successfully!"}, status=status.HTTP_201_CREATED)
+
+# class RegisterView(APIView):
+#     def post(self, request, *args, **kwargs):
+#         username = request.data.get('username')
+#         password = request.data.get('password')
+
+#         if not username or not password:
+#             return Response({"error": "Username and password are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+#         if Account.objects.filter(username=username).exists():
+#             return Response({"error": "Username already exists"}, status=status.HTTP_400_BAD_REQUEST)
+
+#         # สร้าง Account และ User
+#         hashed_password = make_password(password)  # Hash password ก่อนเก็บ
+#         account = Account.objects.create(username=username, password=hashed_password)
+#         User.objects.create_user(username=account.username, password=password)
+
+#         return Response({"message": "Account created successfully"}, status=status.HTTP_201_CREATED)
 
 class UserDetailViewSet(viewsets.ModelViewSet):
     queryset = UserDetail.objects.all()
