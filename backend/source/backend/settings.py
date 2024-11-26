@@ -40,23 +40,27 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
-    'rest_framework.authtoken',
-    'rest_framework_simplejwt',
+    # 'rest_framework.authtoken',
+    # 'rest_framework_simplejwt',
     'corsheaders',
     'drf_yasg',
+    'storages',
 
     'event',
-
 ]
 
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
-}
+# REST_FRAMEWORK = {
+#     'DEFAULT_PERMISSION_CLASSES': (
+#         'rest_framework.permissions.IsAuthenticated',
+#     ),
+#     'DEFAULT_AUTHENTICATION_CLASSES': (
+#         'rest_framework_simplejwt.authentication.JWTAuthentication',
+#     ),
+# }
+
+# AUTHENTICATION_BACKENDS = [
+#     'event.backends.AccountAuthBackend',
+# ]
 
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
@@ -67,13 +71,13 @@ SWAGGER_SETTINGS = {
         }
     }
 }
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
-    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=30),
-    'SLIDING_TOKEN_LIFETIME': timedelta(days=30),
-    'SLIDING_TOKEN_REFRESH_LIFETIME_LATE_USER': timedelta(days=1),
-    'SLIDING_TOKEN_LIFETIME_LATE_USER': timedelta(days=30),
-}
+# SIMPLE_JWT = {
+#     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
+#     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=30),
+#     'SLIDING_TOKEN_LIFETIME': timedelta(days=30),
+#     'SLIDING_TOKEN_REFRESH_LIFETIME_LATE_USER': timedelta(days=1),
+#     'SLIDING_TOKEN_LIFETIME_LATE_USER': timedelta(days=30),
+# }
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -85,6 +89,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
 
 CORS_ALLOW_ALL_ORIGINS = True
 # CORS_ALLOWED_ORIGINS = [
@@ -163,11 +168,21 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = BASE_DIR / 'media'
 
+# MINIO_STORAGE_MEDIA_BUCKET_NAME = 'media'
+# MINIO_STORAGE_STATIC_BUCKET_NAME = 'static'
+
+# MINIO_ENDPOINT = 'localhost:9000'
+# MINIO_ACCESS_KEY = 'admin'
+# MINIO_SECRET_KEY = 'password123'
+
+# DEFAULT_FILE_STORAGE = 'event.storages.MediaStorage'
+# STATICFILES_STORAGE = 'event.storages.StaticStorage'
 
 # Default primary key field type
+
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

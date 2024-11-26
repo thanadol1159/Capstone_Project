@@ -11,3 +11,5 @@ django-cors-headers
 boto3
 django-storages
 gunicorn
+djangorestframework-simplejwt
+drf_yasg

@@ -6,10 +6,21 @@ class Role(models.Model):
     description = models.TextField()
 
 class Account(models.Model):
-    username = models.CharField(max_length=50)
-    password = models.CharField(max_length=255)
-    creation_date = models.DateTimeField()
-    last_login = models.DateTimeField()
+    username = models.CharField(max_length=50,null=True, blank=True)
+    password = models.CharField(max_length=255,null=True, blank=True)
+    creation_date = models.DateTimeField(null=True, blank=True)
+    last_login = models.DateTimeField(null=True, blank=True)
+# class Account(AbstractBaseUser):
+#     username = models.CharField(max_length=50, unique=True)
+#     password = models.CharField(max_length=255)
+#     creation_date = models.DateTimeField(auto_now_add=True)
+#     last_login = models.DateTimeField(blank=True, null=True)
+
+#     # Required fields for authentication
+#     is_active = models.BooleanField(default=True)
+
+#     USERNAME_FIELD = 'username'
+#     REQUIRED_FIELDS = []
 
 class UserDetail(models.Model):
     account = models.OneToOneField(Account, on_delete=models.CASCADE)
@@ -75,11 +86,11 @@ class StatusBooking(models.Model):
     description = models.TextField(null=True)
 
 class Booking(models.Model):
-    check_in = models.DateTimeField()
-    check_out = models.DateTimeField()
+    check_in = models.DateTimeField(null=True,blank=True)
+    check_out = models.DateTimeField(null=True,blank=True)
+    total_price = models.IntegerField(null=True,blank=True) 
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE, null=True,blank=True)
     account = models.ForeignKey(Account, on_delete=models.CASCADE, null=True,blank=True)
-
     status_booking = models.ForeignKey(StatusBooking, on_delete=models.CASCADE, null=True,blank=True)
 
 class VenueApproval(models.Model):
