@@ -47,11 +47,11 @@ class TypeOfVenue(models.Model):
     type_description = models.CharField(max_length=45,null=True)
 
 class Venue(models.Model):
-    venue_type = models.ForeignKey(TypeOfVenue,on_delete=models.CASCADE,max_length=50,null=True, blank=True) 
+    venue_type = models.ForeignKey(TypeOfVenue,on_delete=models.CASCADE,null=True, blank=True) 
     venue_name = models.CharField(max_length=50,null=True, blank=True)  
     image = models.ImageField(upload_to='images/', null=True, blank=True)
     location = models.CharField(max_length=100, null=True, blank=True)
-    category = models.CharField(max_length=50, null=True, blank=True)
+    category_event = models.CharField(max_length=50, null=True, blank=True)
     price = models.IntegerField(null=True, blank=True)
     area_size = models.CharField(max_length=5, null=True, blank=True)  
     capacity = models.IntegerField(null=True, blank=True)
@@ -61,14 +61,14 @@ class Venue(models.Model):
     additional_information = models.TextField(null=True, blank=True)
     venue_certification = models.CharField(max_length=255, null=True, blank=True)
     personal_identification = models.CharField(max_length=255, null=True, blank=True)
-
+    venue_owner = models.ForeignKey(Account,on_delete=models.CASCADE, null=True, blank=True)
 
 class VenueRequest(models.Model):
     venue_type = models.ForeignKey(TypeOfVenue,on_delete=models.CASCADE,null=True, blank=True) 
     venue_name = models.CharField(max_length=50,null=True, blank=True)
     image = models.ImageField(upload_to='images/', null=True, blank=True)
     location = models.CharField(max_length=100, null=True, blank=True)
-    category = models.CharField(max_length=50, null=True, blank=True)
+    category_event = models.CharField(max_length=50, null=True, blank=True)
     price = models.IntegerField(null=True, blank=True)
     area_size = models.CharField(max_length=50, null=True, blank=True) 
     capacity = models.IntegerField(null=True, blank=True)
@@ -78,7 +78,8 @@ class VenueRequest(models.Model):
     additional_information = models.TextField(null=True, blank=True)
     venue_certification = models.CharField(max_length=255, null=True, blank=True)
     personal_identification = models.CharField(max_length=255, null=True, blank=True)
-
+    venue_owner = models.ForeignKey(Account,on_delete=models.CASCADE, null=True, blank=True)
+    
 class StatusBooking(models.Model):
     status =  models.CharField(max_length=25, null=True)
     description = models.TextField(null=True)

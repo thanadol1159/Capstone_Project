@@ -60,7 +60,7 @@ class VenueAdmin(admin.ModelAdmin):
         'id', 'venue_type', 'venue_name', 'location', 'price', 'capacity', 'parking_space'
     )
     search_fields = ('venue_name', 'location')
-    list_filter = ('category',)
+    list_filter = ('category_event',)
 
 
 @admin.register(VenueRequest)
@@ -69,7 +69,7 @@ class VenueRequestAdmin(admin.ModelAdmin):
         'id', 'venue_type', 'venue_name', 'location', 'price', 'capacity', 'parking_space'
     )
     search_fields = ('venue_name', 'location')
-    list_filter = ('category',)
+    list_filter = ('category_event',)
 
 
 @admin.register(Booking)
