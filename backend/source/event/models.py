@@ -43,11 +43,11 @@ class RoleHasPermission(models.Model):
     permission = models.ForeignKey(Permission, on_delete=models.CASCADE)
 
 class TypeOfVenue(models.Model):
-    type_name = models.CharField(max_length=45)
-    type_description = models.CharField(max_length=45)
+    type_name = models.CharField(max_length=45,null=True)
+    type_description = models.CharField(max_length=45,null=True)
 
 class Venue(models.Model):
-    venue_type = models.CharField(max_length=50,null=True, blank=True) 
+    venue_type = models.ForeignKey(TypeOfVenue,on_delete=models.CASCADE,max_length=50,null=True, blank=True) 
     venue_name = models.CharField(max_length=50,null=True, blank=True)  
     image = models.ImageField(upload_to='images/', null=True, blank=True)
     location = models.CharField(max_length=100, null=True, blank=True)
@@ -61,11 +61,10 @@ class Venue(models.Model):
     additional_information = models.TextField(null=True, blank=True)
     venue_certification = models.CharField(max_length=255, null=True, blank=True)
     personal_identification = models.CharField(max_length=255, null=True, blank=True)
-    # type_of_venue = models.ForeignKey(TypeOfVenue, on_delete=models.SET_NULL, null=True, blank=True)
 
 
 class VenueRequest(models.Model):
-    venue_type = models.CharField(max_length=50,null=True, blank=True) 
+    venue_type = models.ForeignKey(TypeOfVenue,on_delete=models.CASCADE,null=True, blank=True) 
     venue_name = models.CharField(max_length=50,null=True, blank=True)
     image = models.ImageField(upload_to='images/', null=True, blank=True)
     location = models.CharField(max_length=100, null=True, blank=True)
@@ -79,7 +78,6 @@ class VenueRequest(models.Model):
     additional_information = models.TextField(null=True, blank=True)
     venue_certification = models.CharField(max_length=255, null=True, blank=True)
     personal_identification = models.CharField(max_length=255, null=True, blank=True)
-    # type_of_venue = models.ForeignKey(TypeOfVenue, on_delete=models.SET_NULL, null=True, blank=True)
 
 class StatusBooking(models.Model):
     status =  models.CharField(max_length=25, null=True)

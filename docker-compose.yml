@@ -69,3 +69,4 @@ volumes:
     driver: local
   minio_data:
     driver: local
+  data:
