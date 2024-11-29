@@ -4,19 +4,20 @@ import { useParams, useRouter } from "next/navigation";
 import { Venue } from "@/types/venue";
 import { apiJson } from "@/hook/api";
 import { format, differenceInDays } from "date-fns";
-import { jwtDecode } from "jwt-decode";
-import { JwtPayload } from "jwt-decode";
-import { RootState } from "@/hook/store";
-import { useSelector } from "react-redux";
+// import { jwtDecode } from "jwt-decode";
+// import { JwtPayload } from "jwt-decode";
+// import { RootState } from "@/hook/store";
+// import { useSelector } from "react-redux";
+import { useAccountId } from "@/hook/userid";
 
 interface BookingFormData {
   check_in: string;
   check_out: string;
 }
 
-interface CustomJwtPayload extends JwtPayload {
-  user_id: string;
-}
+// interface CustomJwtPayload extends JwtPayload {
+//   user_id: string;
+// }
 
 export default function BookingPage() {
   const params = useParams();
@@ -31,6 +32,10 @@ export default function BookingPage() {
     check_in?: string;
     check_out?: string;
   }>({});
+
+  const accountId = useAccountId();
+
+  console.log(accountId);
 
   useEffect(() => {
     const fetchVenueDetail = async () => {
@@ -78,19 +83,19 @@ export default function BookingPage() {
     }));
   };
 
-  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
+  // const accessToken = useSelector((state: RootState) => state.auth.accessToken);
 
-  const accountId = useMemo(() => {
-    if (!accessToken) return null;
+  // const accountId = useMemo(() => {
+  //   if (!accessToken) return null;
 
-    try {
-      const decoded = jwtDecode<CustomJwtPayload>(accessToken);
-      return decoded.user_id;
-    } catch (error) {
-      console.error("Failed to decode token", error);
-      return null;
-    }
-  }, [accessToken]);
+  //   try {
+  //     const decoded = jwtDecode<CustomJwtPayload>(accessToken);
+  //     return decoded.user_id;
+  //   } catch (error) {
+  //     console.error("Failed to decode token", error);
+  //     return null;
+  //   }
+  // }, [accessToken]);
 
   // Calculate total nights and total price
   const totalNights = useMemo(() => {

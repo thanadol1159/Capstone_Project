@@ -13,8 +13,11 @@ const Navigation = () => {
     (state: RootState) => state.auth
   );
 
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+
   if (pathname === "/login") {
-    return null;
+    // Ensure hooks are still called even if navigation is hidden
+    return <div className="hidden" />;
   }
 
   const navItems = [
@@ -29,8 +32,6 @@ const Navigation = () => {
       ],
     },
   ];
-
-  const [dropdownVisible, setDropdownVisible] = useState(false);
 
   const handleMouseEnter = () => {
     setDropdownVisible(true);

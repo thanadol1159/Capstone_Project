@@ -111,9 +111,9 @@ export default function VenueEditPage() {
           <div className="flex gap-2">
             <button
               type="button"
-              onClick={() => setVenue({ ...venue, venue_type: "Large Venue" })}
+              onClick={() => setVenue({ ...venue, venue_type: 1 })}
               className={`px-4 py-2 rounded-md border ${
-                venue.venue_type === "Large Venue"
+                venue.venue_type === 1
                   ? "bg-black text-white hover:bg-gray-800 font-bold"
                   : "bg-white hover:bg-gray-50"
               }`}
@@ -122,9 +122,9 @@ export default function VenueEditPage() {
             </button>
             <button
               type="button"
-              onClick={() => setVenue({ ...venue, venue_type: "Room Space" })}
+              onClick={() => setVenue({ ...venue, venue_type: 2 })}
               className={`px-4 py-2 rounded-md border ${
-                venue.venue_type === "Room Space"
+                venue.venue_type === 2
                   ? "bg-black text-white hover:bg-gray-800 font-bold"
                   : "bg-white hover:bg-gray-50"
               }`}

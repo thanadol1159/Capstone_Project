@@ -5,16 +5,19 @@ import { Venue } from "@/types/venue";
 import axios from "axios";
 import { apiFormData } from "@/hook/api";
 import { useRouter } from "next/navigation";
+import { useAccountId } from "@/hook/userid";
 
 const ManageVenue: React.FC = () => {
   const router = useRouter();
 
+  const accountId = useAccountId();
+  console.log(accountId);
   const [venueData, setVenueData] = useState<Partial<Venue>>({
-    venue_type: "",
+    venue_type: 0,
     venue_name: "",
     image: "",
     location: "",
-    category: null,
+    category_event: null,
     price: 0,
     area_size: null,
     capacity: 0,
@@ -24,6 +27,7 @@ const ManageVenue: React.FC = () => {
     additional_information: "",
     venue_certification: "",
     personal_identification: "",
+    venue_owner: Number(accountId),
   });
 
   const [files, setFiles] = useState({
@@ -106,11 +110,11 @@ const ManageVenue: React.FC = () => {
                 onClick={() =>
                   setVenueData((prev) => ({
                     ...prev,
-                    venue_type: "Large Venue",
+                    venue_type: 1,
                   }))
                 }
                 className={`px-6 py-[2px] rounded-lg border-black border-[1px] ${
-                  venueData.venue_type === "Large Venue"
+                  venueData.venue_type === 1
                     ? "bg-black text-white"
                     : "bg-white"
                 }`}
@@ -122,16 +126,16 @@ const ManageVenue: React.FC = () => {
                 onClick={() =>
                   setVenueData((prev) => ({
                     ...prev,
-                    venue_type: "Room Space",
+                    venue_type: 2,
                   }))
                 }
                 className={`px-6 rounded-lg border-black border-[1px] ${
-                  venueData.venue_type === "Room Space"
+                  venueData.venue_type === 2
                     ? "bg-black text-white"
                     : "bg-white"
                 }`}
               >
-                Room Space
+                Room Spacess
               </button>
             </div>
           </div>
@@ -184,7 +188,7 @@ const ManageVenue: React.FC = () => {
             <div className="flex gap-2 items-center">
               <select
                 name="category"
-                value={venueData.category || ""}
+                value={venueData.category_event || ""}
                 onChange={handleInputChange}
                 className="p-2 border border-gray-300 rounded-md"
               >

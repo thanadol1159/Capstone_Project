@@ -1,8 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useFetchVenues from "@/hook/Venue";
 import VenueCard from "@/components/ui/Venuecards";
 import { useRouter } from "next/navigation";
+import { apiJson } from "@/hook/api";
 
 export default function VenueRental() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function VenueRental() {
 
   const handleCategoryClick = (category: string) => {
     setSelectedCategory(category);
+    console.log(selectedCategory);
   };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,7 +28,7 @@ export default function VenueRental() {
   // Filter venues based on the selected category and search query
   const filteredVenues = venues.filter((venue: any) => {
     const matchesCategory =
-      selectedCategory === "All" || venue.category === selectedCategory;
+      selectedCategory === "All" || venue.category_event === selectedCategory;
     const matchesSearch = venue.venue_name.toLowerCase().includes(searchQuery);
     return matchesCategory && matchesSearch;
   });

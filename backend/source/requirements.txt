@@ -13,3 +13,4 @@ django-storages
 gunicorn
 djangorestframework-simplejwt
 drf_yasg
+Pillow
