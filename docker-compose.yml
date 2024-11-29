@@ -6,6 +6,8 @@ services:
       POSTGRES_DB: postgres
       POSTGRES_USER: root
       POSTGRES_PASSWORD: dbpass
+    ports:
+      - 5432:5432
     networks:
       - my_network
     volumes:
@@ -49,8 +51,8 @@ services:
     build:
       context: Front-end
       dockerfile: Dockerfile
-    ports:
-      - 3100:3000
+    # ports:
+    #   - 3100:3000
     volumes:
       - ./Front-end/venue-rental/:/app
     depends_on:
