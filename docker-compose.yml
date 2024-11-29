@@ -6,6 +6,8 @@ services:
     - "443:443"
     volumes:
     - ./nginx.conf:/etc/nginx/conf.d/nginx.conf
+    depends_on:
+      - next
     networks:
       - my_network
 
