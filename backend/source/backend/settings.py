@@ -90,7 +90,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 #     "http://localhost:3000",
 #     "http://cp24nk1.sit.kmutt.ac.th/",
 # ]
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['cp24nk1.sit.kmutt.ac.th', 'localhost', '127.0.0.1']
 ROOT_URLCONF = 'backend.urls'
 
 TEMPLATES = [
