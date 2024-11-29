@@ -42,9 +42,9 @@ services:
       - SQL_USER=root
       - SQL_PASSWORD=dbpass
       - SQL_HOST=db
-      - SQL_PORT=5432
+      - SQL_PORT=5173
       - DATABASE=postgres
-    command: "python manage.py runserver 0.0.0.0:8000"
+    command: "python manage.py runserver 0.0.0.0:8080"
 
   next:
     container_name: next

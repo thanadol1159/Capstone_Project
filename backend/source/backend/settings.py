@@ -90,7 +90,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 #     "http://localhost:3000",
 #     "http://cp24nk1.sit.kmutt.ac.th/",
 # ]
-ALLOWED_HOSTS = ['cp24nk1.sit.kmutt.ac.th', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['cp24nk1.sit.kmutt.ac.th', 'localhost', '127.0.0.1','capstone24.sit.kmutt.ac.th/']
 ROOT_URLCONF = 'backend.urls'
 
 TEMPLATES = [
@@ -122,7 +122,7 @@ DATABASES = {
         "USER": os.getenv('DB_USER','root'),
         "PASSWORD": os.getenv('DB_PASSWORD','dbpass'),
         "HOST": os.getenv('DB_NAME','db'),
-        "PORT": os.getenv('DB_PORT','5432'),
+        "PORT": os.getenv('DB_PORT','5173'),
     }
 }
 
