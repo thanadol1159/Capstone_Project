@@ -6,6 +6,8 @@ services:
       POSTGRES_DB: postgres
       POSTGRES_USER: root
       POSTGRES_PASSWORD: dbpass
+    ports:
+      - 5432:5432
     networks:
       - my_network
     volumes:
