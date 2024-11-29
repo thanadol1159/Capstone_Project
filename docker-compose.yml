@@ -13,13 +13,13 @@ services:
     volumes:
       - db:/var/lib/postgresql/data/
 
-  adminer:
-    container_name: adminer
-    image: adminer
-    networks:
-      - my_network
-    ports:
-      - 8000:8000
+  # adminer:
+  #   container_name: adminer
+  #   image: adminer
+  #   networks:
+  #     - my_network
+  #   ports:
+  #     - 8000:8000
 
   django:
     container_name: django
