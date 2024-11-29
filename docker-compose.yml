@@ -33,7 +33,7 @@ services:
     user: 1000:1000
     depends_on:
       - db
-      - minio
+      # - minio
     networks:
       - my_network
     environment:
