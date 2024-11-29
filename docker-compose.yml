@@ -1,4 +1,15 @@
 services:
+
+ reverse-proxy:
+  image: nginx:latest
+  ports:
+   - "80:80"
+   - "443:443"
+  volumes:
+   - ./ssl/:/etc/nginx/ssl
+   
+   - ./nginx.conf:/etc/nginx/conf.d/nginx.conf
+
   db:
     container_name: db
     image: postgres:15.5
