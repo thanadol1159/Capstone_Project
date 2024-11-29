@@ -27,24 +27,6 @@ class AccountSerializer(serializers.ModelSerializer):
         model = Account
         fields = '__all__'
 
-# class AccountLoginSerializer(serializers.Serializer):
-#     username = serializers.CharField()
-#     password = serializers.CharField(write_only=True)
-
-#     def validate(self, data):
-#         username = data.get('username')
-#         password = data.get('password')
-
-#         account = Account.objects.filter(username=username).first()
-#         if not account or not account.check_password(password):
-#             raise serializers.ValidationError("Invalid username or password.")
-
-#         refresh = RefreshToken.for_user(account)
-#         return {
-#             'refresh': str(refresh),
-#             'access': str(refresh.access_token),
-#         }
-
 class UserDetailSerializer(serializers.ModelSerializer):
     account = AccountSerializer()
 
