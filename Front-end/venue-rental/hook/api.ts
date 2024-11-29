@@ -29,7 +29,7 @@ const refreshAccessToken = async () => {
     }
 
     const response = await axios.post(
-      "http://localhost:8000/api/token/refresh/",
+      "http://capstone24.sit.kmutt.ac.th:8080/nk1/api/token/refresh/",
       {
         refresh: refreshToken,
       }
