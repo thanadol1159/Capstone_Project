@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Venue } from "@/types/venue";
 import { apiJson } from "@/hook/api";
-import { format } from "date-fns";
+import { format, differenceInDays } from "date-fns";
 import { jwtDecode } from "jwt-decode";
 import { JwtPayload } from "jwt-decode";
 import { RootState } from "@/hook/store";
@@ -35,7 +35,7 @@ export default function BookingPage() {
   useEffect(() => {
     const fetchVenueDetail = async () => {
       try {
-        const { data } = await apiJson.get(`/venues/${params.id}`);
+        const { data } = await apiJson.get(`/venues/${params.id}/`);
         setVenue(data);
       } catch (error) {
         console.error("Error fetching venue:", error);
@@ -85,13 +85,25 @@ export default function BookingPage() {
 
     try {
       const decoded = jwtDecode<CustomJwtPayload>(accessToken);
-      console.log(decoded);
       return decoded.user_id;
     } catch (error) {
       console.error("Failed to decode token", error);
       return null;
     }
   }, [accessToken]);
+
+  // Calculate total nights and total price
+  const totalNights = useMemo(() => {
+    if (!venue) return 0;
+    const check_in_date = new Date(formData.check_in);
+    const check_out_date = new Date(formData.check_out);
+    return differenceInDays(check_out_date, check_in_date);
+  }, [formData.check_in, formData.check_out, venue]);
+
+  const totalPrice = useMemo(() => {
+    if (!venue) return 0;
+    return totalNights * venue.price;
+  }, [totalNights, venue]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,17 +115,16 @@ export default function BookingPage() {
     try {
       setIsSubmitting(true);
       const bookingData = {
-        account: 1,
+        account: accountId,
         venue: params.id,
         check_in: new Date(formData.check_in).toISOString(),
         check_out: new Date(formData.check_out).toISOString(),
+        total_price: totalPrice,
       };
-
-      console.log(bookingData);
 
       await apiJson.post("/bookings/", bookingData);
 
-      // router.push(`/bookings/${params.id}/confirmation`);
+      router.push(`/dashboard`);
     } catch (error) {
       console.error("Error creating booking:", error);
       alert("Failed to create booking. Please try again later.");
@@ -189,7 +200,11 @@ export default function BookingPage() {
                 <h3 className="font-semibold mb-2">Booking Summary</h3>
                 <div className="space-y-2 text-gray-600">
                   <p>Venue: {venue.venue_name}</p>
-                  <p>Price: ฿{venue.price}</p>
+                  <p>Price per Night: ฿{venue.price}</p>
+                  <p>Total Nights: {totalNights}</p>
+                  <p className="font-bold text-black">
+                    Total Price: ฿{totalPrice}
+                  </p>
                 </div>
               </div>
             )}

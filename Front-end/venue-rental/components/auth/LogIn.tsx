@@ -20,12 +20,16 @@ const LoginPage = () => {
         password,
       });
       const { access, refresh, expired } = response.data;
-      dispatch(login(access, refresh, expired));
+      dispatch(login(access, refresh, expired, username));
       router.push("/venue-rental");
       console.log("Already logged in");
     } catch (error) {
       console.error("Error logging in:", error);
     }
+  };
+
+  const handleBack = () => {
+    router.back();
   };
 
   return (
@@ -104,6 +108,7 @@ const LoginPage = () => {
           <div className="flex justify-end mt-6 space-x-10">
             <button
               type="button"
+              onClick={handleBack}
               className="py-2 px-4 border rounded-lg text-gray-700 hover:bg-gray-200 transition duration-200"
             >
               Back

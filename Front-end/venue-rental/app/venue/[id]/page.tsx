@@ -18,7 +18,7 @@ export default function VenuePage() {
   useEffect(() => {
     const fetchVenueDetail = async () => {
       try {
-        const { data } = await apiJson.get(`/venues/${params.id}`);
+        const { data } = await apiJson.get(`/venues/${params.id}/`);
         setVenue(data);
       } catch (error) {
         console.error("Error fetching venue:", error);
@@ -53,8 +53,8 @@ export default function VenuePage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 text-black">
-      <h1 className="text-2xl font-semibold text-center">{venue.venue_name}</h1>
+    <div className="max-w-7xl mx-auto px-4 py-6 text-black ">
+      <h1 className="text-2xl font-semibold text-center mb-4 mt-2">{venue.venue_name}</h1>
       <div className="relative w-full aspect-[20/10]">
         <img
           src={venue.image}
@@ -72,7 +72,7 @@ export default function VenuePage() {
           <span>
             {new Intl.NumberFormat("en-US", {
               style: "currency",
-              currency: "USD",
+              currency: "THB",
             }).format(venue.price)}
           </span>
         </div>

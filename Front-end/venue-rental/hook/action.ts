@@ -1,13 +1,15 @@
 export const login = (
   accessToken: string,
   refreshToken: string,
-  expiredIn: number
+  expiredIn: number,
+  username: string
 ) => ({
   type: "LOGIN",
   payload: {
     accessToken,
     refreshToken,
     tokenExpired: Date.now() + expiredIn * 1000,
+    username,
   },
 });
 

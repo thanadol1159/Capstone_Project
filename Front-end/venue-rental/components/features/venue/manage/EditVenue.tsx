@@ -19,7 +19,7 @@ export default function VenueEditPage() {
   useEffect(() => {
     const fetchVenueDetail = async () => {
       try {
-        const { data } = await apiJson.get(`/venues/${params.id}`);
+        const { data } = await apiJson.get(`/venues/${params.id}/`);
         setVenue(data);
       } catch (error) {
         console.error("Error fetching venue:", error);
@@ -95,7 +95,7 @@ export default function VenueEditPage() {
     <div className="w-full max-w-lg mx-auto p-2 text-black">
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Preview Image */}
-        <div className="overflow-hidden">
+        <div className="overflow-hidden mt-6">
           <div className="p-0">
             <img
               src={venue.image}
@@ -107,14 +107,14 @@ export default function VenueEditPage() {
 
         {/* Venue Type */}
         <div className="space-y-2">
-          <div className="text-sm font-medium">Venue Type :</div>
+          <div className="text-sm font-bold">Venue Type :</div>
           <div className="flex gap-2">
             <button
               type="button"
               onClick={() => setVenue({ ...venue, venue_type: "Large Venue" })}
               className={`px-4 py-2 rounded-md border ${
                 venue.venue_type === "Large Venue"
-                  ? "bg-black text-white hover:bg-gray-800"
+                  ? "bg-black text-white hover:bg-gray-800 font-bold"
                   : "bg-white hover:bg-gray-50"
               }`}
             >
@@ -125,7 +125,7 @@ export default function VenueEditPage() {
               onClick={() => setVenue({ ...venue, venue_type: "Room Space" })}
               className={`px-4 py-2 rounded-md border ${
                 venue.venue_type === "Room Space"
-                  ? "bg-black text-white hover:bg-gray-800"
+                  ? "bg-black text-white hover:bg-gray-800 font-bold"
                   : "bg-white hover:bg-gray-50"
               }`}
             >
@@ -136,7 +136,7 @@ export default function VenueEditPage() {
 
         {/* Venue Name */}
         <div className="space-y-2">
-          <div className="text-sm font-medium">Venue Name :</div>
+          <div className="text-sm font-bold">Venue Name :</div>
           <input
             type="text"
             value={venue.venue_name}
@@ -165,8 +165,8 @@ export default function VenueEditPage() {
         </div>
 
         {/* Price */}
-        <div className="flex items-center gap-2 space-y-2 ">
-          <div className="text-lg font-medium w-[20%]">Price :</div>
+        <div className="flex items-center gap-2">
+          <div className="font-medium w-[15%]">Price :</div>
           <input
             type="number"
             value={venue.price}
@@ -175,19 +175,19 @@ export default function VenueEditPage() {
             }
             className="w-full p-2 border rounded-md"
           />
-          <span> Per </span>
-          <select
+          <p>THB</p>
+          {/* <select
             name="type_of_venue"
             value={undefined}
             className="p-2 border border-gray-300 rounded-md"
           >
             <option value="">Select</option>
-          </select>
+          </select> */}
         </div>
 
         {/* Capacity */}
-        <div className="space-y-2">
-          <div className="text-sm font-medium">Capacity :</div>
+        <div className="flex items-center gap-2">
+          <div className="font-medium w-[25%]">Capacity :</div>
           <input
             type="number"
             value={venue.capacity}
@@ -196,11 +196,12 @@ export default function VenueEditPage() {
             }
             className="w-full p-2 border rounded-md"
           />
+          <p>Persons</p>
         </div>
 
         {/* Parking Space */}
-        <div className="space-y-2">
-          <div className="text-sm font-medium">Parking Space :</div>
+        <div className="flex items-center gap-2">
+          <div className="font-medium w-[50%]">Parking Space (Car):</div>
           <input
             type="number"
             value={venue.parking_space}
@@ -213,7 +214,7 @@ export default function VenueEditPage() {
 
         {/* Additional Information */}
         <div className="space-y-2">
-          <div className="text-sm font-medium">Additional Information :</div>
+          <div className="font-medium">Additional Information :</div>
           <textarea
             value={venue.additional_information}
             onChange={(e) =>

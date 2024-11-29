@@ -90,11 +90,11 @@ const ManageVenue: React.FC = () => {
 
   return (
     <div className="max-w-full mx-auto p-6 text-black">
-      <div className="flex items-center gap-2 mb-6 text-sm">
+      {/* <div className="flex items-center gap-2 mb-6 text-sm">
         <span className="text-black">Rental Management</span>
         <span className="text-black">&gt;</span>
         <span className="text-gray-900">Add Venue</span>
-      </div>
+      </div> */}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="bg-gray-50 p-6 rounded-lg space-y-4">
@@ -189,10 +189,9 @@ const ManageVenue: React.FC = () => {
                 className="p-2 border border-gray-300 rounded-md"
               >
                 <option value="">Select</option>
-                <option value="party">Party</option>
-                <option value="meeting">Meeting</option>
-                <option value="conference">Conference</option>
-                <option value="wedding">Wedding</option>
+                <option value="Party">Party</option>
+                <option value="Meeting">Meeting</option>
+                <option value="Studio">Studio</option>
               </select>
             </div>
           </div>
