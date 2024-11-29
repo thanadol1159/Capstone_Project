@@ -1,12 +1,11 @@
 services:
-
- reverse-proxy:
-  image: nginx:latest
-  ports:
-   - "80:80"
-   - "443:443"
-  volumes:
-   - ./nginx.conf:/etc/nginx/conf.d/nginx.conf
+  reverse-proxy:
+    image: nginx:latest
+    ports:
+    - "80:80"
+    - "443:443"
+    volumes:
+    - ./nginx.conf:/etc/nginx/conf.d/nginx.conf
 
   db:
     container_name: db
