@@ -45,6 +45,22 @@ services:
       - DATABASE=postgres
     command: "python manage.py runserver 0.0.0.0:8000"
 
+  next:
+    container_name: next
+    build:
+      context: Front-end
+      dockerfile: Dockerfile
+    ports:
+      - 3100:3000
+    volumes:
+      - ./Front-end/venue-rental/:/app
+    depends_on:
+      - django
+    user: 1000:1000
+    networks:
+      - my_network
+    command: sh -c "npx next telemetry disable && npm install && npm run dev"
+
   minio:
     image: minio/minio
     container_name: minio
