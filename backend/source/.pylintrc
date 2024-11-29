@@ -1,0 +1,6 @@
+[MESSAGES CONTROL]
+disable=missing-docstring,line-too-long
+
+[MASTER]
+load-plugins=pylint_django
+init-hook='import os, sys; os.environ["DJANGO_SETTINGS_MODULE"] = "myshop.settings"; sys.path.append("/app/backend/source")'

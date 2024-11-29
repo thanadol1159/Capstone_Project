@@ -1,0 +1,16 @@
+Django>=4.0,<5.0
+environs
+psycopg2-binary>=2.9,<3.0
+pytest
+pytest-django
+pylint-django
+djangorestframework
+markdown      
+django-filter 
+django-cors-headers
+boto3
+django-storages
+gunicorn
+djangorestframework-simplejwt
+drf_yasg
+Pillow
