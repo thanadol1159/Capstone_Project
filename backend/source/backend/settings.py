@@ -122,7 +122,7 @@ DATABASES = {
         "USER": os.getenv('DB_USER','root'),
         "PASSWORD": os.getenv('DB_PASSWORD','dbpass'),
         "HOST": os.getenv('DB_NAME','db'),
-        "PORT": os.getenv('DB_PORT','5173'),
+        "PORT": os.getenv('DB_PORT','5432'),
     }
 }
 

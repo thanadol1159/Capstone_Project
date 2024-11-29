@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: dbpass
     ports:
-      - 5173:5173
+      - 5173:5432
     networks:
       - my_network
     volumes:
@@ -42,7 +42,7 @@ services:
       - SQL_USER=root
       - SQL_PASSWORD=dbpass
       - SQL_HOST=db
-      - SQL_PORT=5173
+      - SQL_PORT=5432
       - DATABASE=postgres
     command: "python manage.py runserver 0.0.0.0:8080"
 
