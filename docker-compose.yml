@@ -42,7 +42,7 @@ services:
       - SQL_USER=root
       - SQL_PASSWORD=dbpass
       - SQL_HOST=db
-      - SQL_PORT=5432
+      - SQL_PORT=5173
       - DATABASE=postgres
     command: "python manage.py runserver 0.0.0.0:8080"
 
@@ -62,20 +62,20 @@ services:
       - my_network
     command: sh -c "npm install && npm run dev"
 
-  minio:
-    image: minio/minio
-    container_name: minio
-    command: server /data --console-address ":9001"
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    environment:
-      MINIO_ROOT_USER: admin
-      MINIO_ROOT_PASSWORD: password123
-    volumes:
-      - minio_data:/data
-    networks:
-      - my_network
+  # minio:
+  #   image: minio/minio
+  #   container_name: minio
+  #   command: server /data --console-address ":9001"
+  #   ports:
+  #     - "9000:9000"
+  #     - "9001:9001"
+  #   environment:
+  #     MINIO_ROOT_USER: admin
+  #     MINIO_ROOT_PASSWORD: password123
+  #   volumes:
+  #     - minio_data:/data
+  #   networks:
+  #     - my_network
 
 networks:
   my_network:
