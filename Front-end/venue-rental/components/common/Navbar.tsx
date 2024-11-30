@@ -16,7 +16,6 @@ const Navigation = () => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
 
   if (pathname === "/login") {
-    // Ensure hooks are still called even if navigation is hidden
     return <div className="hidden" />;
   }
 
