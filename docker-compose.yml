@@ -61,12 +61,12 @@ services:
   next:
     container_name: next
     build:
-      context: ./Front-end/venue-rental
-      dockerfile: Dockerfile
+      context: ./Front-end/next-app
+      dockerfile: prod.Dockerfile
     ports:
       - 3000:3000
-    volumes:
-      - ./Front-end/venue-rental/:/app
+    # volumes:
+    #   - ./Front-end/venue-rental/:/app
     depends_on:
       - django
     user: 1000:1000
