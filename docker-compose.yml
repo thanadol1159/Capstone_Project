@@ -66,7 +66,7 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - ./Front-end/venue-rental/:/app
+      - ./Front-end/venue-rental
     depends_on:
       - django
     user: 1000:1000
