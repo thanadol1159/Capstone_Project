@@ -101,7 +101,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         # Retrieve the associated Account model instance (assuming the username is unique)
         try:
             account = Account.objects.get(username=user.username)
-            token['account_id'] = account.id  # Add account_id to the JWT token payload
+            token['account_id'] = account.id  
         except Account.DoesNotExist:
             token['account_id'] = None  # Or handle the case when the account is not found
         
