@@ -7,7 +7,7 @@ export default function VenueCard({
   venue_name,
   image,
   location,
-  category,
+  category_event,
   price,
   area_size,
   capacity,

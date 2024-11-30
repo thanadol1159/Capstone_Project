@@ -221,7 +221,7 @@ const AddVenuePage = () => {
                 </p>
                 <p>รายละเอียด: {venue.additional_information}</p>
                 <p>เฟอร์นิเจอร์: TEST</p>
-                <p>ประเภทกิจกรรม: {venue.category}</p>
+                <p>ประเภทกิจกรรม: {venue.category_event}</p>
               </div>
             </div>
 
