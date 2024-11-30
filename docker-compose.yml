@@ -58,6 +58,7 @@ services:
     volumes:
       - ./vuejs:/project
       - /project/node_modules
+      - ./vuejs/node_modules:/project/node_modules
     networks:
       - my_network
 
