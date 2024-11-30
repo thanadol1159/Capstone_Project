@@ -93,19 +93,19 @@ class AccountViewSet(viewsets.ModelViewSet):
         )
     
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    def validate(self, attrs):
-        data = super().validate(attrs)
-        user = self.user
-
-        # Retrieve the associated Account model instance
+    @classmethod
+    def get_token(cls, user):
+        # Create the token using the base functionality
+        token = super().get_token(user)
+        
+        # Retrieve the associated Account model instance (assuming the username is unique)
         try:
             account = Account.objects.get(username=user.username)
-            data['account_id'] = account.id
+            token['account_id'] = account.id  # Add account_id to the JWT token payload
         except Account.DoesNotExist:
-            data['account_id'] = None  
-
-        return data
-
+            token['account_id'] = None  # Or handle the case when the account is not found
+        
+        return token
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
