@@ -16,14 +16,12 @@ const SignUpPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Basic validation
     if (password !== confirmPassword) {
       alert("Passwords do not match");
       return;
     }
 
     try {
-      // Register the user
       await apiJson.post("/accounts/", {
         username,
         email,
@@ -38,7 +36,6 @@ const SignUpPage = () => {
       const { access, refresh, expired } = response.data;
       dispatch(login(access, refresh, expired, username));
 
-      // Redirect to venue rental page
       router.push("/venue-rental");
     } catch (error) {
       console.error("Error signing up:", error);

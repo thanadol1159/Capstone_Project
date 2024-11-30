@@ -32,6 +32,10 @@ const LoginPage = () => {
     router.back();
   };
 
+  const handleSignUp = () => {
+    router.push("/signup");
+  };
+
   return (
     <div className="flex items-center justify-center h-screen">
       <div className="w-[80%] max-w-full p-8 bg-white">
@@ -72,12 +76,12 @@ const LoginPage = () => {
           {/* Sign Up and Social Login Options */}
           <div className="text-center">
             <span className="text-gray-700">
-              <a
-                href="/signup"
+              <button
+                onClick={handleSignUp}
                 className="text-[#1A9DB8] font-semibold hover:underline"
               >
                 Sign up
-              </a>{" "}
+              </button>{" "}
               or Sign in with
             </span>
           </div>

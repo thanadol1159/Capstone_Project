@@ -135,7 +135,7 @@ const ManageVenue: React.FC = () => {
                     : "bg-white"
                 }`}
               >
-                Room Spacess
+                Room Spaces
               </button>
             </div>
           </div>

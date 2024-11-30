@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
+from rest_framework.permissions import AllowAny
 
 from .models import (
     Role,
@@ -49,16 +50,23 @@ class RoleViewSet(viewsets.ModelViewSet):
 class AccountViewSet(viewsets.ModelViewSet):
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
+    # Allow anyone to create an account without authentication
+    def get_permissions(self):
+        if self.action == 'create':
+            permission_classes = [AllowAny]
+        else:
+            permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
 
-    def post(self, request, *args, **kwargs):
-        # รับข้อมูลจาก Request
+    def create(self, request, *args, **kwargs):
+        # Receive data from Request
         username = request.data.get('username')
         password = request.data.get('password')
 
-        # เพิ่มข้อมูลใน Account
+        # Create Account
         account = Account.objects.create(username=username, password=password)
 
-        # สร้าง User จาก Account
+        # Create User 
         user = User.objects.create(username=username)
         user.set_password(password)
         user.save()
