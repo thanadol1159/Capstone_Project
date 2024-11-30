@@ -10,6 +10,10 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from .models import Account
+
 from .models import (
     Role,
     Account,
@@ -87,6 +91,24 @@ class AccountViewSet(viewsets.ModelViewSet):
             {"message": "Account and User created successfully!"}, 
             status=status.HTTP_201_CREATED
         )
+    
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        user = self.user
+
+        # Retrieve the associated Account model instance
+        try:
+            account = Account.objects.get(username=user.username)
+            data['account_id'] = account.id
+        except Account.DoesNotExist:
+            data['account_id'] = None  
+
+        return data
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
 # class RegisterView(APIView):
 #     def post(self, request, *args, **kwargs):
