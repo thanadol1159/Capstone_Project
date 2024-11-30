@@ -4,15 +4,29 @@ import { store, persistor } from "@/hook/store";
 import { logout } from "@/hook/action";
 import { useRouter } from "next/navigation";
 
+// const apiJson = axios.create({
+//   baseURL: "http://capstone24.sit.kmutt.ac.th:8080/nk1/api/",
+//   headers: {
+//     "Content-Type": "application/json",
+//   },
+// });
+
+// const apiFormData = axios.create({
+//   baseURL: "http://capstone24.sit.kmutt.ac.th:8080/nk1/api/",
+//   headers: {
+//     "Content-Type": "multipart/form-data",
+//   },
+// });
+
 const apiJson = axios.create({
-  baseURL: "http://capstone24.sit.kmutt.ac.th:8080/nk1/api/",
+  baseURL: "https://localhost:8000/api/",
   headers: {
     "Content-Type": "application/json",
   },
 });
 
 const apiFormData = axios.create({
-  baseURL: "http://capstone24.sit.kmutt.ac.th:8080/nk1/api/",
+  baseURL: "https://localhost:8000/api/",
   headers: {
     "Content-Type": "multipart/form-data",
   },
