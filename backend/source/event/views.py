@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from .models import (
     Role,
@@ -50,28 +50,44 @@ class RoleViewSet(viewsets.ModelViewSet):
 class AccountViewSet(viewsets.ModelViewSet):
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
-    # Allow anyone to create an account without authentication
+    
+    # Explicitly set permissions to allow anyone to create an account
     def get_permissions(self):
         if self.action == 'create':
-            permission_classes = [AllowAny]
-        else:
-            permission_classes = [IsAuthenticated]
-        return [permission() for permission in permission_classes]
+            return [AllowAny()]
+        return [IsAuthenticated()]
 
     def create(self, request, *args, **kwargs):
         # Receive data from Request
         username = request.data.get('username')
         password = request.data.get('password')
 
-        # Create Account
-        account = Account.objects.create(username=username, password=password)
+        # Validate input
+        if not username or not password:
+            return Response(
+                {"error": "Username and password are required"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
+        # Check if username already exists
+        if Account.objects.filter(username=username).exists():
+            return Response(
+                {"error": "Username already exists"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Create Account
+        account = Account.objects.create(username=username)
+        
         # Create User 
         user = User.objects.create(username=username)
         user.set_password(password)
         user.save()
 
-        return Response({"message": "Account and User created successfully!"}, status=status.HTTP_201_CREATED)
+        return Response(
+            {"message": "Account and User created successfully!"}, 
+            status=status.HTTP_201_CREATED
+        )
 
 # class RegisterView(APIView):
 #     def post(self, request, *args, **kwargs):
