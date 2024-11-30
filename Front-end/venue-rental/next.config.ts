@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   basePath: "/nk1",
   output: "standalone",
   reactStrictMode: true,
-  swcMinify: true,
+  // swcMinify: true,
   eslint: {
     ignoreDuringBuilds: true,
   },
