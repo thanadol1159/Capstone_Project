@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // basePath: "/nk1",
+  basePath: "/nk1",
   // async rewrites() {
   //   return [
   //     {
@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
   //     },
   //   ];
   // },
-  output: "standalone", // Recommended for Docker deployments
+  output: "standalone", 
 };
 
 export default nextConfig;
