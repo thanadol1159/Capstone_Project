@@ -51,14 +51,9 @@ services:
 
   next:
     build:
-      context: ./Front-end/vuejs
-      target: development
+      context: ./Front-end/react-nginx
     ports:
-      - "3000:8080"
-    volumes:
-      - ./vuejs:/project
-      - /project/node_modules
-      - ./vuejs/node_modules:/project/node_modules
+      - "3000:80"
     networks:
       - my_network
 
