@@ -6,6 +6,7 @@ class Role(models.Model):
     description = models.TextField()
 
 class Account(models.Model):
+    id = models.CharField(max_length=45, primary_key=True)
     username = models.CharField(max_length=50,null=True, blank=True)
     password = models.CharField(max_length=255,null=True, blank=True)
     creation_date = models.DateTimeField(null=True, blank=True)
