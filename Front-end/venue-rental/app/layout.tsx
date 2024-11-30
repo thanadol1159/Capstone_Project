@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { Prompt } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/common/Navbar";
 import Sidebar from "@/components/common/Sidebar";
 import ReduxProvider from "@/components/common/ReduxProvider";
 
+// Uncomment and adjust Geist fonts if needed
 // const geistSans = localFont({
 //   src: "./fonts/GeistVF.woff",
 //   variable: "--font-geist-sans",
@@ -15,6 +17,12 @@ import ReduxProvider from "@/components/common/ReduxProvider";
 //   variable: "--font-geist-mono",
 //   weight: "100 900",
 // });
+
+const prompt = Prompt({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-prompt",
+});
 
 export const metadata: Metadata = {
   title: "E-searchh",
@@ -27,10 +35,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html>
+    <html className={`${prompt.variable}`}>
       <body className="bg-white h-screen">
         <ReduxProvider>
-          <div className="h-screen bg-white flex flex-col">
+          <div className="h-screen bg-white flex flex-col font-prompt">
             <Navigation />
             <div className="flex flex-1 h-screen">
               <Sidebar />

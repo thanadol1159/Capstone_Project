@@ -19,31 +19,41 @@ export default function VenueCard({
   personal_identification,
   onDetailClick,
 }: Venue) {
+  const categoryColors: Record<string, string> = {
+    Meeting: "bg-blue-100 text-blue-600",
+    Studio: "bg-green-100 text-green-600",
+    Party: "bg-purple-100 text-purple-600",
+    Default: "bg-gray-200 text-gray-600",
+  };
+
+  const categoryKey = category_event || "Default";
+  const categoryStyle =
+    categoryColors[categoryKey] || categoryColors["Default"];
+
   return (
     <div className="bg-white rounded-lg shadow-sm border-[2.5px] border-[#000000]">
-      <div className="p-4 ">
+      <div className="p-4">
         <img
           src={image}
           alt={venue_name}
-          className="w-full h-36 object-cover "
+          className="w-full h-36 object-cover rounded-t-lg"
         />
         <div className="flex justify-between items-center mb-2 py-2">
-          <p className="text-black font-bold ">{venue_name}</p>
-          {/* <div className="flex gap-1">
-            {tags.map((tag) => (
-              <span
-                key={tag}
-                className="px-2 py-0.5 text-xs rounded bg-pink-100 text-pink-600"
-              >
-                {tag}
-              </span>
-            ))}
-          </div> */}
+          <p className="text-black font-bold">{venue_name}</p>
         </div>
 
-        <div className="flex items-center gap-1 text-gray-600 mb-4">
+        <div className="flex items-center gap-2 text-black mb-4">
           <img src="/logo/location_icon.png" alt="" />
           <span className="text-sm">{location}</span>
+
+          {/* Category Badge */}
+          {category_event && (
+            <div
+              className={`text-xs font-semibold px-3 py-1 rounded-lg ${categoryStyle}`}
+            >
+              {category_event}
+            </div>
+          )}
         </div>
 
         <button
