@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  basePath: "/nk1",
+  // basePath: "/nk1",
   // async rewrites() {
   //   return [
   //     {
@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  output: "standalone",
+  // output: "standalone",
 };
 
 export default nextConfig;
