@@ -74,6 +74,16 @@ services:
       - my_network
     # command: sh -c "npm install && npm run build && npm start"
 
+   web:
+    build:
+      context: ./Front-end/vuejs
+      target: development
+    ports:
+      - 8080:8080
+    volumes:
+      - ./vuejs:/project
+      - /project/node_modules
+
   # minio:
   #   image: minio/minio
   #   container_name: minio

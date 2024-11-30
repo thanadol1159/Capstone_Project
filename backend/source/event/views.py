@@ -51,13 +51,12 @@ class AccountViewSet(viewsets.ModelViewSet):
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
     
-    # Explicitly set permissions to allow anyone to create an account
     def get_permissions(self):
         if self.action == 'create':
             return [AllowAny()]
         return [IsAuthenticated()]
 
-    def create(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         # Receive data from Request
         username = request.data.get('username')
         password = request.data.get('password')
@@ -70,15 +69,15 @@ class AccountViewSet(viewsets.ModelViewSet):
             )
 
         # Check if username already exists
-        if Account.objects.filter(username=username).exists():
+        if Account.objects.filter(username=username).exists() or User.objects.filter(username=username).exists():
             return Response(
                 {"error": "Username already exists"}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         # Create Account
-        account = Account.objects.create(username=username)
-        
+        account = Account.objects.create(username=username, password=password)
+
         # Create User 
         user = User.objects.create(username=username)
         user.set_password(password)
