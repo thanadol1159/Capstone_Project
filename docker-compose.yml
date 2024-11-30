@@ -53,7 +53,7 @@ services:
     container_name: next
     build:
       context: ./Front-end/venue-rental
-      dockerfile: prod.Dockerfile
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     depends_on:
