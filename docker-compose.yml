@@ -49,30 +49,19 @@ services:
       DATABASE: postgres
     command: "python manage.py runserver 0.0.0.0:8080"
 
-  # next:
-  #   build:
-  #     context: ./Front-end/react-nginx
-  #   ports:
-  #     - "3000:80"
-  #   networks:
-  #     - my_network
-
-    next:
-      container_name: next
-      build:
-        context: ./Front-end/venue-rental
-        dockerfile: Dockerfile
-      ports:
-        - 3000:3000
-    # volumes:
-    #   - ./Front-end/venue-rental/:/app
-      depends_on:
-        - django
-      user: 1000:1000
-      networks:
-        - my_network
-      command: sh -c "npm install && npm run build && npm start"
-
+  next:
+    container_name: next
+    build:
+      context: ./Front-end/venue-rental
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - django
+    user: "1000:1000"
+    networks:
+      - my_network
+    command: sh -c "npm install && npm run build && npm start"
 
 networks:
   my_network:
