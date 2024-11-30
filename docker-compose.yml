@@ -49,7 +49,7 @@ services:
       DATABASE: postgres
     command: "python manage.py runserver 0.0.0.0:8080"
 
-   next:
+  next:
     container_name: next
     build:
       context: ./Front-end/venue-rental
