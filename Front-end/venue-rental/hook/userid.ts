@@ -4,7 +4,7 @@ import { RootState } from "@/hook/store";
 import { useSelector } from "react-redux";
 
 interface CustomJwtPayload extends JwtPayload {
-  user_id: string;
+  account_id: string;
 }
 
 /** 
@@ -18,7 +18,7 @@ export const useAccountId = (): string | null => {
 
     try {
       const decoded = jwtDecode<CustomJwtPayload>(accessToken);
-      return decoded.user_id;
+      return decoded.account_id;
     } catch (error) {
       console.error("Failed to decode token", error);
       return null;
