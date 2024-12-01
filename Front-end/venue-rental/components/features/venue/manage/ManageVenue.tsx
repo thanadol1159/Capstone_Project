@@ -17,7 +17,7 @@ const ManageVenue: React.FC = () => {
     venue_name: "",
     image: "",
     location: "",
-    category_event: null,
+    category_event: "",
     price: 0,
     area_size: null,
     capacity: 0,
@@ -46,6 +46,7 @@ const ManageVenue: React.FC = () => {
       ...prev,
       [name]: value,
     }));
+
   };
 
   const handleFileChange = (
@@ -187,7 +188,7 @@ const ManageVenue: React.FC = () => {
             <span className="w-32 font-medium">Category :</span>
             <div className="flex gap-2 items-center">
               <select
-                name="category"
+                name="category_event"
                 value={venueData.category_event || ""}
                 onChange={handleInputChange}
                 className="p-2 border border-gray-300 rounded-md"
