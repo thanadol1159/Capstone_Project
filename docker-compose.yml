@@ -60,6 +60,14 @@ services:
       - django
     networks:
       - my_network
+      
+  adminer:
+    container_name: adminer
+    image: adminer
+    networks:
+      - my_network
+    ports:
+      - 8900:8000
 
 
 networks:
