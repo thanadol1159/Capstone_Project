@@ -18,6 +18,7 @@ export const useAccountId = (): string | null => {
 
     try {
       const decoded = jwtDecode<CustomJwtPayload>(accessToken);
+      console.log(decoded)
       return decoded.account_id;
     } catch (error) {
       console.error("Failed to decode token", error);
