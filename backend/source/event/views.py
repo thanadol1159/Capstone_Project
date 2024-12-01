@@ -144,7 +144,7 @@ class VenueViewSet(viewsets.ModelViewSet):
     serializer_class = VenueSerializer
 
     def get_permissions(self):
-        if self.action == 'list':
+        if self.action == 'list' or self.action == 'retrieve':
             return [AllowAny()]
         return [IsAuthenticated()]
 
