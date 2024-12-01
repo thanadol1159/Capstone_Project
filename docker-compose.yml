@@ -67,7 +67,7 @@ services:
     networks:
       - my_network
     ports:
-      - 8900:8000
+      - 8900:8080
 
 
 networks:
