@@ -30,11 +30,17 @@ export default function VenueCard({
   const categoryStyle =
     categoryColors[categoryKey] || categoryColors["Default"];
 
+  const addNk1ToUrl = (url: string): string => {
+    return url.replace(/(:8080)(\/images\/)/, "$1/nk1$2");
+  };
+
+  const modifiedImage = image ? addNk1ToUrl(image) : "/placeholder-image.jpg";
+
   return (
     <div className="bg-white rounded-lg shadow-sm border-[2.5px] border-[#000000]">
       <div className="p-4">
         <img
-          src={image}
+          src={modifiedImage}
           alt={venue_name}
           className="w-full h-36 object-cover rounded-t-lg"
         />
@@ -43,7 +49,7 @@ export default function VenueCard({
         </div>
 
         <div className="flex items-center gap-2 text-black mb-4">
-          <img src="/logo/location_icon.png" alt="" />
+          <img src="/logo/location_icon.png" alt="Location Icon" />
           <span className="text-sm">{location}</span>
 
           {/* Category Badge */}
