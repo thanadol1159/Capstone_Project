@@ -94,7 +94,7 @@ const SignUpPage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="flex-grow px-4 py-2 border rounded-lg focus:ring focus:ring-indigo-300 focus:outline-none text-gray-700"
-              placeholder="Create a password"
+              placeholder="Password must be up to 8 characters"
               required
               minLength={8}
             />
@@ -134,7 +134,7 @@ const SignUpPage = () => {
           </div>
 
           {/* Social Sign Up Options */}
-          <div className="flex justify-center space-x-4 mt-4">
+          {/* <div className="flex justify-center space-x-4 mt-4">
             <button
               type="button"
               className="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-200 transition duration-200"
@@ -153,10 +153,10 @@ const SignUpPage = () => {
             >
               GitHub
             </button>
-          </div>
+          </div> */}
 
           {/* Back and Sign Up Buttons */}
-          <div className="flex justify-end mt-6 space-x-10">
+          <div className="flex justify-center mt-6 space-x-10">
             <button
               type="button"
               onClick={handleBack}

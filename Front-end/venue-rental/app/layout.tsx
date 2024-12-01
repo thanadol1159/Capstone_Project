@@ -38,11 +38,11 @@ export default function RootLayout({
     <html className={`${prompt.variable}`}>
       <body className="bg-white h-screen">
         <ReduxProvider>
-          <div className="h-screen bg-white flex flex-col font-prompt">
+          <div className="h-screen bg-white flex flex-col">
             <Navigation />
             <div className="flex flex-1 h-screen">
               <Sidebar />
-              <main className="flex-1">{children}</main>
+              <main className={`flex-1 ${prompt.className}`}>{children}</main>
             </div>
           </div>
         </ReduxProvider>

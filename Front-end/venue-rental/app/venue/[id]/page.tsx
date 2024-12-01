@@ -21,7 +21,6 @@ export default function VenuePage() {
 
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
 
-  // Fetch Venue Details
   useEffect(() => {
     const fetchVenueDetail = async () => {
       try {

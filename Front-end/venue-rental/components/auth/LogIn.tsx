@@ -19,12 +19,32 @@ const LoginPage = () => {
         username,
         password,
       });
-      const { access, refresh, expired } = response.data;
-      dispatch(login(access, refresh, expired, username));
-      router.push("/venue-rental");
-      console.log("Already logged in");
-    } catch (error) {
-      console.error("Error logging in:", error);
+
+      if (response.status === 200) {
+        const { access, refresh, expired } = response.data;
+        dispatch(login(access, refresh, expired, username));
+        router.push("/venue-rental");
+        console.log("Already logged in");
+      } else {
+        console.warn(`Unexpected status code: ${response.status}`);
+      }
+    } catch (error: any) {
+      if (error.response) {
+        if (error.response.status === 401) {
+          alert("Username or password incorrect");
+        } else {
+          console.error(`Error: ${error.response.statusText}`);
+          alert("An error occurred. Please try again.");
+        }
+      } else if (error.request) {
+        console.error("No response received:", error.request);
+        alert(
+          "Unable to connect to the server. Please check your internet connection."
+        );
+      } else {
+        console.error("Unexpected error:", error.message);
+        alert("Username or password incorrect");
+      }
     }
   };
 
@@ -35,6 +55,7 @@ const LoginPage = () => {
   const handleSignUp = () => {
     router.push("/signup");
   };
+  
 
   return (
     <div className="flex items-center justify-center h-screen">
@@ -70,24 +91,8 @@ const LoginPage = () => {
             />
           </div>
 
-          {/* Horizontal Line */}
-          <div className="border-t border-gray-300 my-4"></div>
-
-          {/* Sign Up and Social Login Options */}
-          <div className="text-center">
-            <span className="text-gray-700">
-              <button
-                onClick={handleSignUp}
-                className="text-[#1A9DB8] font-semibold hover:underline"
-              >
-                Sign up
-              </button>{" "}
-              or Sign in with
-            </span>
-          </div>
-
           {/* Social Login Buttons */}
-          <div className="flex justify-center space-x-4 mt-4">
+          {/* <div className="flex justify-center space-x-4 mt-4">
             <button
               type="button"
               className="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-200 transition duration-200"
@@ -106,10 +111,13 @@ const LoginPage = () => {
             >
               GitHub
             </button>
-          </div>
+          </div> */}
+
+          {/* Horizontal Line */}
+          <div className="border-t border-gray-300 my-4"></div>
 
           {/* Back and Login Buttons */}
-          <div className="flex justify-end mt-6 space-x-10">
+          <div className="flex justify-center mt-6 space-x-10">
             <button
               type="button"
               onClick={handleBack}
@@ -125,6 +133,19 @@ const LoginPage = () => {
             </button>
           </div>
         </form>
+
+        {/* Sign Up and Social Login Options */}
+        <div className="text-center mt-4">
+          <span className="text-gray-700">
+            <button
+              onClick={handleSignUp}
+              className="text-[#1A9DB8] font-semibold hover:underline"
+            >
+              Sign up
+            </button>{" "}
+            or Sign in with
+          </span>
+        </div>
       </div>
     </div>
   );

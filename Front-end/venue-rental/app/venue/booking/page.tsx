@@ -75,7 +75,7 @@ const BookingsPage = () => {
                           ? "In process"
                           : booking.status_booking === "approve"
                           ? "Approve"
-                          : "Disapprove"}
+                          : "Rejected"}
                       </span>
                     </td>
                     <td className="py-4 px-6 text-center">

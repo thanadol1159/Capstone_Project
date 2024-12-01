@@ -6,10 +6,12 @@ import axios from "axios";
 import { apiFormData } from "@/hook/api";
 import { useRouter } from "next/navigation";
 import { useAccountId } from "@/hook/userid";
+import { useSelector } from "react-redux";
+import { RootState } from "@/hook/store";
 
-const ManageVenue: React.FC = () => {
+export default function ManageVenue() {
   const router = useRouter();
-
+  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
   const accountId = useAccountId();
   console.log(accountId);
   const [venueData, setVenueData] = useState<Partial<Venue>>({
@@ -46,7 +48,6 @@ const ManageVenue: React.FC = () => {
       ...prev,
       [name]: value,
     }));
-
   };
 
   const handleFileChange = (
@@ -61,6 +62,16 @@ const ManageVenue: React.FC = () => {
       }));
     }
   };
+
+  const handleNoAuth = () => {
+    if (accessToken === null) {
+      router.push("/login");
+    }
+  };
+
+  useEffect(() => {
+    handleNoAuth();
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,7 +96,6 @@ const ManageVenue: React.FC = () => {
       const response = await apiFormData.post("/venues/", formData);
 
       if (response.status === 201 || response.status === 200) {
-        // Success
         router.push("/venue/manage");
       }
     } catch (err) {
@@ -163,6 +173,7 @@ const ManageVenue: React.FC = () => {
               accept="image/*"
               className="hidden"
               id="image-upload"
+              required
             />
             <label
               htmlFor="image-upload"
@@ -181,6 +192,7 @@ const ManageVenue: React.FC = () => {
               onChange={handleInputChange}
               placeholder="Paste URL"
               className="flex-1 p-2 border border-gray-300 rounded-md"
+              required
             />
           </div>
 
@@ -192,6 +204,7 @@ const ManageVenue: React.FC = () => {
                 value={venueData.category_event || ""}
                 onChange={handleInputChange}
                 className="p-2 border border-gray-300 rounded-md"
+                required
               >
                 <option value="">Select</option>
                 <option value="Party">Party</option>
@@ -206,9 +219,11 @@ const ManageVenue: React.FC = () => {
             <input
               type="number"
               name="capacity"
+              min="0"
               value={venueData.capacity || ""}
               onChange={handleInputChange}
               className="flex-1 p-2 border border-gray-300 rounded-md"
+              required
             />
           </div>
 
@@ -218,21 +233,22 @@ const ManageVenue: React.FC = () => {
               <input
                 type="number"
                 name="price"
+                min="0"
                 value={venueData.price}
                 onChange={handleInputChange}
                 className="w-32 p-2 border border-gray-300 rounded-md"
                 required
               />
-              <span>Per</span>
+              {/* <span>Per</span>
               <select
                 onChange={handleInputChange}
                 className="p-2 border border-gray-300 rounded-md"
-              >
-                {/* <option value="">Select</option>
+              > */}
+              {/* <option value="">Select</option>
                 <option value="hour">Hour</option>
                 <option value="day">Day</option>
                 <option value="month">Month</option> */}
-              </select>
+              {/* </select> */}
             </div>
           </div>
 
@@ -242,9 +258,11 @@ const ManageVenue: React.FC = () => {
               <input
                 type="number"
                 name="area_size"
+                min="0"
                 value={venueData.area_size || ""}
                 onChange={handleInputChange}
                 className="flex-1 p-2 border border-gray-300 rounded-md"
+                required
               />
               <span>m²</span>
             </div>
@@ -256,9 +274,11 @@ const ManageVenue: React.FC = () => {
             <input
               type="number"
               name="number_of_rooms"
+              min="0"
               value={venueData.number_of_rooms || ""}
               onChange={handleInputChange}
               className="flex-1 p-2 border border-gray-300 rounded-md"
+              required
             />
           </div>
 
@@ -267,6 +287,7 @@ const ManageVenue: React.FC = () => {
             <input
               type="number"
               name="parking_space"
+              min="0"
               value={venueData.parking_space}
               onChange={handleInputChange}
               className="flex-1 p-2 border border-gray-300 rounded-md"
@@ -279,9 +300,11 @@ const ManageVenue: React.FC = () => {
             <input
               type="text"
               name="outdoor_spaces"
+              min="0"
               value={venueData.outdoor_spaces || ""}
               onChange={handleInputChange}
               className="flex-1 p-2 border border-gray-300 rounded-md"
+              required
             />
           </div>
 
@@ -342,7 +365,12 @@ const ManageVenue: React.FC = () => {
           </button>
           <button
             type="submit"
-            className="px-6 py-2 bg-gray-200 text-gray-800 rounded-md"
+            className={`px-6 py-2 rounded-md ${
+              venueData.venue_type
+                ? "bg-gray-200 text-gray-800"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            }`}
+            disabled={!venueData.venue_type}
           >
             Submit
           </button>
@@ -350,6 +378,4 @@ const ManageVenue: React.FC = () => {
       </form>
     </div>
   );
-};
-
-export default ManageVenue;
+}

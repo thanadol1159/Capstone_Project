@@ -15,22 +15,23 @@ const Navigation = () => {
 
   const [dropdownVisible, setDropdownVisible] = useState(false);
 
-  if (pathname === "/login") {
+  if (pathname === "/login" || pathname === "/signup") {
     return <div className="hidden" />;
   }
 
-  const navItems = [
-    { label: "Dashboard", href: "/dashboard" },
-    { label: "Venue Rental", href: "/venue-rental" },
-    {
-      label: "Management",
-      href: "#",
-      dropdown: [
-        { label: "Book Venue", href: "/venue/booking" },
-        { label: "Manage & Add Venue", href: "/venue/manage" },
-      ],
-    },
-  ];
+  const navItems = accessToken
+    ? [
+        { label: "Venue Rental", href: "/venue-rental" },
+        {
+          label: "Management",
+          href: "#",
+          dropdown: [
+            { label: "Book Venue", href: "/venue/booking" },
+            { label: "Manage & Add Venue", href: "/venue/manage" },
+          ],
+        },
+      ]
+    : [{ label: "Venue Rental", href: "/venue-rental" }];
 
   const handleMouseEnter = () => {
     setDropdownVisible(true);
@@ -45,7 +46,7 @@ const Navigation = () => {
   };
 
   return (
-    <nav className="w-full bg-white border-b border-gray-200 shadow-[rgba(0,0,0,0.2)_0px_4px_4px_0px]">
+    <nav className="w-full bg-white border-b border-gray-200 shadow-[rgba(0,0,0,0.2)_0px_4px_4px_0px] ">
       <div className="px-4 h-14 flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center space-x-8">
@@ -66,7 +67,8 @@ const Navigation = () => {
                   <Link
                     href={item.href}
                     className={`${
-                      pathname.startsWith(item.href)
+                      pathname.startsWith("/venue/booking") ||
+                      pathname.startsWith("/venue/manage")
                         ? "text-[#74512D] font-bold" // Active
                         : "text-[#D6C0B3] font-bold" // Default
                     } hover:text-[#74512D] delay-75 duration-200`}
@@ -111,13 +113,13 @@ const Navigation = () => {
 
         {/* Right side items */}
         <div className="flex items-center space-x-2">
-          <button className="p-1 text-gray-600 hover:text-gray-900">
+          {/* <button className="p-1 text-gray-600 hover:text-gray-900">
             <img src="/logo/help_icon.png" alt="" />
           </button>
 
           <button className="p-1 text-gray-600 hover:text-gray-900 relative">
             <img src="/logo/bell_icon.png" alt="" />
-          </button>
+          </button> */}
 
           <div
             className={`flex items-center space-x-2 font-bold ${

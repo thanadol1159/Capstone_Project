@@ -8,6 +8,13 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  redirects: async () => [
+    {
+      source: "/", 
+      destination: "/venue-rental", 
+      permanent: false, 
+    },
+  ],
   // output: "standalone",
 };
 

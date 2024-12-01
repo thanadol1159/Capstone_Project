@@ -5,6 +5,9 @@ import useFetchVenues from "@/hook/Venue";
 import { Venue } from "@/types/venue";
 // import axios from "axios";
 import { apiJson } from "@/hook/api";
+import { useSelector } from "react-redux";
+import { RootState } from "@/hook/store";
+import { useRouter } from "next/navigation";
 
 interface SlidingStates {
   [key: number]: boolean;
@@ -12,9 +15,12 @@ interface SlidingStates {
 
 const AddVenuePage = () => {
   const { venues } = useFetchVenues();
+  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
+  const router = useRouter();
   const [isCheckboxMode, setIsCheckboxMode] = useState(false);
   const [isCheckAll, setIsCheckAll] = useState(false);
   const [isButtonMode, setIsButtonMode] = useState(false);
+  const [userOwner, setUserOwner] = useState("");
   const [selectedVenues, setSelectedVenues] = useState<number[]>([]);
   const [slidingButtonStates, setSlidingButtonStates] = useState<SlidingStates>(
     {}
@@ -116,6 +122,16 @@ const AddVenuePage = () => {
         : [...prev, venueId]
     );
   };
+
+  const handleNoAuth = () => {
+    if (accessToken === null) {
+      router.push("/login");
+    }
+  };
+
+  useEffect(() => {
+    handleNoAuth();
+  });
 
   const addNk1ToUrl = (url: string): string => {
     return url.replace(/(:8080)(\/images\/)/, "$1/nk1$2");
@@ -223,12 +239,11 @@ const AddVenuePage = () => {
               </div>
 
               {/* Venue Info */}
-              <div className="space-y-2 text-sm text-gray-600">
-                <p>
+              <div className="space-y-2 text-sm text-gray-600 my-auto">
+                {/* <p>
                   <span className="font-medium">Owner Name:</span> TEST
-                </p>
+                </p> */}
                 <p>รายละเอียด: {venue.additional_information}</p>
-                <p>เฟอร์นิเจอร์: TEST</p>
                 <p>ประเภทกิจกรรม: {venue.category_event}</p>
               </div>
             </div>

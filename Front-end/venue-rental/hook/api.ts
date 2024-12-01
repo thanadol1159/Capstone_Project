@@ -92,10 +92,9 @@ const addAuthorizationInterceptor = (instance: any) => {
     (response: any) => response,
     (error: any) => {
       if (error.response && error.response.status === 401) {
-        const router = useRouter();
         store.dispatch(logout());
         persistor.purge();
-        router.push("/login");
+        window.location.assign("/login");
       }
       return Promise.reject(error);
     }

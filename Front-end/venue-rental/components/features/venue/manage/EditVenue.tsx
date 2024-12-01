@@ -5,10 +5,13 @@ import { useParams, useRouter } from "next/navigation";
 import { Venue } from "@/types/venue";
 import { apiFormData } from "@/hook/api";
 import { apiJson } from "@/hook/api";
+import { useSelector } from "react-redux";
+import { RootState } from "@/hook/store";
 
 export default function VenueEditPage() {
   const params = useParams();
   const router = useRouter();
+  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
   const [venue, setVenue] = useState<Venue | null>(null);
   const [files, setFiles] = useState({
     image: null as File | null,
@@ -77,6 +80,7 @@ export default function VenueEditPage() {
       await apiFormData.put(`/venues/${params.id}/`, formData);
 
       router.push(`/venue/${params.id}`);
+      // router.push(`/venue/manage`);
       router.refresh();
     } catch (error) {
       console.error("Error updating venue:", error);
@@ -84,12 +88,26 @@ export default function VenueEditPage() {
   };
 
   const handleCancel = () => {
-    router.back();
+    router.push("/venue/manage");
   };
+
+  const handleNoAuth = () => {
+    if (accessToken === null) {
+      router.push("/login");
+    }
+  };
+
+  useEffect(() => {
+    handleNoAuth();
+  });
 
   if (!venue) {
     return <div>Loading...</div>;
   }
+
+  const addNk1ToUrl = (url: string): string => {
+    return url.replace(/(:8080)(\/images\/)/, "$1/nk1$2");
+  };
 
   return (
     <div className="w-full max-w-lg mx-auto p-2 text-black">
@@ -98,9 +116,13 @@ export default function VenueEditPage() {
         <div className="overflow-hidden mt-6">
           <div className="p-0">
             <img
-              src={venue.image}
+              src={
+                venue.image
+                  ? addNk1ToUrl(venue.image)
+                  : "/placeholder-image.jpg"
+              }
               alt="Venue Preview"
-              className="w-full h-48 object-cover"
+              className="w-full h-48 object-scale-down"
             />
           </div>
         </div>
@@ -142,6 +164,7 @@ export default function VenueEditPage() {
             value={venue.venue_name}
             onChange={(e) => setVenue({ ...venue, venue_name: e.target.value })}
             className="w-full p-2 border rounded-md"
+            required
           />
         </div>
 
@@ -174,15 +197,10 @@ export default function VenueEditPage() {
               setVenue({ ...venue, price: Number(e.target.value) })
             }
             className="w-full p-2 border rounded-md"
+            min={0}
+            required
           />
           <p>THB</p>
-          {/* <select
-            name="type_of_venue"
-            value={undefined}
-            className="p-2 border border-gray-300 rounded-md"
-          >
-            <option value="">Select</option>
-          </select> */}
         </div>
 
         {/* Capacity */}
@@ -195,6 +213,8 @@ export default function VenueEditPage() {
               setVenue({ ...venue, capacity: Number(e.target.value) })
             }
             className="w-full p-2 border rounded-md"
+            min={0}
+            required
           />
           <p>Persons</p>
         </div>
@@ -209,6 +229,8 @@ export default function VenueEditPage() {
               setVenue({ ...venue, parking_space: Number(e.target.value) })
             }
             className="w-full p-2 border rounded-md"
+            min={0}
+            required
           />
         </div>
 
@@ -221,12 +243,14 @@ export default function VenueEditPage() {
               setVenue({ ...venue, additional_information: e.target.value })
             }
             className="w-full p-2 border rounded-md min-h-[100px]"
+            required
           />
         </div>
 
         {/* Action Buttons */}
         <div className="flex justify-end gap-4 pt-4">
           <button
+            type="button"
             onClick={handleCancel}
             className="px-6 py-2 border border-gray-300 rounded-md"
           >
