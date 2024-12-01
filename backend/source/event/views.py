@@ -95,10 +95,8 @@ class AccountViewSet(viewsets.ModelViewSet):
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
-        # Create the token using the base functionality
         token = super().get_token(user)
         
-        # Retrieve the associated Account model instance (assuming the username is unique)
         try:
             account = Account.objects.get(username=user.username)
             token['account_id'] = account.id  
