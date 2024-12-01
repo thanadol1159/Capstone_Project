@@ -13,8 +13,6 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import Account
-from .models import Venue
-from .serializers import VenueSerializer
 
 from .models import (
     Role,
@@ -111,14 +109,6 @@ class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
 
-class PublicVenueListView(APIView):
-    permission_classes = [AllowAny]  
-
-    def get(self, request):
-        venues = Venue.objects.all()  
-        serializer = VenueSerializer(venues, many=True)  
-        return Response(serializer.data, status=200)  
-
 # class RegisterView(APIView):
 #     def post(self, request, *args, **kwargs):
 #         username = request.data.get('username')
@@ -152,6 +142,11 @@ class RoleHasPermissionViewSet(viewsets.ModelViewSet):
 class VenueViewSet(viewsets.ModelViewSet):
     queryset = Venue.objects.all()
     serializer_class = VenueSerializer
+
+    def get_permissions(self):
+        if self.action == 'list':
+            return [AllowAny()]
+        return [IsAuthenticated()]
 
 class TypeOfvanueViewSet(viewsets.ModelViewSet):
     queryset = TypeOfVenue.objects.all()

@@ -16,7 +16,6 @@ Including another URLconf
 """
 
 from event.views import CustomTokenObtainPairView
-from event.views import PublicVenueListView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.contrib import admin
 from django.urls import path, include, re_path
@@ -73,8 +72,7 @@ urlpatterns = [
     path('api/', include(router.urls)),
     path('admin/', admin.site.urls),
     path('api/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('public-venues/', PublicVenueListView.as_view(), name='public_venues'),   
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),   
     # path('login/', AccountLoginView.as_view(), name='account-login'),
     re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     re_path(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
