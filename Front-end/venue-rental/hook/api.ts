@@ -19,14 +19,14 @@ import { useRouter } from "next/navigation";
 // });
 
 const apiJson = axios.create({
-  baseURL: "https://localhost:8000/api/",
+  baseURL: "http://localhost:8080/api/",
   headers: {
     "Content-Type": "application/json",
   },
 });
 
 const apiFormData = axios.create({
-  baseURL: "https://localhost:8000/api/",
+  baseURL: "http://localhost:8080/api/",
   headers: {
     "Content-Type": "multipart/form-data",
   },
