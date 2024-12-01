@@ -117,6 +117,10 @@ const AddVenuePage = () => {
     );
   };
 
+  const addNk1ToUrl = (url: string): string => {
+    return url.replace(/(:8080)(\/images\/)/, "$1/nk1$2");
+  };
+
   return (
     <div className="container mx-auto p-14 space-y-6">
       <div className="flex w-full justify-between my-2">
@@ -208,7 +212,11 @@ const AddVenuePage = () => {
               {/* Venue Image */}
               <div className="relative w-32 h-32 rounded-lg overflow-hidden">
                 <img
-                  src={venue.image}
+                  src={
+                    venue.image
+                      ? addNk1ToUrl(venue.image)
+                      : "/placeholder-image.jpg"
+                  }
                   alt={venue.venue_name}
                   className="object-cover w-full h-full rounded-lg border-4 border-[#B67373]"
                 />

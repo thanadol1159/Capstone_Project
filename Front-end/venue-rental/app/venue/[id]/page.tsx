@@ -8,6 +8,10 @@ import { VenueType } from "@/types/venueType";
 import { apiJson } from "@/hook/api";
 import { RootState } from "@/hook/store";
 
+const addNk1ToUrl = (url: string): string => {
+  return url ? url.replace(/(:8080)(\/images\/)/, "$1/nk1$2") : "";
+};
+
 export default function VenuePage() {
   const params = useParams();
   const [venue, setVenue] = useState<Venue | null>(null);
@@ -72,6 +76,11 @@ export default function VenuePage() {
     return <div>Venue not found</div>;
   }
 
+  const imageUrl = venue.image
+    ? addNk1ToUrl(venue.image)
+    : "/placeholder-image.jpg";
+  const venueType = typeVenue?.type_name || "Unknown Type"; // Fallback in case typeVenue is null
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 text-black ">
       <h1 className="text-2xl font-semibold text-center mb-4 mt-2">
@@ -79,7 +88,7 @@ export default function VenuePage() {
       </h1>
       <div className="relative w-full aspect-[20/10]">
         <img
-          src={venue.image}
+          src={imageUrl}
           alt={venue.venue_name}
           className="rounded-lg object-cover w-[80%] mx-auto"
         />
@@ -114,7 +123,7 @@ export default function VenuePage() {
         )}
         <div className="flex items-center gap-4">
           <span className="font-semibold">Type:</span>
-          <span>{typeVenue?.type_name}</span>
+          <span>{venueType}</span>
         </div>
       </div>
       <div className="flex justify-end mt-6 space-x-10">

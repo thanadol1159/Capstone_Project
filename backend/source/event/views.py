@@ -152,6 +152,11 @@ class TypeOfvanueViewSet(viewsets.ModelViewSet):
     queryset = TypeOfVenue.objects.all()
     serializer_class = TypeOfvanueSerializer
 
+    def get_permissions(self):
+        if self.action == 'list' or self.action == 'retrieve':
+            return [AllowAny()]
+        return [IsAuthenticated()]
+
 class VenueRequestViewSet(viewsets.ModelViewSet):
     queryset = VenueRequest.objects.all()
     serializer_class = VenueRequestSerializer
