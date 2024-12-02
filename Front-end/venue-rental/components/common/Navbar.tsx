@@ -122,7 +122,7 @@ const Navigation = () => {
           </button> */}
 
           <div
-            className={`flex items-center space-x-2 font-bold ${
+            className={`flex items-center pr-2 font-bold ${
               username ? "block" : "hidden"
             }`}
           >

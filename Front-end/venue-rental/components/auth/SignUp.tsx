@@ -47,9 +47,13 @@ const SignUpPage = () => {
     router.back();
   };
 
+  const handleLogin = () => {
+    router.push("/login");
+  };
+
   return (
     <div className="flex items-center justify-center h-screen">
-      <div className="w-[80%] max-w-full p-8 bg-white">
+      <div className="w-[50%] max-w-full p-8 bg-white">
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Username Field */}
           <div className="flex items-center space-x-4 mb-4">
@@ -124,12 +128,12 @@ const SignUpPage = () => {
           <div className="text-center">
             <span className="text-gray-700">
               Already have an account?{" "}
-              <a
-                href="/login"
+              <button
+                onClick={handleLogin}
                 className="text-[#1A9DB8] font-semibold hover:underline"
               >
                 Log in
-              </a>
+              </button>
             </span>
           </div>
 
@@ -160,13 +164,13 @@ const SignUpPage = () => {
             <button
               type="button"
               onClick={handleBack}
-              className="py-2 px-4 border rounded-lg text-gray-700 hover:bg-gray-200 transition duration-200"
+              className="py-2 px-12 border rounded-lg text-gray-700 hover:bg-gray-200 transition duration-200"
             >
               Back
             </button>
             <button
               type="submit"
-              className="py-2 px-4 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 transition duration-200"
+              className="py-2 px-12 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 transition duration-200"
             >
               Sign Up
             </button>

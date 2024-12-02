@@ -8,12 +8,18 @@ const LogoutButton: React.FC = () => {
   const router = useRouter();
 
   const handleLogout = () => {
-    dispatch(logout());
-    router.push("/login");
+    const confirmed = window.confirm("Are you sure you want to log out?");
+    if (confirmed) {
+      dispatch(logout());
+      router.push("/login");
+    }
   };
 
   return (
-    <button onClick={handleLogout} className="text-black">
+    <button
+      onClick={handleLogout}
+      className="bg-[#74512D] text-white px-4 py-2 rounded-md hover:bg-[#492b26]"
+    >
       Logout
     </button>
   );

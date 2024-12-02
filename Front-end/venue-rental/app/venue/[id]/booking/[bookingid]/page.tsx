@@ -129,7 +129,7 @@ export default function BookingPage() {
 
       await apiJson.post("/bookings/", bookingData);
 
-      router.push(`/booking`);
+      router.push(`/venue/booking`);
     } catch (error) {
       console.error("Error creating booking:", error);
       alert("Failed to create booking. Please try again later.");

@@ -212,7 +212,7 @@ const AddVenuePage = () => {
             }`}
           >
             <button onClick={() => setIsCheckboxMode(false)}>ยกเลิก</button>
-            <button onClick={handleDeleteSelected}>ลบทั้งหมด</button>
+            <button onClick={handleDeleteSelected}>ลบที่เลือกทั้งหมด</button>
           </div>
         </div>
       </div>
