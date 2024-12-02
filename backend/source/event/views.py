@@ -9,6 +9,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.decorators import action
 
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -139,6 +140,8 @@ class RoleHasPermissionViewSet(viewsets.ModelViewSet):
     queryset = RoleHasPermission.objects.all()
     serializer_class = RoleHasPermissionSerializer
 
+
+
 class VenueViewSet(viewsets.ModelViewSet):
     queryset = Venue.objects.all()
     serializer_class = VenueSerializer
@@ -147,6 +150,25 @@ class VenueViewSet(viewsets.ModelViewSet):
         if self.action == 'list' or self.action == 'retrieve':
             return [AllowAny()]
         return [IsAuthenticated()]
+
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def my_venues(self, request):
+        try:
+            # Find the Account associated with the authenticated user
+            account = Account.objects.get(username=request.user.username)
+            
+            # Filter venues by the authenticated account's owner
+            venues = Venue.objects.filter(venue_owner=account)
+            
+            # Serialize the filtered venues
+            serializer = self.get_serializer(venues, many=True)
+            return Response(serializer.data)
+        
+        except Account.DoesNotExist:
+            return Response(
+                {"error": "Account not found"}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
 
 class TypeOfvanueViewSet(viewsets.ModelViewSet):
     queryset = TypeOfVenue.objects.all()
