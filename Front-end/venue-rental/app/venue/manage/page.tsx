@@ -1,20 +1,18 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import useFetchVenues from "@/hook/Venue";
-import { Venue } from "@/types/venue";
-// import axios from "axios";
 import { apiJson } from "@/hook/api";
 import { useSelector } from "react-redux";
 import { RootState } from "@/hook/store";
 import { useRouter } from "next/navigation";
+import { Venue } from "@/types/venue";
 
 interface SlidingStates {
   [key: number]: boolean;
 }
 
 const AddVenuePage = () => {
-  const { venues } = useFetchVenues();
+  const [venues, setVenues] = useState<Venue[] | null>(null);
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
   const router = useRouter();
   const [isCheckboxMode, setIsCheckboxMode] = useState(false);
@@ -29,6 +27,29 @@ const AddVenuePage = () => {
     useState<SlidingStates>({});
 
   useEffect(() => {
+    const fetchVenues = async () => {
+      if (!accessToken) {
+        router.push("/login");
+        return;
+      }
+
+      try {
+        const response = await apiJson.get("/venues/my_venues/");
+        if (response.data.length === 0) {
+          setVenues([]);
+        } else {
+          setVenues(response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching venues:", error);
+        setVenues([]);
+      }
+    };
+
+    fetchVenues();
+  }, []);
+
+  useEffect(() => {
     if (venues) {
       const newButtonStates: SlidingStates = {};
       const newCheckboxStates: SlidingStates = {};
@@ -41,6 +62,7 @@ const AddVenuePage = () => {
     }
   }, [isCheckboxMode, isButtonMode, venues]);
 
+  // Delete single venue
   const handleDelete = async (venueId: number) => {
     const isConfirmed = window.confirm("จะลบจริงหรอมันหายน้า");
 
@@ -50,12 +72,15 @@ const AddVenuePage = () => {
 
     try {
       await apiJson.delete(`/venues/${venueId}/`);
-      window.location.reload();
+      // Refresh venues after deletion
+      const response = await apiJson.get("/venues/my_venues/");
+      setVenues(response.data);
     } catch (error) {
       console.error("Error deleting venue:", error);
     }
   };
 
+  // Delete multiple venues
   const handleDeleteSelected = async () => {
     if (selectedVenues.length === 0) {
       alert("กรุณาเลือกสถานที่ที่ต้องการลบ");
@@ -75,22 +100,23 @@ const AddVenuePage = () => {
         apiJson.delete(`/venues/${venueId}/`)
       );
 
-      const responses = await Promise.all(deletePromises);
+      await Promise.all(deletePromises);
 
-      const failedDeletes = responses.filter(
-        (response) => response.status !== 200
-      );
+      // Refresh venues after deletion
+      const response = await apiJson.get("/venues/my_venues/");
+      setVenues(response.data);
 
+      // Reset selection
+      setSelectedVenues([]);
+      setIsCheckAll(false);
       alert("สถานที่ที่เลือกทั้งหมดถูกลบเรียบร้อยแล้ว");
-
-      // Reload the page or update the venue state
-      window.location.reload();
     } catch (error) {
       console.error("Error deleting venues:", error);
       alert("เกิดข้อผิดพลาดในการลบสถานที่");
     }
   };
 
+  // Fetch owner names
   useEffect(() => {
     const fetchOwnerNames = async () => {
       if (venues) {
@@ -126,6 +152,7 @@ const AddVenuePage = () => {
     fetchOwnerNames();
   }, [venues]);
 
+  // Rest of the component remains the same...
   const Buttonmode = () => {
     setIsButtonMode(!isButtonMode);
     if (isCheckboxMode === true) {
@@ -157,16 +184,6 @@ const AddVenuePage = () => {
         : [...prev, venueId]
     );
   };
-
-  const handleNoAuth = () => {
-    if (accessToken === null) {
-      router.push("/login");
-    }
-  };
-
-  useEffect(() => {
-    handleNoAuth();
-  });
 
   const addNk1ToUrl = (url: string): string => {
     return url.replace(/(:8080)(\/images\/)/, "$1/nk1$2");

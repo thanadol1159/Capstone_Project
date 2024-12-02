@@ -18,6 +18,20 @@ const apiFormData = axios.create({
   },
 });
 
+// const apiJson = axios.create({
+//   baseURL: "http://localhost:8080/api/",
+//   headers: {
+//     "Content-Type": "application/json",
+//   },
+// });
+
+// const apiFormData = axios.create({
+//   baseURL: "http://localhost:8080/api/",
+//   headers: {
+//     "Content-Type": "multipart/form-data",
+//   },
+// });
+
 // Function to refresh the access token
 const refreshAccessToken = async () => {
   try {
