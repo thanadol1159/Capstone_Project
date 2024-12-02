@@ -186,6 +186,25 @@ class VenueRequestViewSet(viewsets.ModelViewSet):
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request, *args, **kwargs):
+        try:
+            # Get the account associated with the authenticated user
+            account = Account.objects.get(username=request.user.username)
+            
+            # Filter bookings by the authenticated user's account
+            queryset = Booking.objects.filter(account=account)
+            
+            # Serialize the filtered bookings
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+        
+        except Account.DoesNotExist:
+            return Response(
+                {"error": "Account not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
 class VenueApprovalViewSet(viewsets.ModelViewSet):
     queryset = VenueApproval.objects.all()
