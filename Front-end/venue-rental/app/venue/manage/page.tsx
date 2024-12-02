@@ -20,7 +20,7 @@ const AddVenuePage = () => {
   const [isCheckboxMode, setIsCheckboxMode] = useState(false);
   const [isCheckAll, setIsCheckAll] = useState(false);
   const [isButtonMode, setIsButtonMode] = useState(false);
-  const [userOwner, setUserOwner] = useState("");
+  const [ownerNames, setOwnerNames] = useState<{ [key: number]: string }>({});
   const [selectedVenues, setSelectedVenues] = useState<number[]>([]);
   const [slidingButtonStates, setSlidingButtonStates] = useState<SlidingStates>(
     {}
@@ -90,6 +90,41 @@ const AddVenuePage = () => {
       alert("เกิดข้อผิดพลาดในการลบสถานที่");
     }
   };
+
+  useEffect(() => {
+    const fetchOwnerNames = async () => {
+      if (venues) {
+        const ownerNamePromises = venues.map(async (venue) => {
+          try {
+            const response = await apiJson.get(
+              `/accounts/${venue.venue_owner}/`
+            );
+            return {
+              venueId: venue.id,
+              ownerName: response.data.username,
+            };
+          } catch (error) {
+            console.error(`Error fetching owner for venue ${venue.id}:`, error);
+            return {
+              venueId: venue.id,
+              ownerName: "Unknown",
+            };
+          }
+        });
+
+        const ownerNameResults = await Promise.all(ownerNamePromises);
+
+        const ownerNameMap = ownerNameResults.reduce((acc: any, result) => {
+          acc[result.venueId] = result.ownerName;
+          return acc;
+        }, {});
+
+        setOwnerNames(ownerNameMap);
+      }
+    };
+
+    fetchOwnerNames();
+  }, [venues]);
 
   const Buttonmode = () => {
     setIsButtonMode(!isButtonMode);
@@ -243,6 +278,10 @@ const AddVenuePage = () => {
                 {/* <p>
                   <span className="font-medium">Owner Name:</span> TEST
                 </p> */}
+                <p>
+                  <span className="font-medium">Owner Name:</span>{" "}
+                  {ownerNames[venue.id] || "Loading..."}
+                </p>
                 <p>รายละเอียด: {venue.additional_information}</p>
                 <p>ประเภทกิจกรรม: {venue.category_event}</p>
               </div>
