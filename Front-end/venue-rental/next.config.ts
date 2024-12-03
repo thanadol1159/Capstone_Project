@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   // basePath: "/nk1",
-  output: "standalone",
+  output: "export",
   reactStrictMode: true,
   // swcMinify: true,
   eslint: {
