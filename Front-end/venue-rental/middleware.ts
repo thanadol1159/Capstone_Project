@@ -12,9 +12,9 @@ export function middleware(request: NextRequest) {
   const isPersistTokenValid = token && token !== "null";
 
   // If on public path and authenticated, redirect to dashboard
-  if (isPublicPath && isPersistTokenValid) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
-  }
+  // if (isPublicPath && isPersistTokenValid) {
+  //   return NextResponse.redirect(new URL("/dashboard", request.url));
+  // }
 
   // If on protected path without token, redirect to login
   if (!isPublicPath && !isPersistTokenValid) {
@@ -25,7 +25,7 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/",
+    // "/",
     "/dashboard/:path*",
     "/login",
     "/signup",

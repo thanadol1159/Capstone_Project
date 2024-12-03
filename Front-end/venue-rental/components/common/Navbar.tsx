@@ -21,7 +21,7 @@ const Navigation = () => {
 
   const navItems = accessToken
     ? [
-        { label: "Venue Rental", href: "/venue-rental" },
+        { label: "Venue Rental", href: "/" },
         {
           label: "Management",
           href: "#",
@@ -31,7 +31,7 @@ const Navigation = () => {
           ],
         },
       ]
-    : [{ label: "Venue Rental", href: "/venue-rental" }];
+    : [{ label: "Venue Rental", href: "/" }];
 
   const handleMouseEnter = () => {
     setDropdownVisible(true);
@@ -67,8 +67,10 @@ const Navigation = () => {
                   <Link
                     href={item.href}
                     className={`${
-                      pathname.startsWith("/venue/booking") ||
-                      pathname.startsWith("/venue/manage")
+                      pathname === item.href ||
+                      item.dropdown.some((subItem) =>
+                        pathname.startsWith(subItem.href)
+                      )
                         ? "text-[#74512D] font-bold" // Active
                         : "text-[#D6C0B3] font-bold" // Default
                     } hover:text-[#74512D] delay-75 duration-200`}

@@ -55,7 +55,7 @@ export default function VenuePage() {
   }, [venue]);
 
   const handleBack = () => {
-    router.push("/venue-rental");
+    router.push("/");
   };
 
   const handleBooking = () => {

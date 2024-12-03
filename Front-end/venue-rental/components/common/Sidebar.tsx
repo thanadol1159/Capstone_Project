@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 const Sidebar: React.FC = () => {
   const pathname = usePathname();
 
-  if (pathname === "/venue-rental" || "/login" || pathname.match(/([0-9])/g)) {
+  if (pathname === "/" || "/login" || pathname.match(/([0-9])/g)) {
     return null;
   }
 

@@ -36,7 +36,7 @@ const SignUpPage = () => {
       const { access, refresh, expired } = response.data;
       dispatch(login(access, refresh, expired, username));
 
-      router.push("/venue-rental");
+      router.push("/");
     } catch (error) {
       console.error("Error signing up:", error);
       alert("Registration failed. Please try again.");
