@@ -2,12 +2,13 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   // basePath: "/nk1",
-  output: "export",
+  output: "standalone",
   reactStrictMode: true,
   // swcMinify: true,
   eslint: {
     ignoreDuringBuilds: true,
   },
+  assetPrefix:"http://capstone24.sit.kmutt.ac.th/nk1/"
   // redirects: async () => [
   //   {
   //     source: "/",
