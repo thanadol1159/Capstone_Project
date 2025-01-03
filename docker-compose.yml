@@ -72,7 +72,10 @@ services:
       - my_network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.next.rule=Host(`cp24nk1.sit.kmutt.ac.th`)"
+      - "traefik.http.routers.next-private.rule=Host(`cp24nk1.sit.kmutt.ac.th`)"
+      - "traefik.http.routers.next-private.service=next"
+      - "traefik.http.routers.next-public.rule=Host(`capstone24.sit.kmutt.ac.th`)"
+      - "traefik.http.routers.next-public.service=next"
       - "traefik.http.services.next.loadbalancer.server.port=3000"
 
   adminer:
