@@ -1,15 +1,21 @@
 services:
-  reverse-proxy:
-    image: nginx:latest
+  traefik:
+    image: traefik:v2.10
     ports:
       - "80:80"
       - "443:443"
+      - "9000:9000"
     volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-    depends_on:
-      - next
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./config.yml:/etc/traefik/config.yml:ro
     networks:
       - my_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=PathPrefix(`/api`) || PathPrefix(`/dashboard`)"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.entrypoints=dashboard"
 
   db:
     container_name: db
@@ -48,6 +54,10 @@ services:
       SQL_PORT: 5432
       DATABASE: postgres
     command: "python manage.py runserver 0.0.0.0:8080"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.django.rule=PathPrefix(`/api`)"
+      - "traefik.http.services.django.loadbalancer.server.port=8080"
 
   next:
     container_name: next
@@ -60,6 +70,22 @@ services:
       - django
     networks:
       - my_network
+    labels:
+      - "traefik.enable=true"
+      # Private domain route
+      - "traefik.http.routers.next-private.rule=Host(`cp24nk1.sit.kmutt.ac.th`)"
+      - "traefik.http.routers.next-private.service=next"
+      # Public domain route
+      - "traefik.http.routers.next-public.rule=Host(`capstone24.sit.kmutt.ac.th`)"
+      - "traefik.http.routers.next-public.service=next"
+      # Service configuration
+      - "traefik.http.services.next.loadbalancer.server.port=3000"
+      # Middleware to handle base path
+      - "traefik.http.middlewares.next-prefix.stripprefix.prefixes=/nk1"
+      - "traefik.http.middlewares.next-prefix.stripprefix.forceSlash=false"
+      # Apply middleware to both routes
+      - "traefik.http.routers.next-private.middlewares=next-prefix@docker"
+      - "traefik.http.routers.next-public.middlewares=next-prefix@docker"
 
   adminer:
     container_name: adminer
@@ -68,6 +94,10 @@ services:
       - my_network
     ports:
       - 8900:8080
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.adminer.rule=PathPrefix(`/adminer`)"
+      - "traefik.http.services.adminer.loadbalancer.server.port=8080"
 
 networks:
   my_network:
