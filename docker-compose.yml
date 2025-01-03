@@ -1,22 +1,21 @@
-version: "3.9"
-
 services:
   traefik:
     image: traefik:v2.10
-    container_name: traefik
-    command:
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
     ports:
       - "80:80"
       - "443:443"
+      - "9000:9000"
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./traefik.yml:/etc/traefik/traefik.yml"
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./config.yml:/etc/traefik/config.yml:ro
     networks:
       - my_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=PathPrefix(`/api`) || PathPrefix(`/dashboard`)"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.entrypoints=dashboard"
 
   db:
     container_name: db
@@ -54,10 +53,11 @@ services:
       SQL_HOST: db
       SQL_PORT: 5432
       DATABASE: postgres
+    command: "python manage.py runserver 0.0.0.0:8080"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.django.rule=Host(`django.localhost`)"
-      - "traefik.http.routers.django.entrypoints=web"
+      - "traefik.http.routers.django.rule=PathPrefix(`/api`)"
+      - "traefik.http.services.django.loadbalancer.server.port=8080"
 
   next:
     container_name: next
@@ -73,10 +73,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.next.rule=Host(`cp24nk1.sit.kmutt.ac.th`)"
-      - "traefik.http.routers.next.entrypoints=web"
       - "traefik.http.services.next.loadbalancer.server.port=3000"
-      - "traefik.http.middlewares.next-headers.headers.customrequestheaders.Connection=upgrade"
-      - "traefik.http.middlewares.next-headers.headers.customrequestheaders.Upgrade=$http_upgrade"
 
   adminer:
     container_name: adminer
@@ -87,8 +84,8 @@ services:
       - 8900:8080
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.adminer.rule=Host(`adminer.localhost`)"
-      - "traefik.http.routers.adminer.entrypoints=web"
+      - "traefik.http.routers.adminer.rule=PathPrefix(`/adminer`)"
+      - "traefik.http.services.adminer.loadbalancer.server.port=8080"
 
 networks:
   my_network:
