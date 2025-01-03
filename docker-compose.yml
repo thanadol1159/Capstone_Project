@@ -72,11 +72,20 @@ services:
       - my_network
     labels:
       - "traefik.enable=true"
+      # Private domain route
       - "traefik.http.routers.next-private.rule=Host(`cp24nk1.sit.kmutt.ac.th`)"
       - "traefik.http.routers.next-private.service=next"
+      # Public domain route
       - "traefik.http.routers.next-public.rule=Host(`capstone24.sit.kmutt.ac.th`)"
       - "traefik.http.routers.next-public.service=next"
+      # Service configuration
       - "traefik.http.services.next.loadbalancer.server.port=3000"
+      # Middleware to handle base path
+      - "traefik.http.middlewares.next-prefix.stripprefix.prefixes=/nk1"
+      - "traefik.http.middlewares.next-prefix.stripprefix.forceSlash=false"
+      # Apply middleware to both routes
+      - "traefik.http.routers.next-private.middlewares=next-prefix@docker"
+      - "traefik.http.routers.next-public.middlewares=next-prefix@docker"
 
   adminer:
     container_name: adminer

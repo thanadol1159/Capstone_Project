@@ -10,11 +10,11 @@ http:
       entryPoints:
         - "dashboard"
 
-    # next-private:
-    #   rule: "Host(`cp24nk1.sit.kmutt.ac.th`)"
-    #   service: next
-    #   entryPoints:
-    #     - "web"
+    next-private:
+      rule: "Host(`cp24nk1.sit.kmutt.ac.th`)"
+      service: next
+      entryPoints:
+        - "web"
 
     next-public:
       rule: "Host(`capstone24.sit.kmutt.ac.th`)"
