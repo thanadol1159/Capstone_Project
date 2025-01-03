@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  assetPrefix: "http://capstone24.sit.kmutt.ac.th/nk1/",
+  assetPrefix: "http://capstone24.sit.kmutt.ac.th/",
   // redirects: async () => [
   //   {
   //     source: "/",
