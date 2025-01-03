@@ -17,7 +17,7 @@ http:
         - "web"
 
     next-public:
-      rule: "Host(`capstone24.sit.kmutt.ac.th/nk1/`)"
+      rule: "Host(`capstone24.sit.kmutt.ac.th/nk1`)"
       service: next
       entryPoints:
         - "web"
