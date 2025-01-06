@@ -21,7 +21,7 @@ const Navigation = () => {
 
   const navItems = accessToken
     ? [
-        { label: "Venue Rental", href: "/nk1" },
+        { label: "Venue Rental", href: "/" },
         {
           label: "Management",
           href: "#",
