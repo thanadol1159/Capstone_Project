@@ -51,7 +51,7 @@ const Navigation = () => {
         {/* Logo */}
         <div className="flex items-center space-x-8">
           <Link href="/" className="text-xl font-semibold">
-            <img src="/logo/logo.png" alt="EVENT Logo" />
+            <img src="/nk1/logo/logo.png" alt="EVENT Logo" />
           </Link>
 
           {/* Main Navigation */}
