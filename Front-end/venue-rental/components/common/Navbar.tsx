@@ -21,7 +21,7 @@ const Navigation = () => {
 
   const navItems = accessToken
     ? [
-        { label: "Venue Rental", href: "/" },
+        { label: "Venue Rental", href: "/nk1" },
         {
           label: "Management",
           href: "#",
@@ -42,7 +42,7 @@ const Navigation = () => {
   };
 
   const handleLogin = () => {
-    router.push("/login");
+    router.push("/nk1/login");
   };
 
   return (
