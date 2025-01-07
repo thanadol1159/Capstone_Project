@@ -26,12 +26,12 @@ const Navigation = () => {
           label: "Management",
           href: "#",
           dropdown: [
-            { label: "Book Venue", href: "/venue/booking" },
-            { label: "Manage & Add Venue", href: "/venue/manage" },
+            { label: "Book Venue", href: "/nk1/venue/booking" },
+            { label: "Manage & Add Venue", href: "/nk1/venue/manage" },
           ],
         },
       ]
-    : [{ label: "Venue Rental", href: "/" }];
+    : [{ label: "Venue Rental", href: "/nk1" }];
 
   const handleMouseEnter = () => {
     setDropdownVisible(true);
@@ -137,13 +137,13 @@ const Navigation = () => {
             {accessToken ? (
               <Logout />
             ) : (
-              <a
+              <Link
                 className="bg-[#74512D] text-white px-4 py-2 rounded-md hover:bg-[#492b26]"
                 href="/nk1/login"
                 // onClick={handleLogin}
               >
                 Login
-              </a>
+              </Link>
             )}
           </div>
         </div>
