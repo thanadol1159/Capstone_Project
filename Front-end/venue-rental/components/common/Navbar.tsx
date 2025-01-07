@@ -41,9 +41,9 @@ const Navigation = () => {
     setDropdownVisible(false);
   };
 
-  const handleLogin = () => {
-    router.push("/nk1/login");
-  };
+  // const handleLogin = () => {
+  //   router.push("/nk1/login");
+  // };
 
   return (
     <nav className="w-full bg-white border-b border-gray-200 shadow-[rgba(0,0,0,0.2)_0px_4px_4px_0px] ">
@@ -137,12 +137,13 @@ const Navigation = () => {
             {accessToken ? (
               <Logout />
             ) : (
-              <button
+              <a
                 className="bg-[#74512D] text-white px-4 py-2 rounded-md hover:bg-[#492b26]"
-                onClick={handleLogin}
+                href="/nk1/login"
+                // onClick={handleLogin}
               >
                 Login
-              </button>
+              </a>
             )}
           </div>
         </div>
