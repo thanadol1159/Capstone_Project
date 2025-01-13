@@ -37,7 +37,7 @@ const SignUpPage = () => {
       const { access, refresh, expired } = response.data;
       dispatch(login(access, refresh, expired, username));
 
-      router.push("/");
+      router.push("/nk1");
     } catch (error) {
       console.error("Error signing up:", error);
       alert("Registration failed. Please try again.");

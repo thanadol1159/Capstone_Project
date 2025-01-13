@@ -15,7 +15,7 @@ const Navigation = () => {
 
   const [dropdownVisible, setDropdownVisible] = useState(false);
 
-  if (pathname === "/login" || pathname === "/signup") {
+  if (pathname === "/nk1/login" || pathname === "/nk1/signup") {
     return <div className="hidden" />;
   }
 

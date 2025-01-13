@@ -13,7 +13,7 @@ export default function VenueRental() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleDetailClick = (id: string) => {
-    router.push(`/venue/${id}`);
+    router.push(`/nk1/venue/${id}`);
   };
 
   const handleCategoryClick = (category: string) => {

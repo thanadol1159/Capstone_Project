@@ -79,7 +79,7 @@ export default function VenueEditPage() {
 
       await apiFormData.put(`/venues/${params.id}/`, formData);
 
-      router.push(`/venue/${params.id}`);
+      router.push(`/nk1/venue/${params.id}`);
       // router.push(`/venue/manage`);
       router.refresh();
     } catch (error) {
@@ -88,12 +88,12 @@ export default function VenueEditPage() {
   };
 
   const handleCancel = () => {
-    router.push("/venue/manage");
+    router.push("/nk1/venue/manage");
   };
 
   const handleNoAuth = () => {
     if (accessToken === null) {
-      router.push("/login");
+      router.push("/nk1/login");
     }
   };
 

@@ -65,7 +65,7 @@ export default function ManageVenue() {
 
   const handleNoAuth = () => {
     if (accessToken === null) {
-      router.push("/login");
+      router.push("/nk1/login");
     }
   };
 
@@ -96,7 +96,7 @@ export default function ManageVenue() {
       const response = await apiFormData.post("/venues/", formData);
 
       if (response.status === 201 || response.status === 200) {
-        router.push("/venue/manage");
+        router.push("/nk1/venue/manage");
       }
     } catch (err) {
       console.error("Error creating venue:", err);

@@ -29,7 +29,7 @@ const AddVenuePage = () => {
   useEffect(() => {
     const fetchVenues = async () => {
       if (!accessToken) {
-        router.push("/login");
+        router.push("/nk1/login");
         return;
       }
 

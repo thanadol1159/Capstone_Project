@@ -23,7 +23,7 @@ const LoginPage = () => {
       if (response.status === 200) {
         const { access, refresh, expired } = response.data;
         dispatch(login(access, refresh, expired, username));
-        router.push("/");
+        router.push("/nk1");
         console.log("Already logged in");
       } else {
         console.warn(`Unexpected status code: ${response.status}`);
@@ -53,7 +53,7 @@ const LoginPage = () => {
   };
 
   const handleSignUp = () => {
-    router.push("/signup");
+    router.push("/nk1/signup");
   };
 
   return (

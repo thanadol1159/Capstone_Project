@@ -11,7 +11,7 @@ const LogoutButton: React.FC = () => {
     const confirmed = window.confirm("Are you sure you want to log out?");
     if (confirmed) {
       dispatch(logout());
-      router.push("/login");
+      router.push("/nk1/login");
     }
   };
 

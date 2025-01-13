@@ -53,7 +53,7 @@ export default function BookingPage() {
   }, [params.id]);
 
   const handleBack = () => {
-    router.push(`/venue/${params.id}`);
+    router.push(`/nk1/venue/${params.id}`);
   };
 
   const validateDates = () => {
@@ -129,7 +129,7 @@ export default function BookingPage() {
 
       await apiJson.post("/bookings/", bookingData);
 
-      router.push(`/venue/booking`);
+      router.push(`/nk1/venue/booking`);
     } catch (error) {
       console.error("Error creating booking:", error);
       alert("Failed to create booking. Please try again later.");

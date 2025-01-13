@@ -55,7 +55,7 @@ export default function VenuePage() {
   }, [venue]);
 
   const handleBack = () => {
-    router.push("/");
+    router.push("/nk1");
   };
 
   const handleBooking = () => {
@@ -63,12 +63,12 @@ export default function VenuePage() {
       setShowLoginModal(true);
       return;
     }
-    router.push(`/venue/${params.id}/booking/create`);
+    router.push(`/nk1/venue/${params.id}/booking/create`);
   };
 
   const handleLogin = () => {
     const returnUrl = `/venue/${params.id}`;
-    router.push(`/login?returnUrl=${encodeURIComponent(returnUrl)}`);
+    router.push(`/nk1/login?returnUrl=${encodeURIComponent(returnUrl)}`);
   };
 
   if (!venue) {
