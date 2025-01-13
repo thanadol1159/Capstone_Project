@@ -57,7 +57,7 @@ export default function VenueCard({
         </div>
 
         <div className="flex items-center gap-2 text-black mb-4">
-          <img src="nk1/logo/location_icon.png" alt="Location Icon" />
+          <img src="/nk1/logo/location_icon.png" alt="Location Icon" />
           <span className="text-sm">{location}</span>
         </div>
 
