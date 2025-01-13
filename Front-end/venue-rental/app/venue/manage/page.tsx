@@ -218,7 +218,7 @@ const AddVenuePage = () => {
       </div>
 
       {/* Add Venue Card */}
-      <Link href="/venue/manage/add" className="text-xl font-semibold">
+      <Link href="nk1/venue/manage/add" className="text-xl font-semibold">
         <div className="bg-gray-100 hover:bg-gray-200 transition-colors cursor-pointer rounded-lg">
           <div className="flex flex-col items-center justify-center py-12">
             <span className="text-gray-600">เพิ่มสถานที่ของคุณ</span>
@@ -306,7 +306,7 @@ const AddVenuePage = () => {
 
             {/* Edit and Delete Buttons */}
             <Link
-              href={`/venue/${venue.id}/edit`}
+              href={`nk1/venue/${venue.id}/edit`}
               className={`absolute right-0 top-0 h-full w-20 bg-[#666666] text-white flex items-center justify-center transition-transform duration-300 ease-in-out rounded-lg ${
                 slidingCheckboxStates[venue.id]
                   ? "translate-x-0"
@@ -332,7 +332,7 @@ const AddVenuePage = () => {
                 สำเร็จ
               </button>
               <Link
-                href={`/venue/${venue.id}/edit`}
+                href={`nk1/venue/${venue.id}/edit`}
                 className={`h-full w-20 bg-[#666666] text-white flex items-center justify-center rounded-l-lg`}
               >
                 Edit

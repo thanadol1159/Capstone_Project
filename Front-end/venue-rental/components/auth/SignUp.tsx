@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { apiJson } from "@/hook/api";
 import { login } from "@/hook/action";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const SignUpPage = () => {
   const [username, setUsername] = useState("");
@@ -47,9 +48,9 @@ const SignUpPage = () => {
     router.back();
   };
 
-  const handleLogin = () => {
-    router.push("/login");
-  };
+  // const handleLogin = () => {
+  //   router.push("/login");
+  // };
 
   return (
     <div className="flex items-center justify-center h-screen">
@@ -128,12 +129,13 @@ const SignUpPage = () => {
           <div className="text-center">
             <span className="text-gray-700">
               Already have an account?{" "}
-              <button
-                onClick={handleLogin}
+              <Link
+                // onClick={handleLogin}
+                href="/nk1/login"
                 className="text-[#1A9DB8] font-semibold hover:underline"
               >
                 Log in
-              </button>
+              </Link>
             </span>
           </div>
 
