@@ -10,17 +10,7 @@ class Account(models.Model):
     password = models.CharField(max_length=255,null=True, blank=True)
     creation_date = models.DateTimeField(null=True, blank=True)
     last_login = models.DateTimeField(null=True, blank=True)
-# class Account(AbstractBaseUser):
-#     username = models.CharField(max_length=50, unique=True)
-#     password = models.CharField(max_length=255)
-#     creation_date = models.DateTimeField(auto_now_add=True)
-#     last_login = models.DateTimeField(blank=True, null=True)
 
-#     # Required fields for authentication
-#     is_active = models.BooleanField(default=True)
-
-#     USERNAME_FIELD = 'username'
-#     REQUIRED_FIELDS = []
 
 class UserDetail(models.Model):
     account = models.OneToOneField(Account, on_delete=models.CASCADE)
@@ -104,8 +94,19 @@ class CategoryOfEvent(models.Model):
     category_name = models.CharField(max_length=45)
     category_detail = models.CharField(max_length=45)
 
-class EvnetOfVenue(models.Model):
+# class EvnetOfVenue(models.Model):
+#     venue = models.ForeignKey(Venue, on_delete=models.CASCADE)
+#     venue_request = models.ForeignKey(VenueRequest, on_delete=models.CASCADE)
+#     CategoryOfEvent = models.ForeignKey(CategoryOfEvent, on_delete=models.CASCADE)
+
+class EventOfVenue(models.Model):
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE)
     venue_request = models.ForeignKey(VenueRequest, on_delete=models.CASCADE)
     CategoryOfEvent = models.ForeignKey(CategoryOfEvent, on_delete=models.CASCADE)
 
+class Review(models.Model):
+    account = models.ForeignKey(Account,on_delete=models.CASCADE, null=True, blank=True)
+    venue = models.ForeignKey(Venue, on_delete=models.CASCADE, null=True,blank=True)
+    reviewDetail = models.TextField()
+    createAt = models.DateTimeField()
+    point = models.IntegerField()

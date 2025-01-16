@@ -37,8 +37,9 @@ from event.views import (
     BookingViewSet,
     VenueApprovalViewSet,
     CategoryOfEventViewSet,
-    EvnetOfVenueViewSet,
+    EventOfVenueViewSet,
     StatusBookingViewSet,
+    ReviewViewSet
     # AccountLoginView,
 )
 
@@ -55,8 +56,9 @@ router.register(r'venue-requests', VenueRequestViewSet)
 router.register(r'bookings', BookingViewSet)
 router.register(r'venue-approvals', VenueApprovalViewSet)
 router.register(r'categories-of-event', CategoryOfEventViewSet)
-router.register(r'event-of-venues', EvnetOfVenueViewSet)
+router.register(r'event-of-venues', EventOfVenueViewSet)
 router.register(r'status-bookings', StatusBookingViewSet, basename='status-booking')
+router.register(r'review',ReviewViewSet)
 
 schema_view = get_schema_view(
     openapi.Info(

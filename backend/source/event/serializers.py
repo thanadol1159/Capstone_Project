@@ -12,9 +12,9 @@ from .models import (
     Booking,
     VenueApproval,
     CategoryOfEvent,
-    EvnetOfVenue,
+    EventOfVenue,
     StatusBooking,
-
+    Review
 )
 
 class RoleSerializer(serializers.ModelSerializer):
@@ -89,12 +89,19 @@ class CategoryOfEventSerializer(serializers.ModelSerializer):
         model = CategoryOfEvent
         fields = '__all__'
 
-class EvnetOfVenueSerializer(serializers.ModelSerializer):
+class EventOfVenueSerializer(serializers.ModelSerializer):
     venue = VenueSerializer()
     venue_request = VenueRequestSerializer()
     category_of_event = CategoryOfEventSerializer()
 
     class Meta:
-        model = EvnetOfVenue
+        model = EventOfVenue
         fields = '__all__'
 
+class ReviewSerializer(serializers.ModelSerializer):
+    account  = serializers.PrimaryKeyRelatedField(queryset=Account.objects.all())
+    venue = serializers.PrimaryKeyRelatedField(queryset=Venue.objects.all())
+
+    class  Meta:
+        model = Review
+        fields = '__all__'

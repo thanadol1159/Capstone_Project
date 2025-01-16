@@ -11,8 +11,9 @@ from .models import (
     Booking,
     VenueApproval,
     CategoryOfEvent,
-    EvnetOfVenue,
-    StatusBooking
+    EventOfVenue,
+    StatusBooking,
+    Review
 )
 
 # Register your models here.
@@ -91,7 +92,7 @@ class CategoryOfEventAdmin(admin.ModelAdmin):
     search_fields = ('category_name',)
 
 
-@admin.register(EvnetOfVenue)
+@admin.register(EventOfVenue)
 class EvnetOfVenueAdmin(admin.ModelAdmin):
     list_display = ('id', 'venue', 'venue_request', 'CategoryOfEvent')
     search_fields = ('venue__venue_name', 'CategoryOfEvent__category_name')
@@ -100,3 +101,7 @@ class EvnetOfVenueAdmin(admin.ModelAdmin):
 class StatusBookingAdmin(admin.ModelAdmin):
     list_display = ('id','status','description')
     # search_fields  = ('status')
+
+@admin.register(Review)
+class Review(admin.ModelAdmin):
+    list_display = ('id','account','venue','reviewDetail','createAt','point')

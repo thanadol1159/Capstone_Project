@@ -14,6 +14,7 @@ from rest_framework.decorators import action
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import Account
+from django.core.exceptions import ValidationError
 
 from .models import (
     Role,
@@ -27,8 +28,9 @@ from .models import (
     Booking,
     VenueApproval,
     CategoryOfEvent,
-    EvnetOfVenue,
+    EventOfVenue,
     StatusBooking,
+    Review,
 )
 from .serializers import (
     RoleSerializer,
@@ -42,8 +44,9 @@ from .serializers import (
     BookingSerializer,
     VenueApprovalSerializer,
     CategoryOfEventSerializer,
-    EvnetOfVenueSerializer,
+    EventOfVenueSerializer,
     StatusBookingSerializer,
+    ReviewSerializer,
     # AccountLoginSerializer,
 )
 
@@ -51,55 +54,58 @@ from .serializers import (
 class RoleViewSet(viewsets.ModelViewSet):
     queryset = Role.objects.all()
     serializer_class = RoleSerializer
-
+    
 class AccountViewSet(viewsets.ModelViewSet):
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
-    
+
     def get_permissions(self):
         if self.action == 'create':
             return [AllowAny()]
         return [IsAuthenticated()]
-
-    def post(self, request, *args, **kwargs):
-        # Receive data from Request
-        username = request.data.get('username')
+    
+    def create(self, request, *args, **kwargs):
+        username = request.data.get('user_name')
         password = request.data.get('password')
-
-        # Validate input
         if not username or not password:
             return Response(
-                {"error": "Username and password are required"}, 
+                {"error": "Username and password are required"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Check if username already exists
-        if Account.objects.filter(username=username).exists() or User.objects.filter(username=username).exists():
+        if Account.objects.filter(username=username).exists() or  User.objects.filter(username=username).exists():
             return Response(
-                {"error": "Username already exists"}, 
+                {"error": "Username already exists"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Create Account
-        account = Account.objects.create(username=username, password=password)
+        if len(password) <  8  :
+            return Response(
+                {"error": "password are required length more than 8 charactor"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+            User.objects.create_user(username=username, password=password)
+        try:
+            Account.objects.create(username=username, password=make_password(password))
+            return Response(
+                {"message": "Account and User created successfully!"},
+                status=status.HTTP_201_CREATED
+            )
 
-        # Create User 
-        user = User.objects.create(username=username)
-        user.set_password(password)
-        user.save()
+        except Exception as e:
+            return Response(
+                {"error": f"An error occurred: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
-        return Response(
-            {"message": "Account and User created successfully!"}, 
-            status=status.HTTP_201_CREATED
-        )
-    
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
         
         try:
-            account = Account.objects.get(username=user.username)
+            account = Account.objects.get(user_name=username)
             token['account_id'] = account.id  
         except Account.DoesNotExist:
             token['account_id'] = None  # Or handle the case when the account is not found
@@ -214,27 +220,27 @@ class CategoryOfEventViewSet(viewsets.ModelViewSet):
     queryset = CategoryOfEvent.objects.all()
     serializer_class = CategoryOfEventSerializer
 
-class EvnetOfVenueViewSet(viewsets.ModelViewSet):
-    queryset = EvnetOfVenue.objects.all()
-    serializer_class = EvnetOfVenueSerializer
+class EventOfVenueViewSet(viewsets.ModelViewSet):
+    queryset = EventOfVenue.objects.all()
+    serializer_class = EventOfVenueSerializer
 
 class StatusBookingViewSet(viewsets.ModelViewSet):
     queryset = StatusBooking.objects.all()
     serializer_class = StatusBookingSerializer
 
-class Home(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+# class Home(APIView):
+#     authentication_classes = [JWTAuthentication]
+#     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        content = {'message': 'Hello, World!'}
-        return Response(content)
+#     def get(self, request):
+#         content = {'message': 'Hello, World!'}
+#         return Response(content)
     
-class SuperuserOnlyAPIView(APIView):
-    def get(self, request):
-        if request.user.is_superuser:
-            return Response({"message": "You are a superuser!"})
-        return Response({"message": "Access denied"}, status=403)
+# class SuperuserOnlyAPIView(APIView):
+#     def get(self, request):
+#         if request.user.is_superuser:
+#             return Response({"message": "You are a superuser!"})
+#         return Response({"message": "Access denied"}, status=403)
 
 # class AccountLoginView(APIView):
 #     def post(self, request):
@@ -242,3 +248,7 @@ class SuperuserOnlyAPIView(APIView):
 #         if serializer.is_valid():
 #             return Response(serializer.validated_data, status=status.HTTP_200_OK)
 #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
