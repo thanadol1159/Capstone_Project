@@ -105,7 +105,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token = super().get_token(user)
         
         try:
-            account = Account.objects.get(user_name=username)
+            account = Account.objects.get(username=user.username)
             token['account_id'] = account.id  
         except Account.DoesNotExist:
             token['account_id'] = None  # Or handle the case when the account is not found
