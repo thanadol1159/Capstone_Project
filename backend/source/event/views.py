@@ -65,7 +65,7 @@ class AccountViewSet(viewsets.ModelViewSet):
         return [IsAuthenticated()]
     
     def create(self, request, *args, **kwargs):
-        username = request.data.get('user_name')
+        username = request.data.get('username')
         password = request.data.get('password')
         if not username or not password:
             return Response(
