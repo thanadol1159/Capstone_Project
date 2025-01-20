@@ -20,8 +20,13 @@ export function middleware(request: NextRequest) {
   if (!isPublicPath && !isPersistTokenValid) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
-}
 
+  const url = request.nextUrl;
+  if (url.protocol === "http:") {
+    url.protocol = "https:";
+    return NextResponse.redirect(url);
+  }
+}
 
 export const config = {
   matcher: [
