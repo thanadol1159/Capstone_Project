@@ -29,8 +29,6 @@ from event.views import (
     RoleViewSet,
     AccountViewSet,
     UserDetailViewSet,
-    PermissionViewSet,
-    RoleHasPermissionViewSet,
     VenueViewSet,
     TypeOfvanueViewSet,
     VenueRequestViewSet,
@@ -39,8 +37,8 @@ from event.views import (
     CategoryOfEventViewSet,
     EventOfVenueViewSet,
     StatusBookingViewSet,
-    ReviewViewSet
-    # AccountLoginView,
+    ReviewViewSet,
+    NotificationViewset,
 )
 
 # Create a router and register our viewsets with it.
@@ -48,8 +46,6 @@ router = DefaultRouter()
 router.register(r'roles', RoleViewSet)
 router.register(r'accounts', AccountViewSet)
 router.register(r'user-details', UserDetailViewSet)
-router.register(r'permissions', PermissionViewSet)
-router.register(r'role-has-permissions', RoleHasPermissionViewSet)
 router.register(r'venues', VenueViewSet)
 router.register(r'types-of-venue', TypeOfvanueViewSet)
 router.register(r'venue-requests', VenueRequestViewSet)
@@ -58,7 +54,9 @@ router.register(r'venue-approvals', VenueApprovalViewSet)
 router.register(r'categories-of-event', CategoryOfEventViewSet)
 router.register(r'event-of-venues', EventOfVenueViewSet)
 router.register(r'status-bookings', StatusBookingViewSet, basename='status-booking')
-router.register(r'review',ReviewViewSet)
+router.register(r'reviews',ReviewViewSet)
+router.register(r'notifications',NotificationViewset)
+
 
 schema_view = get_schema_view(
     openapi.Info(

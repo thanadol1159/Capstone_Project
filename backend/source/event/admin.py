@@ -3,8 +3,6 @@ from .models import (
     Role,
     Account,
     UserDetail,
-    Permission,
-    RoleHasPermission,
     TypeOfVenue,
     Venue,
     VenueRequest,
@@ -13,7 +11,8 @@ from .models import (
     CategoryOfEvent,
     EventOfVenue,
     StatusBooking,
-    Review
+    Review,
+    Notifications
 )
 
 # Register your models here.
@@ -35,19 +34,6 @@ class UserDetailAdmin(admin.ModelAdmin):
     list_display = ('id', 'account', 'first_name', 'last_name', 'email', 'phone_number')
     search_fields = ('first_name', 'last_name', 'email')
     list_filter = ('province', 'district', 'sub_district')
-
-
-@admin.register(Permission)
-class PermissionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'permission_name', 'description')
-    search_fields = ('permission_name',)
-
-
-@admin.register(RoleHasPermission)
-class RoleHasPermissionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'role', 'permission')
-    search_fields = ('role__role_name', 'permission__permission_name')
-
 
 @admin.register(TypeOfVenue)
 class TypeOfVenueAdmin(admin.ModelAdmin):
@@ -105,3 +91,7 @@ class StatusBookingAdmin(admin.ModelAdmin):
 @admin.register(Review)
 class Review(admin.ModelAdmin):
     list_display = ('id','account','venue','reviewDetail','createAt','point')
+
+@admin.register(Notifications)
+class Notifications(admin.ModelAdmin):
+    list_display =  ('id','notifications_type','create_at','sender')

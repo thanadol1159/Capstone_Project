@@ -4,8 +4,6 @@ from .models import (
     Role,
     Account,
     UserDetail,
-    Permission,
-    RoleHasPermission,
     Venue,
     TypeOfVenue,
     VenueRequest,
@@ -14,7 +12,8 @@ from .models import (
     CategoryOfEvent,
     EventOfVenue,
     StatusBooking,
-    Review
+    Review,
+    Notifications,
 )
 
 class RoleSerializer(serializers.ModelSerializer):
@@ -32,19 +31,6 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserDetail
-        fields = '__all__'
-
-class PermissionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Permission
-        fields = '__all__'
-
-class RoleHasPermissionSerializer(serializers.ModelSerializer):
-    role = RoleSerializer()
-    permission = PermissionSerializer()
-
-    class Meta:
-        model = RoleHasPermission
         fields = '__all__'
 
 class VenueSerializer(serializers.ModelSerializer):
@@ -104,4 +90,9 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class  Meta:
         model = Review
+        fields = '__all__'
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class  Meta:
+        model = Notifications
         fields = '__all__'
