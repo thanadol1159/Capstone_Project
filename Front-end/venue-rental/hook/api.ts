@@ -5,14 +5,14 @@ import { logout } from "@/hook/action";
 import { useRouter } from "next/navigation";
 
 const apiJson = axios.create({
-  baseURL: "http://capstone24.sit.kmutt.ac.th:8080/nk1/api/",
+  baseURL: "https://capstone24.sit.kmutt.ac.th:8080/nk1/api/",
   headers: {
     "Content-Type": "application/json",
   },
 });
 
 const apiFormData = axios.create({
-  baseURL: "http://capstone24.sit.kmutt.ac.th:8080/nk1/api/",
+  baseURL: "https://capstone24.sit.kmutt.ac.th:8080/nk1/api/",
   headers: {
     "Content-Type": "multipart/form-data",
   },
@@ -43,7 +43,7 @@ const refreshAccessToken = async () => {
     }
 
     const response = await axios.post(
-      "http://capstone24.sit.kmutt.ac.th:8080/nk1/api/token/refresh/",
+      "https://capstone24.sit.kmutt.ac.th:8080/nk1/api/token/refresh/",
       {
         refresh: refreshToken,
       }
