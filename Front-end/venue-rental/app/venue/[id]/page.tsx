@@ -9,7 +9,7 @@ import { apiJson } from "@/hook/api";
 import { RootState } from "@/hook/store";
 
 const addNk1ToUrl = (url: string): string => {
-  return url ? url.replace(/(:8080)(\/images\/)/, "$1/nk1$2") : "";
+  return url ? url.replace(/(\/images\/)/, "$1/nk1$2") : "";
 };
 
 export default function VenuePage() {

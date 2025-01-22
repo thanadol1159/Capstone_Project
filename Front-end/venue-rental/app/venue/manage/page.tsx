@@ -186,7 +186,7 @@ const AddVenuePage = () => {
   };
 
   const addNk1ToUrl = (url: string): string => {
-    return url.replace(/(:8080)(\/images\/)/, "$1/nk1$2");
+    return url.replace(/(\/images\/)/, "$1/nk1$2");
   };
 
   return (
