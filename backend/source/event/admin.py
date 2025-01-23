@@ -3,16 +3,16 @@ from .models import (
     Role,
     Account,
     UserDetail,
-    Permission,
-    RoleHasPermission,
     TypeOfVenue,
     Venue,
     VenueRequest,
     Booking,
     VenueApproval,
     CategoryOfEvent,
-    EvnetOfVenue,
-    StatusBooking
+    EventOfVenue,
+    StatusBooking,
+    Review,
+    Notifications
 )
 
 # Register your models here.
@@ -34,19 +34,6 @@ class UserDetailAdmin(admin.ModelAdmin):
     list_display = ('id', 'account', 'first_name', 'last_name', 'email', 'phone_number')
     search_fields = ('first_name', 'last_name', 'email')
     list_filter = ('province', 'district', 'sub_district')
-
-
-@admin.register(Permission)
-class PermissionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'permission_name', 'description')
-    search_fields = ('permission_name',)
-
-
-@admin.register(RoleHasPermission)
-class RoleHasPermissionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'role', 'permission')
-    search_fields = ('role__role_name', 'permission__permission_name')
-
 
 @admin.register(TypeOfVenue)
 class TypeOfVenueAdmin(admin.ModelAdmin):
@@ -91,7 +78,7 @@ class CategoryOfEventAdmin(admin.ModelAdmin):
     search_fields = ('category_name',)
 
 
-@admin.register(EvnetOfVenue)
+@admin.register(EventOfVenue)
 class EvnetOfVenueAdmin(admin.ModelAdmin):
     list_display = ('id', 'venue', 'venue_request', 'CategoryOfEvent')
     search_fields = ('venue__venue_name', 'CategoryOfEvent__category_name')
@@ -100,3 +87,11 @@ class EvnetOfVenueAdmin(admin.ModelAdmin):
 class StatusBookingAdmin(admin.ModelAdmin):
     list_display = ('id','status','description')
     # search_fields  = ('status')
+
+@admin.register(Review)
+class Review(admin.ModelAdmin):
+    list_display = ('id','account','venue','reviewDetail','createAt','point')
+
+@admin.register(Notifications)
+class Notifications(admin.ModelAdmin):
+    list_display =  ('id','notifications_type','create_at','sender')

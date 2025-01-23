@@ -4,17 +4,16 @@ from .models import (
     Role,
     Account,
     UserDetail,
-    Permission,
-    RoleHasPermission,
     Venue,
     TypeOfVenue,
     VenueRequest,
     Booking,
     VenueApproval,
     CategoryOfEvent,
-    EvnetOfVenue,
+    EventOfVenue,
     StatusBooking,
-
+    Review,
+    Notifications,
 )
 
 class RoleSerializer(serializers.ModelSerializer):
@@ -32,19 +31,6 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserDetail
-        fields = '__all__'
-
-class PermissionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Permission
-        fields = '__all__'
-
-class RoleHasPermissionSerializer(serializers.ModelSerializer):
-    role = RoleSerializer()
-    permission = PermissionSerializer()
-
-    class Meta:
-        model = RoleHasPermission
         fields = '__all__'
 
 class VenueSerializer(serializers.ModelSerializer):
@@ -89,12 +75,24 @@ class CategoryOfEventSerializer(serializers.ModelSerializer):
         model = CategoryOfEvent
         fields = '__all__'
 
-class EvnetOfVenueSerializer(serializers.ModelSerializer):
+class EventOfVenueSerializer(serializers.ModelSerializer):
     venue = VenueSerializer()
     venue_request = VenueRequestSerializer()
     category_of_event = CategoryOfEventSerializer()
 
     class Meta:
-        model = EvnetOfVenue
+        model = EventOfVenue
         fields = '__all__'
 
+class ReviewSerializer(serializers.ModelSerializer):
+    account  = serializers.PrimaryKeyRelatedField(queryset=Account.objects.all())
+    venue = serializers.PrimaryKeyRelatedField(queryset=Venue.objects.all())
+
+    class  Meta:
+        model = Review
+        fields = '__all__'
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class  Meta:
+        model = Notifications
+        fields = '__all__'

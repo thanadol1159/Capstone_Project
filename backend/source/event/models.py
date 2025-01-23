@@ -8,19 +8,10 @@ class Role(models.Model):
 class Account(models.Model):
     username = models.CharField(max_length=50,null=True, blank=True)
     password = models.CharField(max_length=255,null=True, blank=True)
+    email = models.EmailField(max_length=255,null=True, blank=True)
     creation_date = models.DateTimeField(null=True, blank=True)
     last_login = models.DateTimeField(null=True, blank=True)
-# class Account(AbstractBaseUser):
-#     username = models.CharField(max_length=50, unique=True)
-#     password = models.CharField(max_length=255)
-#     creation_date = models.DateTimeField(auto_now_add=True)
-#     last_login = models.DateTimeField(blank=True, null=True)
-
-#     # Required fields for authentication
-#     is_active = models.BooleanField(default=True)
-
-#     USERNAME_FIELD = 'username'
-#     REQUIRED_FIELDS = []
+    role_id = models.ForeignKey(Role,on_delete=models.CASCADE, null=True, blank=True)
 
 class UserDetail(models.Model):
     account = models.OneToOneField(Account, on_delete=models.CASCADE)
@@ -33,14 +24,6 @@ class UserDetail(models.Model):
     sub_district = models.CharField(max_length=45)
     address = models.CharField(max_length=255)
     dob = models.DateField()
-
-class Permission(models.Model):
-    permission_name = models.CharField(max_length=50)
-    description = models.TextField()
-
-class RoleHasPermission(models.Model):
-    role = models.ForeignKey(Role, on_delete=models.CASCADE)
-    permission = models.ForeignKey(Permission, on_delete=models.CASCADE)
 
 class TypeOfVenue(models.Model):
     type_name = models.CharField(max_length=45,null=True)
@@ -59,8 +42,8 @@ class Venue(models.Model):
     parking_space = models.IntegerField(null=True, blank=True)
     outdoor_spaces = models.IntegerField(null=True, blank=True)
     additional_information = models.TextField(null=True, blank=True)
-    venue_certification = models.CharField(max_length=255, null=True, blank=True)
-    personal_identification = models.CharField(max_length=255, null=True, blank=True)
+    venue_certification = models.FileField(upload_to='pdfs/',null=True, blank=True)
+    personal_identification = models.FileField(upload_to='pdfs/',null=True, blank=True)
     venue_owner = models.ForeignKey(Account,on_delete=models.CASCADE, null=True, blank=True)
 
 class VenueRequest(models.Model):
@@ -76,8 +59,8 @@ class VenueRequest(models.Model):
     parking_space = models.IntegerField(null=True, blank=True)
     outdoor_spaces = models.IntegerField(null=True, blank=True)
     additional_information = models.TextField(null=True, blank=True)
-    venue_certification = models.CharField(max_length=255, null=True, blank=True)
-    personal_identification = models.CharField(max_length=255, null=True, blank=True)
+    venue_certification = models.FileField(upload_to='pdfs/',null=True, blank=True)
+    personal_identification = models.FileField(upload_to='pdfs/',null=True, blank=True)
     venue_owner = models.ForeignKey(Account,on_delete=models.CASCADE, null=True, blank=True)
     
 class StatusBooking(models.Model):
@@ -104,8 +87,20 @@ class CategoryOfEvent(models.Model):
     category_name = models.CharField(max_length=45)
     category_detail = models.CharField(max_length=45)
 
-class EvnetOfVenue(models.Model):
+class EventOfVenue(models.Model):
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE)
     venue_request = models.ForeignKey(VenueRequest, on_delete=models.CASCADE)
     CategoryOfEvent = models.ForeignKey(CategoryOfEvent, on_delete=models.CASCADE)
 
+class Review(models.Model):
+    account = models.ForeignKey(Account,on_delete=models.CASCADE, null=True, blank=True)
+    venue = models.ForeignKey(Venue, on_delete=models.CASCADE, null=True,blank=True)
+    reviewDetail = models.TextField()
+    createAt = models.DateTimeField()
+    point = models.IntegerField()
+
+class Notifications(models.Model):
+    notifications_type =  models.CharField(max_length=45,)
+    create_at = models.DateTimeField()
+    message =  models.TextField(null=True,blank=True)
+    sender  = models.ForeignKey(Account, on_delete=models.CASCADE, null=True,blank=True)

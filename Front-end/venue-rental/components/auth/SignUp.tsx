@@ -11,23 +11,30 @@ const SignUpPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const dispatch = useDispatch();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (password !== confirmPassword) {
-      alert("Passwords do not match");
-      return;
-    }
+    setIsSubmitting(true);
 
     try {
-      await apiJson.post("/accounts/", {
+      if (password !== confirmPassword) {
+        alert("Passwords do not match");
+        setIsSubmitting(false);
+        return;
+      }
+
+      const registerResponse = await apiJson.post("/accounts/", {
         username,
         email,
         password,
       });
+
+      if (registerResponse.status === 201) {
+        alert(registerResponse.data.message);
+      }
 
       const response = await apiJson.post("/token/", {
         username,
@@ -42,6 +49,8 @@ const SignUpPage = () => {
       console.error("Error signing up:", error);
       alert("Registration failed. Please try again.");
     }
+
+    setIsSubmitting(false);
   };
 
   const handleBack = () => {
@@ -69,6 +78,7 @@ const SignUpPage = () => {
               className="flex-grow px-4 py-2 border rounded-lg focus:ring focus:ring-indigo-300 focus:outline-none text-gray-700"
               placeholder="Choose a username"
               required
+              disabled={isSubmitting}
             />
           </div>
 
@@ -85,6 +95,7 @@ const SignUpPage = () => {
               className="flex-grow px-4 py-2 border rounded-lg focus:ring focus:ring-indigo-300 focus:outline-none text-gray-700"
               placeholder="Enter your email"
               required
+              disabled={isSubmitting}
             />
           </div>
 
@@ -99,9 +110,10 @@ const SignUpPage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="flex-grow px-4 py-2 border rounded-lg focus:ring focus:ring-indigo-300 focus:outline-none text-gray-700"
-              placeholder="Password must be up to 8 characters"
+              placeholder="Password must be at least 8 characters"
               required
               minLength={8}
+              disabled={isSubmitting}
             />
           </div>
 
@@ -119,13 +131,12 @@ const SignUpPage = () => {
               placeholder="Repeat your password"
               required
               minLength={8}
+              disabled={isSubmitting}
             />
           </div>
 
-          {/* Horizontal Line */}
           <div className="border-t border-gray-300 my-4"></div>
 
-          {/* Login Link */}
           <div className="text-center">
             <span className="text-gray-700">
               Already have an account?{" "}
@@ -133,48 +144,28 @@ const SignUpPage = () => {
                 // onClick={handleLogin}
                 href="/nk1/login"
                 className="text-[#1A9DB8] font-semibold hover:underline"
+                // disabled={isSubmitting}
               >
                 Log in
               </Link>
             </span>
           </div>
 
-          {/* Social Sign Up Options */}
-          {/* <div className="flex justify-center space-x-4 mt-4">
-            <button
-              type="button"
-              className="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-200 transition duration-200"
-            >
-              Gmail
-            </button>
-            <button
-              type="button"
-              className="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-200 transition duration-200"
-            >
-              Line
-            </button>
-            <button
-              type="button"
-              className="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-200 transition duration-200"
-            >
-              GitHub
-            </button>
-          </div> */}
-
-          {/* Back and Sign Up Buttons */}
           <div className="flex justify-center mt-6 space-x-10">
             <button
               type="button"
               onClick={handleBack}
               className="py-2 px-12 border rounded-lg text-gray-700 hover:bg-gray-200 transition duration-200"
+              disabled={isSubmitting}
             >
               Back
             </button>
             <button
               type="submit"
-              className="py-2 px-12 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 transition duration-200"
+              className="py-2 px-12 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isSubmitting}
             >
-              Sign Up
+              {isSubmitting ? "Signing up..." : "Sign Up"}
             </button>
           </div>
         </form>
