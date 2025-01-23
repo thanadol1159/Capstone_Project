@@ -81,10 +81,10 @@ class AccountViewSet(viewsets.ModelViewSet):
                 {"error": "password are required length more than 8 charactor"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-            User.objects.create_user(username=username, password=password)
+            
             
         try:
-            
+            User.objects.create_user(username=username, password=password)
             Account.objects.create(username=username, password=make_password(password))
             return Response(
                 {"message": "Account and User created successfully!"},
@@ -106,7 +106,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             account = Account.objects.get(username=user.username)
             token['account_id'] = account.id  
         except Account.DoesNotExist:
-            token['account_id'] = None  # Or handle the case when the account is not found
+            token['account_id'] = None 
         
         return token
 
