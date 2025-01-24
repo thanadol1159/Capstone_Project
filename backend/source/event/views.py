@@ -10,7 +10,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import action
-
+from django.db import IntegrityError
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import Account
@@ -61,42 +61,52 @@ class AccountViewSet(viewsets.ModelViewSet):
             return [AllowAny()]
         return [IsAuthenticated()]
     
-    def create(self, request, *args, **kwargs):
-        username = request.data.get('username')
-        password = request.data.get('password')
-        if not username or not password:
-            return Response(
-                {"error": "Username and password are required"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+def create(self, request, *args, **kwargs):
+    username = request.data.get('username')  # ใช้ request.data แทน request.REQUEST
+    password = request.data.get('password')
+    
+    # ตรวจสอบว่า username และ password ถูกส่งมาหรือไม่
+    if not username or not password:
+        return Response(
+            {"error": "Username and password are required"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    # ตรวจสอบว่า username ซ้ำหรือไม่
+    if Account.objects.filter(username=username).exists() or User.objects.filter(username=username).exists():
+        return Response(
+            {"error": "Username already exists"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    # ตรวจสอบความยาว password
+    if len(password) < 8:
+        return Response(
+            {"error": "Password must be at least 8 characters long"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        # สร้าง Account และ User
+        Account.objects.create(username=username, password=make_password(password))
+        User.objects.create_user(username=username, password=password)
+    except IntegrityError as e:
+        # จัดการกรณีที่เกิดข้อผิดพลาดกับฐานข้อมูล
+        return Response(
+            {"error": "An error occurred while creating the account"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+    except Exception as e:
+        # จัดการข้อผิดพลาดอื่น ๆ
+        return Response(
+            {"error": f"Unexpected error: {str(e)}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 
-        if Account.objects.filter(username=username).exists() or  User.objects.filter(username=username).exists():
-            return Response(
-                {"error": "Username already exists"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        if len(password) <  8  :
-            return Response(
-                {"error": "password are required length more than 8 charactor"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-            User.objects.create_user(username=username, password=password)
-            
-        try:
-            
-            Account.objects.create(username=username, password=make_password(password))
-            return Response(
-                {"message": "Account and User created successfully!"},
-                status=status.HTTP_201_CREATED
-            )
-
-        except Exception as e:
-            return Response(
-                {"error": f"An error occurred: {str(e)}"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
+    return Response(
+        {"message": "Account and User created successfully!"},
+        status=status.HTTP_201_CREATED
+    )
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
