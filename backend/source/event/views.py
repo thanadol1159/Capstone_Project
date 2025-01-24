@@ -80,10 +80,10 @@ class AccountViewSet(viewsets.ModelViewSet):
             return Response(
                 {"error": "password are required length more than 8 charactor"},
                 status=status.HTTP_400_BAD_REQUEST
-            )
-            
+        )
+        User.objects.create_user(username=username, password=password)
         try:
-            User.objects.create_user(username=username, password=password)
+            
             Account.objects.create(username=username, password=make_password(password))
             return Response(
                 {"message": "Account and User created successfully!"},
