@@ -58,11 +58,26 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
 
     def get_permissions(self):
-        if self.action == 'POST':
+        if self.action == 'create':
             return [AllowAny()]
         return [IsAuthenticated()]
 
-    def post(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs):
+        username = request.data.get('username')  
+        password = request.data.get('password')
+        
+        if User.objects.filter(username=username).exists():
+            return Response(
+                {"error": "Username already exists"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        if len(password) < 8:
+            return Response(
+                {"error": "Password must be at least 8 characters long"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -72,70 +87,10 @@ class UserViewSet(viewsets.ModelViewSet):
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def get(self, request, *args, **kwargs):
+    def list(self, request, *args, **kwargs):
         users = User.objects.all()  
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def get(self, request, *args, **kwargs):
-        users = User.objects.all()  
-        serializer = UserSerializer(users, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-# class AccountViewSet(viewsets.ModelViewSet):
-#     queryset = Account.objects.all()
-#     serializer_class = AccountSerializer
-
-    # def get_permissions(self):
-    #     if self.action == 'create':
-    #         return [AllowAny()]
-    #     return [IsAuthenticated()]
-        
-    # def create(self, request, *args, **kwargs):
-    #     username = request.data.get('username')  
-    #     password = request.data.get('password')
-        
-    #     if not username or not password:
-    #         return Response(
-    #             {"error": "Username and password are required"},
-    #             status=status.HTTP_400_BAD_REQUEST
-    #         )
-        
-    #     if Account.objects.filter(username=username).exists() or User.objects.filter(username=username).exists():
-    #         return Response(
-    #             {"error": "Username already exists"},
-    #             status=status.HTTP_400_BAD_REQUEST
-    #         )
-        
-    #     if len(password) < 8:
-    #         return Response(
-    #             {"error": "Password must be at least 8 characters long"},
-    #             status=status.HTTP_400_BAD_REQUEST
-    #         )
-        
-    #     try:
-    #         # user = Account.objects.create(username=username, password=make_password(password))
-    #         user = User.objects.create_user(username=username, password=password)
-    #         user.save()
-    #         # time.sleep(5)
-    #         # Account.objects.create(username=username, password=make_password(password))
-    #         # account.save()
-    #     except IntegrityError as e:
-    #         return Response(
-    #             {"error": "An error occurred while creating the account"},
-    #             status=status.HTTP_500_INTERNAL_SERVER_ERROR
-    #         )
-
-    #     except Exception as e:
-    #         return Response(
-    #             {"error": f"Unexpected error: {str(e)}"},
-    #             status=status.HTTP_500_INTERNAL_SERVER_ERROR
-    #         )
-
-    #     return Response(
-    #         {"message": "Account and User created successfully!"},
-    #         status=status.HTTP_201_CREATED
-    #     )
 
 # class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 #     @classmethod
