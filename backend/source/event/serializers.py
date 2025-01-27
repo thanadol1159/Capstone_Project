@@ -1,8 +1,9 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth.models import User
 from .models import (
     Role,
-    Account,
+    # Account,
     UserDetail,
     Venue,
     TypeOfVenue,
@@ -21,14 +22,31 @@ class RoleSerializer(serializers.ModelSerializer):
         model = Role
         fields = '__all__'
 
-class AccountSerializer(serializers.ModelSerializer):
+# class AccountSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Account
+#         fields = '__all__'
+
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Account
-        fields = '__all__'
+        model = User
+        fields = ['id', 'username', 'password', 'email', 'first_name', 'last_name']
+        extra_kwargs = {
+            'password': {'write_only': True} 
+        }
+        
+    def create(self, validated_data):
+        # ใช้ set_password เพื่อแฮชรหัสผ่านก่อนบันทึก
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            password=validated_data['password'],
+            email=validated_data.get('email', ''),
+            first_name=validated_data.get('first_name', ''),
+            last_name=validated_data.get('last_name', ''),
+        )
+        return user
 
 class UserDetailSerializer(serializers.ModelSerializer):
-    account = AccountSerializer()
-
     class Meta:
         model = UserDetail
         fields = '__all__'
@@ -54,7 +72,7 @@ class StatusBookingSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class BookingSerializer(serializers.ModelSerializer):
-    account  = serializers.PrimaryKeyRelatedField(queryset=Account.objects.all())
+    user  = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     venue = serializers.PrimaryKeyRelatedField(queryset=Venue.objects.all())
     StatusBooking = StatusBookingSerializer(read_only=True)
 
@@ -64,7 +82,7 @@ class BookingSerializer(serializers.ModelSerializer):
 
 class VenueApprovalSerializer(serializers.ModelSerializer):
     venue_request = VenueRequestSerializer()
-    account = AccountSerializer()
+    user = UserSerializer()
 
     class Meta:
         model = VenueApproval
@@ -85,7 +103,7 @@ class EventOfVenueSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ReviewSerializer(serializers.ModelSerializer):
-    account  = serializers.PrimaryKeyRelatedField(queryset=Account.objects.all())
+    user  = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     venue = serializers.PrimaryKeyRelatedField(queryset=Venue.objects.all())
 
     class  Meta:

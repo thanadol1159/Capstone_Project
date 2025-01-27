@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import (
     Role,
-    Account,
+    # Account,
     UserDetail,
     TypeOfVenue,
     Venue,
@@ -23,15 +23,15 @@ class RoleAdmin(admin.ModelAdmin):
     search_fields = ('role_name',)
 
 
-@admin.register(Account)
-class AccountAdmin(admin.ModelAdmin):
-    list_display = ('id', 'username', 'creation_date', 'last_login')
-    search_fields = ('username',)
+# @admin.register(Account)
+# class AccountAdmin(admin.ModelAdmin):
+#     list_display = ('id', 'user', 'creation_date', 'last_login')
+#     search_fields = ('user',)
 
 
 @admin.register(UserDetail)
 class UserDetailAdmin(admin.ModelAdmin):
-    list_display = ('id', 'account', 'first_name', 'last_name', 'email', 'phone_number')
+    list_display = ('id', 'first_name', 'last_name', 'email', 'phone_number')
     search_fields = ('first_name', 'last_name', 'email')
     list_filter = ('province', 'district', 'sub_district')
 
@@ -68,7 +68,7 @@ class BookingAdmin(admin.ModelAdmin):
 
 @admin.register(VenueApproval)
 class VenueApprovalAdmin(admin.ModelAdmin):
-    list_display = ('id', 'id_venue_approval', 'status', 'comment', 'datetime', 'venue_request', 'account')
+    list_display = ('id', 'id_venue_approval', 'status', 'comment', 'datetime', 'venue_request', 'user')
     search_fields = ('id_venue_approval', 'status')
 
 
@@ -90,8 +90,8 @@ class StatusBookingAdmin(admin.ModelAdmin):
 
 @admin.register(Review)
 class Review(admin.ModelAdmin):
-    list_display = ('id','account','venue','reviewDetail','createAt','point')
+    list_display = ('id','user','venue','reviewDetail','createAt','point')
 
 @admin.register(Notifications)
 class Notifications(admin.ModelAdmin):
-    list_display =  ('id','notifications_type','create_at','sender')
+    list_display =  ('id','notifications_type','create_at','user')
