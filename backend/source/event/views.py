@@ -205,19 +205,19 @@ class ReviewViewSet(viewsets.ModelViewSet):
         # bkk =  pytz("Thailand/Bang_kok")
         # booking = request.data.get('booking')
         booking  =  Booking.objects.filter(id=1)
+        booking_status = booking[0].status_booking.status
         booking_Time =  booking[0].check_out
-        time  =  booking_Time.strftime("%H:%M:%S")
         print(booking_Time)
-        print(current_time)
+        print(booking_status)
         print(currentDateAndTime)
-        if time >  current_time:
+        if booking_Time <  currentDateAndTime and booking_status == "approved":
             return  Response(
                 {"message": "User has an active booking"},
                 status=status.HTTP_200_OK,
             )
         else:
              return Response(
-                    {"error": "Cannot proceed, checkout time has already passed"},
+                    {"error": "Cannot proceed, checkout time was not past current date"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
         # if bookings.exists():
