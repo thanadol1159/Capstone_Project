@@ -7,7 +7,7 @@ from .models import (
     UserDetail,
     Venue,
     TypeOfVenue,
-    # VenueRequest,
+    VenueRequest,
     Booking,
     # VenueApproval,
     CategoryOfEvent,
@@ -79,13 +79,13 @@ class BookingSerializer(serializers.ModelSerializer):
         model = Booking
         fields = '__all__'
 
-# class VenueApprovalSerializer(serializers.ModelSerializer):
-#     venue_request = VenueRequestSerializer()
-#     user = UserSerializer()
+class VenueApprovalSerializer(serializers.ModelSerializer):
+    venue_request = VenueRequestSerializer()
+    user = UserSerializer()
 
-#     class Meta:
-#         model = VenueApproval
-#         fields = '__all__'
+    class Meta:
+        model = VenueApproval
+        fields = '__all__'
 
 class CategoryOfEventSerializer(serializers.ModelSerializer):
     class Meta:
@@ -94,7 +94,7 @@ class CategoryOfEventSerializer(serializers.ModelSerializer):
 
 class EventOfVenueSerializer(serializers.ModelSerializer):
     venue = VenueSerializer()
-    # venue_request = VenueRequestSerializer()
+    venue_request = VenueRequestSerializer()
     category_of_event = CategoryOfEventSerializer()
 
     class Meta:

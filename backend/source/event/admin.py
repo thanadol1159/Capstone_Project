@@ -5,7 +5,7 @@ from .models import (
     UserDetail,
     TypeOfVenue,
     Venue,
-    # VenueRequest,
+    VenueRequest,
     Booking,
     # VenueApproval,
     CategoryOfEvent,
@@ -50,13 +50,13 @@ class VenueAdmin(admin.ModelAdmin):
     list_filter = ('category_event',)
 
 
-# @admin.register(VenueRequest)
-# class VenueRequestAdmin(admin.ModelAdmin):
-#     list_display = (
-#         'id', 'venue_type', 'venue_name', 'location', 'price', 'capacity', 'parking_space'
-#     )
-#     search_fields = ('venue_name', 'location')
-#     list_filter = ('category_event',)
+@admin.register(VenueRequest)
+class VenueRequestAdmin(admin.ModelAdmin):
+    list_display = (
+        'id', 'venue_type', 'venue_name', 'location', 'price', 'capacity', 'parking_space'
+    )
+    search_fields = ('venue_name', 'location')
+    list_filter = ('category_event',)
 
 
 @admin.register(Booking)

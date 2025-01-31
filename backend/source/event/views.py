@@ -24,7 +24,7 @@ from .models import (
     UserDetail,
     Venue,
     TypeOfVenue,
-    # VenueRequest,
+    VenueRequest,
     Booking,
     # VenueApproval,
     CategoryOfEvent,
@@ -40,7 +40,7 @@ from .serializers import (
     UserDetailSerializer,
     VenueSerializer,
     TypeOfvanueSerializer,
-    # VenueRequestSerializer,
+    VenueRequestSerializer,
     BookingSerializer,
     # VenueApprovalSerializer,
     CategoryOfEventSerializer,
@@ -132,29 +132,29 @@ class TypeOfvanueViewSet(viewsets.ModelViewSet):
             return [AllowAny()]
         return [IsAuthenticated()]
 
-# class VenueRequestViewSet(viewsets.ModelViewSet):
-#     queryset = VenueRequest.objects.all()
-#     serializer_class = VenueRequestSerializer
+class VenueRequestViewSet(viewsets.ModelViewSet):
+    queryset = VenueRequest.objects.all()
+    serializer_class = VenueRequestSerializer
 
-#     def get_permissions(self):
-#         if self.action == 'list' or self.action == 'retrieve':
-#             return [AllowAny()]
-#         return [IsAuthenticated()]
+    def get_permissions(self):
+        if self.action == 'list' or self.action == 'retrieve':
+            return [AllowAny()]
+        return [IsAuthenticated()]
 
-#     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
-#     def my_venues(self, request):
-#         try:
-#             user = User.objects.get(username=request.user.username)
-#             venues = Venue.objects.filter(venue_owner=user)
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def my_venues(self, request):
+        try:
+            user = User.objects.get(username=request.user.username)
+            venues = Venue.objects.filter(venue_owner=user)
             
-#             serializer = self.get_serializer(venues, many=True)
-#             return Response(serializer.data)
+            serializer = self.get_serializer(venues, many=True)
+            return Response(serializer.data)
         
-#         except User.DoesNotExist:
-#             return Response(
-#                 {"error": "user not found"}, 
-#                 status=status.HTTP_404_NOT_FOUND
-#             )
+        except User.DoesNotExist:
+            return Response(
+                {"error": "user not found"}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
 
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
@@ -210,6 +210,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
         print(booking_Time)
         print(booking_status)
         print(currentDateAndTime)
+        # change status of booking
+
         if booking_Time <  currentDateAndTime and booking_status == "approved":
             return  Response(
                 {"message": "User has an active booking"},
