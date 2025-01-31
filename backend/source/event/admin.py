@@ -7,7 +7,7 @@ from .models import (
     Venue,
     VenueRequest,
     Booking,
-    VenueApproval,
+    # VenueApproval,
     CategoryOfEvent,
     EventOfVenue,
     StatusBooking,
@@ -66,10 +66,10 @@ class BookingAdmin(admin.ModelAdmin):
     list_filter = ('check_in', 'check_out')
 
 
-@admin.register(VenueApproval)
-class VenueApprovalAdmin(admin.ModelAdmin):
-    list_display = ('id', 'id_venue_approval', 'status', 'comment', 'datetime', 'venue_request', 'user')
-    search_fields = ('id_venue_approval', 'status')
+# @admin.register(VenueApproval)
+# class VenueApprovalAdmin(admin.ModelAdmin):
+#     list_display = ('id', 'id_venue_approval', 'status', 'comment', 'datetime', 'venue_request', 'user')
+#     search_fields = ('id_venue_approval', 'status')
 
 
 @admin.register(CategoryOfEvent)
@@ -80,7 +80,7 @@ class CategoryOfEventAdmin(admin.ModelAdmin):
 
 @admin.register(EventOfVenue)
 class EvnetOfVenueAdmin(admin.ModelAdmin):
-    list_display = ('id', 'venue', 'venue_request', 'CategoryOfEvent')
+    list_display = ('id', 'venue', 'CategoryOfEvent')
     search_fields = ('venue__venue_name', 'CategoryOfEvent__category_name')
 
 @admin.register(StatusBooking)
