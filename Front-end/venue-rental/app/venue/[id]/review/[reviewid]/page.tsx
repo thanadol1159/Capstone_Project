@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/hook/store";
 import { apiJson } from "@/hook/api";
 import { Star } from "lucide-react";
-import { useAccountId } from "@/hook/userid";
+import { useUserId } from "@/hook/userid";
 
 export default function ReviewCreate() {
   const params = useParams();
@@ -14,7 +14,7 @@ export default function ReviewCreate() {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
 
-  const accountId = useAccountId();
+  const userId = useUserId();
   const venueId = params.id;
 
   const handleSubmitReview = async () => {
@@ -25,7 +25,7 @@ export default function ReviewCreate() {
 
     try {
       await apiJson.post("/reviews/", {
-        account: accountId,
+        user: userId,
         venue: venueId,
         reviewDetail: reviewText,
         point: rating,

@@ -1,6 +1,6 @@
 interface Review {
   id: number;
-  account: number;
+  user: number;
   createAt: string;
   point: number;
   reviewDetail: string;

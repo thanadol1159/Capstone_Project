@@ -25,7 +25,7 @@ const SignUpPage = () => {
         return;
       }
 
-      const registerResponse = await apiJson.post("/accounts/", {
+      const registerResponse = await apiJson.post("/users/", {
         username,
         email,
         password,
