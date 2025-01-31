@@ -37,7 +37,7 @@ const BookingsPage = () => {
         <table className="w-full bg-[#f8f3ef] rounded-lg overflow-hidden shadow border-separate border-spacing-y-4 p-4">
           <thead>
             <tr className="text-left text-[#492b26] font-bold border-b border-[#c6a89e]">
-              <th className="py-4 px-6">PLACE NAME</th>
+              <th className="py-4 px-6">PLACE NAMESSSS</th>
               <th className="py-4 px-6">DATE</th>
               <th className="py-4 px-6 text-center">STATUS</th>
               <th className="py-4 px-6 text-center">Detail</th>
