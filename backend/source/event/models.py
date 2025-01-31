@@ -39,10 +39,6 @@ class Venue(models.Model):
     personal_identification = models.FileField(upload_to='pdfs/',null=True, blank=True)
     venue_owner = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)
 
-class StatusBooking(models.Model):
-    status =  models.CharField(max_length=25, null=True)
-    description = models.TextField(null=True)
-    
 class VenueRequest(models.Model):
     venue_type = models.ForeignKey(TypeOfVenue,on_delete=models.CASCADE,null=True, blank=True) 
     venue_name = models.CharField(max_length=50,null=True, blank=True)
@@ -59,8 +55,10 @@ class VenueRequest(models.Model):
     venue_certification = models.FileField(upload_to='pdfs/',null=True, blank=True)
     personal_identification = models.FileField(upload_to='pdfs/',null=True, blank=True)
     venue_owner = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)
-    status = models.ForeignKey(StatusBooking, on_delete=models.CASCADE,null=True, blank=True)
     
+class StatusBooking(models.Model):
+    status =  models.CharField(max_length=25, null=True)
+    description = models.TextField(null=True)
 
 class Booking(models.Model):
     check_in = models.DateTimeField(null=True,blank=True)
