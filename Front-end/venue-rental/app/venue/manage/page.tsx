@@ -123,7 +123,7 @@ const AddVenuePage = () => {
         const ownerNamePromises = venues.map(async (venue) => {
           try {
             const response = await apiJson.get(
-              `/users/${venue.venue_owner}/`
+              `/accounts/${venue.venue_owner}/`
             );
             return {
               venueId: venue.id,

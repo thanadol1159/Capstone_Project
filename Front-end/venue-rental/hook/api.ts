@@ -32,8 +32,7 @@ const apiFormData = axios.create({
   },
 });
 
-// Function to refresh the access token 
-// production
+// Function to refresh the access token
 // const refreshAccessToken = async () => {
 //   try {
 //     const state = store.getState();
@@ -75,8 +74,6 @@ const apiFormData = axios.create({
 //   }
 // };
 
-
-//Develop
 const refreshAccessToken = async () => {
   try {
     const state = store.getState();

@@ -14,7 +14,10 @@ from django.db import IntegrityError
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.core.exceptions import ValidationError
-import time
+from django.utils import timezone
+from datetime import datetime,date
+import pytz
+
 from .models import (
     Role,
     # Account,
@@ -23,7 +26,7 @@ from .models import (
     TypeOfVenue,
     VenueRequest,
     Booking,
-    VenueApproval,
+    # VenueApproval,
     CategoryOfEvent,
     EventOfVenue,
     StatusBooking,
@@ -39,7 +42,7 @@ from .serializers import (
     TypeOfvanueSerializer,
     VenueRequestSerializer,
     BookingSerializer,
-    VenueApprovalSerializer,
+    # VenueApprovalSerializer,
     CategoryOfEventSerializer,
     EventOfVenueSerializer,
     StatusBookingSerializer,
@@ -92,23 +95,6 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-# class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-#     @classmethod
-#     def get_token(cls, user):
-#         token = super().get_token(user)
-        
-#         try:
-#             account = Account.objects.get(username=user.username)
-#             token['account_id'] = account.id  
-#         except Account.DoesNotExist:
-#             token['account_id'] = None  # Or handle the case when the account is not found
-        
-#         return token
-
-# class CustomTokenObtainPairView(TokenObtainPairView):
-#     serializer_class = CustomTokenObtainPairSerializer
-#     permission_classes = [AllowAny]
-    
 class UserDetailViewSet(viewsets.ModelViewSet):
     queryset = UserDetail.objects.all()
     serializer_class = UserDetailSerializer
@@ -189,9 +175,9 @@ class BookingViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-class VenueApprovalViewSet(viewsets.ModelViewSet):
-    queryset = VenueApproval.objects.all()
-    serializer_class = VenueApprovalSerializer
+# class VenueApprovalViewSet(viewsets.ModelViewSet):
+#     queryset = VenueApproval.objects.all()
+#     serializer_class = VenueApprovalSerializer
 
 class CategoryOfEventViewSet(viewsets.ModelViewSet):
     queryset = CategoryOfEvent.objects.all()
@@ -208,6 +194,51 @@ class StatusBookingViewSet(viewsets.ModelViewSet):
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+
+    def create(self, request):
+
+
+        # checkout_bookings = bookings.checkout
+        zones = pytz.timezone("Asia/Jakarta")
+        currentDateAndTime = datetime.now(zones)
+        current_time = currentDateAndTime.strftime("%H:%M:%S")
+        # bkk =  pytz("Thailand/Bang_kok")
+        # booking = request.data.get('booking')
+        booking  =  Booking.objects.filter(id=1)
+        booking_status = booking[0].status_booking.status
+        booking_Time =  booking[0].check_out
+        print(booking_Time)
+        print(booking_status)
+        print(currentDateAndTime)
+        # change status of booking
+
+        if booking_Time <  currentDateAndTime and booking_status == "approved":
+            return  Response(
+                {"message": "User has an active booking"},
+                status=status.HTTP_200_OK,
+            )
+        else:
+             return Response(
+                    {"error": "Cannot proceed, checkout time was not past current date"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        # if bookings.exists():
+        #     expired_bookings = bookings.filter(checkout__lt=now)
+
+        #     if expired_bookings.exists():
+        #         return Response(
+        #             {"error": "Cannot proceed, checkout time has already passed"},
+        #             status=status.HTTP_400_BAD_REQUEST,
+        #         )
+        #     return Response(
+        #         {"message": "User has an active booking"},
+        #         status=status.HTTP_200_OK,
+        #     )
+        # else:
+        #     return Response(
+        #         {"error": "No booking found for this user"},
+        #         status=status.HTTP_404_NOT_FOUND,
+        #     )
 
 class NotificationViewset(viewsets.ModelViewSet):
     queryset = Notifications.objects.all()

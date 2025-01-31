@@ -5,15 +5,15 @@ import { Venue } from "@/types/venue";
 import axios from "axios";
 import { apiFormData } from "@/hook/api";
 import { useRouter } from "next/navigation";
-import { useUserId } from "@/hook/userid";
+import { useAccountId } from "@/hook/userid";
 import { useSelector } from "react-redux";
 import { RootState } from "@/hook/store";
 
 export default function ManageVenue() {
   const router = useRouter();
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
-  const userId = useUserId();
-  // console.log(accountId);
+  const accountId = useAccountId();
+  console.log(accountId);
   const [venueData, setVenueData] = useState<Partial<Venue>>({
     venue_type: 0,
     venue_name: "",
@@ -29,7 +29,7 @@ export default function ManageVenue() {
     additional_information: "",
     venue_certification: "",
     personal_identification: "",
-    venue_owner: Number(userId),
+    venue_owner: Number(accountId),
   });
 
   const [files, setFiles] = useState({

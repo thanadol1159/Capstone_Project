@@ -7,7 +7,6 @@ import { Venue } from "@/types/venue";
 import { VenueType } from "@/types/venueType";
 import { apiJson } from "@/hook/api";
 import { RootState } from "@/hook/store";
-import Review from "@/components/ui/ReviewsBox";
 
 const addNk1ToUrl = (url: string): string => {
   return url ? url.replace(/(:8080)(\/images\/)/, "$1/nk1$2") : "";
@@ -16,7 +15,6 @@ const addNk1ToUrl = (url: string): string => {
 export default function VenuePage() {
   const params = useParams();
   const [venue, setVenue] = useState<Venue | null>(null);
-  const [reviews, setReviews] = useState<Review[]>([]);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [typeVenue, setTypeVenue] = useState<VenueType | null>(null);
   const router = useRouter();
@@ -34,20 +32,8 @@ export default function VenuePage() {
       }
     };
 
-    const fetchReviews = async () => {
-      try {
-        const venueId = params.id;
-        const { data } = await apiJson.get(`/reviews?venue=${venueId}`);
-        setReviews(data);
-      } catch (error) {
-        console.error("Error fetching reviews:", error);
-        setReviews([]);
-      }
-    };
-
     if (params.id) {
       fetchVenueDetail();
-      fetchReviews();
     }
   }, [params.id]);
 
@@ -67,14 +53,6 @@ export default function VenuePage() {
 
     fetchVenueType();
   }, [venue]);
-
-  const handleCreateReview = () => {
-    if (!accessToken) {
-      setShowLoginModal(true);
-      return;
-    }
-    router.push(`/venue/${params.id}/review/create`);
-  };
 
   const handleBack = () => {
     router.push("/");
@@ -147,21 +125,6 @@ export default function VenuePage() {
           <span>{venueType}</span>
         </div>
       </div>
-
-      <div className="mt-8">
-        <h2 className="text-xl font-semibold mb-4">Reviews</h2>
-        <div className="space-y-4">
-          {reviews.map((review) => (
-            <Review
-              key={review.id}
-              date={review.createAt}
-              rating={review.point}
-              review={review.reviewDetail}
-            />
-          ))}
-        </div>
-      </div>
-
       <div className="flex justify-end mt-6 space-x-10">
         <button
           type="button"
@@ -175,12 +138,6 @@ export default function VenuePage() {
           className="py-2 px-12 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 transition duration-200"
         >
           {accessToken ? "Book Now" : "Login to Book"}
-        </button>
-        <button
-          onClick={handleCreateReview}
-          className="py-2 px-12 bg-white text-[#7A90A4] font-semibold rounded-lg border border-[#3F6B96]"
-        >
-          {accessToken ? "Write a Review" : "Login to Review"}
         </button>
       </div>
 

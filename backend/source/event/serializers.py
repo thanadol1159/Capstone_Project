@@ -9,7 +9,7 @@ from .models import (
     TypeOfVenue,
     VenueRequest,
     Booking,
-    VenueApproval,
+    # VenueApproval,
     CategoryOfEvent,
     EventOfVenue,
     StatusBooking,
@@ -30,13 +30,12 @@ class RoleSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'password', 'email', 'first_name', 'last_name']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name']
         extra_kwargs = {
             'password': {'write_only': True} 
         }
         
     def create(self, validated_data):
-        # ใช้ set_password เพื่อแฮชรหัสผ่านก่อนบันทึก
         user = User.objects.create_user(
             username=validated_data['username'],
             password=validated_data['password'],
@@ -61,10 +60,10 @@ class TypeOfvanueSerializer(serializers.ModelSerializer):
         model = TypeOfVenue
         fields = '__all__'
 
-# class VenueRequestSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = VenueRequest
-#         fields = '__all__'
+class VenueRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VenueRequest
+        fields = '__all__'
 
 class StatusBookingSerializer(serializers.ModelSerializer):
     class Meta:
@@ -80,13 +79,13 @@ class BookingSerializer(serializers.ModelSerializer):
         model = Booking
         fields = '__all__'
 
-class VenueApprovalSerializer(serializers.ModelSerializer):
-    venue_request = VenueRequestSerializer()
-    user = UserSerializer()
+# class VenueApprovalSerializer(serializers.ModelSerializer):
+#     venue_request = VenueRequestSerializer()
+#     user = UserSerializer()
 
-    class Meta:
-        model = VenueApproval
-        fields = '__all__'
+    # class Meta:
+    #     model = VenueApproval
+    #     fields = '__all__'
 
 class CategoryOfEventSerializer(serializers.ModelSerializer):
     class Meta:
@@ -105,6 +104,7 @@ class EventOfVenueSerializer(serializers.ModelSerializer):
 class ReviewSerializer(serializers.ModelSerializer):
     user  = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     venue = serializers.PrimaryKeyRelatedField(queryset=Venue.objects.all())
+    # booking =  serializers.PrimaryKeyRelatedField(querys=Booking.objects.all())
 
     class  Meta:
         model = Review

@@ -8,7 +8,7 @@ import { format, differenceInDays } from "date-fns";
 // import { JwtPayload } from "jwt-decode";
 // import { RootState } from "@/hook/store";
 // import { useSelector } from "react-redux";
-import { useUserId } from "@/hook/userid";
+import { useAccountId } from "@/hook/userid";
 
 interface BookingFormData {
   check_in: string;
@@ -33,9 +33,9 @@ export default function BookingPage() {
     check_out?: string;
   }>({});
 
-  const userId = useUserId();
+  const accountId = useAccountId();
 
-  console.log(userId);
+  console.log(accountId);
 
   useEffect(() => {
     const fetchVenueDetail = async () => {
@@ -120,7 +120,7 @@ export default function BookingPage() {
     try {
       setIsSubmitting(true);
       const bookingData = {
-        user: userId,
+        account: accountId,
         venue: params.id,
         check_in: new Date(formData.check_in).toISOString(),
         check_out: new Date(formData.check_out).toISOString(),
