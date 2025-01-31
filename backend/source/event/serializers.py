@@ -61,10 +61,10 @@ class TypeOfvanueSerializer(serializers.ModelSerializer):
         model = TypeOfVenue
         fields = '__all__'
 
-class VenueRequestSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = VenueRequest
-        fields = '__all__'
+# class VenueRequestSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = VenueRequest
+#         fields = '__all__'
 
 class StatusBookingSerializer(serializers.ModelSerializer):
     class Meta:
