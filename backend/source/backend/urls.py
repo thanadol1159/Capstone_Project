@@ -31,7 +31,7 @@ from event.views import (
     UserViewSet,
     VenueViewSet,
     TypeOfvanueViewSet,
-    # VenueRequestViewSet,
+    VenueRequestViewSet,
     BookingViewSet,
     VenueApprovalViewSet,
     CategoryOfEventViewSet,
@@ -48,7 +48,7 @@ router.register(r'user-details', UserDetailViewSet)
 router.register(r'users', UserViewSet, basename='user')
 router.register(r'venues', VenueViewSet)
 router.register(r'types-of-venue', TypeOfvanueViewSet)
-# router.register(r'venue-requests', VenueRequestViewSet)
+router.register(r'venue-requests', VenueRequestViewSet)
 router.register(r'bookings', BookingViewSet)
 router.register(r'venue-approvals', VenueApprovalViewSet)
 router.register(r'categories-of-event', CategoryOfEventViewSet)
