@@ -1,24 +1,36 @@
 "use client";
+import { useEffect, useState } from "react";
 import { Venue } from "@/types/venue";
 
 export default function VenueCard({
   id,
-  venue_type,
   venue_name,
   image,
   location,
   category_event,
-  price,
-  area_size,
-  capacity,
-  number_of_rooms,
-  parking_space,
-  outdoor_spaces,
-  additional_information,
-  venue_certification,
-  personal_identification,
   onDetailClick,
 }: Venue) {
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchImageBlob() {
+      if (!image) return;
+      try {
+        const response = await fetch(image); // โหลดรูปจาก API
+        const blob = await response.blob(); // แปลงเป็น Blob
+        const url = URL.createObjectURL(blob); // สร้าง Blob URL
+        setBlobUrl(url);
+      } catch (error) {
+        console.error("Error loading image:", error);
+      }
+    }
+
+    fetchImageBlob();
+    return () => {
+      if (blobUrl) URL.revokeObjectURL(blobUrl); // ล้าง Blob URL เมื่อ component unmount
+    };
+  }, [image]);
+
   const categoryColors: Record<string, string> = {
     Meeting: "bg-[#E5D59B] text-[#5E4444] bg-opacity-70",
     Studio: "bg-[#AADEE5] text-[#5E4444] bg-opacity-70",
@@ -26,31 +38,20 @@ export default function VenueCard({
     Default: "bg-gray-200 text-gray-600",
   };
 
-  const categoryKey = category_event || "Default";
-  const categoryStyle =
-    categoryColors[categoryKey] || categoryColors["Default"];
-
-  const addNk1ToUrl = (url: string): string => {
-    return url.replace(/(\/images\/)/, "$1/nk1$2");
-  };
-
-  const modifiedImage = image ? addNk1ToUrl(image) : "/placeholder-image.jpg";
+  const categoryStyle = categoryColors[category_event || "Default"];
 
   return (
     <div className="bg-white rounded-lg shadow-sm border-[2.5px] border-[#000000]">
       <div className="p-4">
         <img
-          src={modifiedImage}
+          src={blobUrl || "/placeholder-image.jpg"} // ใช้ Blob URL ถ้ามี
           alt={venue_name}
           className="w-full h-36 object-cover rounded-t-lg"
         />
         <div className="flex items-center py-2 mt-2 gap-2 ">
           <p className="text-black font-bold">{venue_name}</p>
-          {/* Category Badge */}
           {category_event && (
-            <div
-              className={`text-xs font-semibold px-3 py-1 rounded-md ${categoryStyle} opacity-70`}
-            >
+            <div className={`text-xs font-semibold px-3 py-1 rounded-md ${categoryStyle} opacity-70`}>
               {category_event}
             </div>
           )}
