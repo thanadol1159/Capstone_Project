@@ -37,8 +37,14 @@ export default function VenuePage() {
     const fetchReviews = async () => {
       try {
         const venueId = params.id;
-        const { data } = await apiJson.get(`/reviews?venue=${venueId}`);
-        setReviews(data);
+        const { data } = await apiJson.get(`/reviews`);
+
+        const filteredReviews = data.filter(
+          (review: { venue: number }) => review.venue === Number(venueId)
+        );
+
+        console.log("Filtered Reviews:", filteredReviews);
+        setReviews(filteredReviews);
       } catch (error) {
         console.error("Error fetching reviews:", error);
         setReviews([]);
@@ -157,6 +163,7 @@ export default function VenuePage() {
               date={review.createAt}
               rating={review.point}
               review={review.reviewDetail}
+              user={review.user}
             />
           ))}
         </div>

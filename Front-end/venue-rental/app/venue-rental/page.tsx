@@ -46,8 +46,8 @@ export default function VenueRental() {
                 onClick={() => handleCategoryClick(category)}
                 className={`px-12 py-1 rounded-lg ${
                   category === selectedCategory
-                    ? "bg-[#AC978A] text-black font-bold"
-                    : "bg-gray-200 text-black font-bold"
+                    ? "bg-[#335473] text-white font-bold"
+                    : "bg-[#BCCFE1] text-[#7397BB] font-bold"
                 }`}
               >
                 {category}

@@ -196,8 +196,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
 
     def create(self, request):
-
-
         # checkout_bookings = bookings.checkout
         zones = pytz.timezone("Asia/Jakarta")
         currentDateAndTime = datetime.now(zones)

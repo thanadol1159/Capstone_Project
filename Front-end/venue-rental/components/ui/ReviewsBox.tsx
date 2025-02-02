@@ -5,6 +5,7 @@ interface ReviewProps {
   date: string;
   rating: number;
   review: string;
+  user: number;
 }
 
 const formatDate = (dateString: string): string => {

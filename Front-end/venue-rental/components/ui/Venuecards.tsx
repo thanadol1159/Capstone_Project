@@ -37,7 +37,7 @@ export default function VenueCard({
   const modifiedImage = image ? addNk1ToUrl(image) : "/placeholder-image.jpg";
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border-[2.5px] border-[#000000]">
+    <div className="bg-white rounded-lg shadow-sm border-[2.5px] border-[#3F6B96]">
       <div className="p-4">
         <img
           src={modifiedImage}
@@ -63,7 +63,7 @@ export default function VenueCard({
 
         <button
           onClick={() => onDetailClick?.(id)}
-          className="w-full py-2 bg-[#5E4444] text-white rounded"
+          className="w-full py-2 bg-[#3F6B96] text-white rounded"
         >
           Detail
         </button>

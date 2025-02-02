@@ -36,9 +36,9 @@ export default function RootLayout({
 }>) {
   return (
     <html className={`${prompt.variable}`}>
-      <body className="bg-white h-screen">
+      <body className="bg-[#F2F8FF] h-screen">
         <ReduxProvider>
-          <div className="h-screen bg-white flex flex-col">
+          <div className="h-screen bg-[#F2F8FF] flex flex-col">
             <Navigation />
             <div className="flex flex-1 h-screen">
               <Sidebar />
