@@ -61,7 +61,7 @@ class VenueRequest(models.Model):
     personal_identification = models.FileField(upload_to='pdfs/',null=True, blank=True)
     venue_owner = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)
     status = models.ForeignKey(StatusBooking, on_delete=models.CASCADE,null=True, blank=True)
-    
+    venue = models.ForeignKey(Venue, on_delete=models.CASCADE,null=True, blank=True)
 
 class Booking(models.Model):
     check_in = models.DateTimeField(null=True,blank=True)
@@ -70,14 +70,6 @@ class Booking(models.Model):
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE, null=True,blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)
     status_booking = models.ForeignKey(StatusBooking, on_delete=models.CASCADE, null=True,blank=True)
-
-# class VenueApproval(models.Model):
-#     id_venue_approval = models.CharField(max_length=45)
-#     status = models.CharField(max_length=45)
-#     comment = models.CharField(max_length=45)
-#     datetime = models.DateTimeField()
-#     venue_request = models.ForeignKey(VenueRequest, on_delete=models.CASCADE)
-#     user = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)
 
 class CategoryOfEvent(models.Model):
     category_name = models.CharField(max_length=45)
