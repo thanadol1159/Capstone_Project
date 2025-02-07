@@ -175,10 +175,6 @@ class BookingViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-# class VenueApprovalViewSet(viewsets.ModelViewSet):
-#     queryset = VenueApproval.objects.all()
-#     serializer_class = VenueApprovalSerializer
-
 class CategoryOfEventViewSet(viewsets.ModelViewSet):
     queryset = CategoryOfEvent.objects.all()
     serializer_class = CategoryOfEventSerializer
