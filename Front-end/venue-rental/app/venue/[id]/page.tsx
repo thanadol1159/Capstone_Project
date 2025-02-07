@@ -53,6 +53,7 @@ export default function VenuePage() {
 
     if (params.id) {
       fetchVenueDetail();
+      fetchReviews();
     }
   }, [params.id]);
 
@@ -72,6 +73,14 @@ export default function VenuePage() {
 
     fetchVenueType();
   }, [venue]);
+
+  const handleCreateReview = () => {
+    if (!accessToken) {
+      setShowLoginModal(true);
+      return;
+    }
+    router.push(`/venue/${params.id}/review/create`);
+  };
 
   const handleBack = () => {
     router.push("/");
@@ -173,6 +182,12 @@ export default function VenuePage() {
           className="py-2 px-12 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 transition duration-200"
         >
           {accessToken ? "Book Now" : "Login to Book"}
+        </button>
+        <button
+          onClick={handleCreateReview}
+          className="py-2 px-12 bg-white text-[#7A90A4] font-semibold rounded-lg border border-[#3F6B96]"
+        >
+          {accessToken ? "Write a Review" : "Login to Review"}
         </button>
       </div>
 

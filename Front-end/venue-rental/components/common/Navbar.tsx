@@ -140,7 +140,6 @@ const Navigation = () => {
               <Link
                 className="bg-[#7397BB] text-white px-4 py-2 rounded-md hover:bg-[#C9D9EB]"
                 href="/nk1/login"
-                // onClick={handleLogin}
               >
                 Login
               </Link>

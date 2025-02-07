@@ -9,4 +9,5 @@ export interface VenueRequest {
   additional_information: string;
   venue_owner: number;
   status: number;
+  venue: number;
 }

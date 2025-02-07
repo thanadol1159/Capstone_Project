@@ -82,21 +82,6 @@ export default function BookingPage() {
       [name]: value,
     }));
   };
-
-  // const accessToken = useSelector((state: RootState) => state.auth.accessToken);
-
-  // const accountId = useMemo(() => {
-  //   if (!accessToken) return null;
-
-  //   try {
-  //     const decoded = jwtDecode<CustomJwtPayload>(accessToken);
-  //     return decoded.user_id;
-  //   } catch (error) {
-  //     console.error("Failed to decode token", error);
-  //     return null;
-  //   }
-  // }, [accessToken]);
-
   // Calculate total nights and total price
   const totalNights = useMemo(() => {
     if (!venue) return 0;
@@ -125,6 +110,7 @@ export default function BookingPage() {
         check_in: new Date(formData.check_in).toISOString(),
         check_out: new Date(formData.check_out).toISOString(),
         total_price: totalPrice,
+        status_booking: 3,
       };
 
       await apiJson.post("/bookings/", bookingData);

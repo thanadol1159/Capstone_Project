@@ -30,7 +30,9 @@ export default function VenueRental() {
     const matchesCategory =
       selectedCategory === "All" || venue.category_event === selectedCategory;
     const matchesSearch = venue.venue_name.toLowerCase().includes(searchQuery);
-    return matchesCategory && matchesSearch;
+    const matchesStatus = venue.status === 3; // Ensure only venues with status 3 are shown
+
+    return matchesCategory && matchesSearch && matchesStatus;
   });
 
   return (

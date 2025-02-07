@@ -37,10 +37,10 @@ const BookingsPage = () => {
         <table className="w-full bg-[#f8f3ef] rounded-lg overflow-hidden shadow border-separate border-spacing-y-4 p-4">
           <thead>
             <tr className="text-left text-[#492b26] font-bold border-b border-[#c6a89e]">
-              <th className="py-4 px-6">PLACE NAMESSSS</th>
+              <th className="py-4 px-6">PLACE NAME</th>
               <th className="py-4 px-6">DATE</th>
               <th className="py-4 px-6 text-center">STATUS</th>
-              <th className="py-4 px-6 text-center">Detail</th>
+              <th className="py-4 px-6 text-center">DETAIL</th>
             </tr>
           </thead>
           <tbody>
@@ -53,12 +53,23 @@ const BookingsPage = () => {
                   ).toUpperCase()
                 : "Unknown Date";
 
+              const statusText =
+                booking.status_booking === 1
+                  ? "Rejected"
+                  : booking.status_booking === 2
+                  ? "Pending"
+                  : booking.status_booking === 3
+                  ? "Approved"
+                  : "Unknown";
+
               const statusColor =
-                booking.status_booking === null
+                booking.status_booking === 1
+                  ? "text-red-600"
+                  : booking.status_booking === 2
                   ? "text-yellow-600"
-                  : booking.status_booking === "approve"
+                  : booking.status_booking === 3
                   ? "text-green-600"
-                  : "text-red-600";
+                  : "text-gray-600";
 
               return (
                 <React.Fragment key={booking.id}>
@@ -71,11 +82,7 @@ const BookingsPage = () => {
                     </td>
                     <td className="py-4 px-6 text-center">
                       <span className={`font-medium ${statusColor}`}>
-                        {booking.status_booking === null
-                          ? "In process"
-                          : booking.status_booking === "approve"
-                          ? "Approve"
-                          : "Rejected"}
+                        {statusText}
                       </span>
                     </td>
                     <td className="py-4 px-6 text-center">
@@ -96,11 +103,7 @@ const BookingsPage = () => {
                           </p>
                           <p>
                             <strong>Status:</strong>{" "}
-                            {booking.status_booking === null
-                              ? "In process"
-                              : booking.status_booking === "approve"
-                              ? "Approve"
-                              : "Disapprove"}
+                            <span className={statusColor}>{statusText}</span>
                           </p>
                           <p>
                             <strong>Venue Name:</strong>{" "}

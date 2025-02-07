@@ -99,31 +99,42 @@ export default function ManageVenue() {
     e.preventDefault();
 
     try {
-      // Create FormData instance
       const formData = new FormData();
-
       Object.entries(venueData).forEach(([key, value]) => {
         if (value !== null && value !== "") {
           formData.append(key, value.toString());
         }
       });
-
       Object.entries(files).forEach(([key, file]) => {
         if (file) {
           formData.append(key, file);
         }
       });
+
       console.log("Venue Data before submit:", venueData);
 
-      // Make POST request
-      const response = await apiFormData.post("/venues/", formData);
-      const responseRequest = await apiFormData.post("/venue-requests/", formData);
+      const venueResponse = await apiFormData.post("/venues/", formData);
 
-      if (response.status === 201 || response.status === 200) {
-        router.push("/venue/manage");
+      if (venueResponse.status === 201 || venueResponse.status === 200) {
+        const venueId = venueResponse.data.id;
+
+        formData.append("venue", venueId);
+
+        const requestResponse = await apiFormData.post(
+          "/venue-requests/",
+          formData
+        );
+
+        if (requestResponse.status === 201 || requestResponse.status === 200) {
+          router.push("/venue/manage");
+        } else {
+          console.error("Error creating venue request:", requestResponse);
+        }
+      } else {
+        console.error("Error creating venue:", venueResponse);
       }
     } catch (err) {
-      console.error("Error creating venue:", err);
+      console.error("Error:", err);
     }
   };
 
