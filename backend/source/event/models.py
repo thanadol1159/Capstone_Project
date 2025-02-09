@@ -7,7 +7,7 @@ class Role(models.Model):
     description = models.TextField()
 
 class UserDetail(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE,null=True, blank=True,related_name="detail")
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     phone_number = models.CharField(max_length=10)
@@ -17,6 +17,7 @@ class UserDetail(models.Model):
     sub_district = models.CharField(max_length=45)
     address = models.CharField(max_length=255)
     dob = models.DateField()
+    role = models.ForeignKey(Role, on_delete=models.CASCADE,null=True, blank=True)
 
 class TypeOfVenue(models.Model):
     type_name = models.CharField(max_length=45,null=True)
@@ -29,7 +30,7 @@ class StatusBooking(models.Model):
 class Venue(models.Model):
     venue_type = models.ForeignKey(TypeOfVenue,on_delete=models.CASCADE,null=True, blank=True) 
     venue_name = models.CharField(max_length=50,null=True, blank=True)  
-    image = models.ImageField(upload_to='images/', null=True, blank=True)
+    image = models.ImageField(upload_to='images/venue/', null=True, blank=True)
     location = models.CharField(max_length=100, null=True, blank=True)
     category_event = models.CharField(max_length=50, null=True, blank=True)
     price = models.IntegerField(null=True, blank=True)
@@ -39,15 +40,15 @@ class Venue(models.Model):
     parking_space = models.IntegerField(null=True, blank=True)
     outdoor_spaces = models.IntegerField(null=True, blank=True)
     additional_information = models.TextField(null=True, blank=True)
-    venue_certification = models.FileField(upload_to='pdfs/',null=True, blank=True)
-    personal_identification = models.FileField(upload_to='pdfs/',null=True, blank=True)
+    venue_certification = models.FileField(upload_to='pdfs/venue/',null=True, blank=True)
+    personal_identification = models.FileField(upload_to='pdfs/personal/',null=True, blank=True)
     venue_owner = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)
     status = models.ForeignKey(StatusBooking, on_delete=models.CASCADE,null=True, blank=True)
 
 class VenueRequest(models.Model):
     venue_type = models.ForeignKey(TypeOfVenue,on_delete=models.CASCADE,null=True, blank=True) 
     venue_name = models.CharField(max_length=50,null=True, blank=True)
-    image = models.ImageField(upload_to='images/', null=True, blank=True)
+    image = models.ImageField(upload_to='images/venue/', null=True, blank=True)
     location = models.CharField(max_length=100, null=True, blank=True)
     category_event = models.CharField(max_length=50, null=True, blank=True)
     price = models.IntegerField(null=True, blank=True)
@@ -57,8 +58,8 @@ class VenueRequest(models.Model):
     parking_space = models.IntegerField(null=True, blank=True)
     outdoor_spaces = models.IntegerField(null=True, blank=True)
     additional_information = models.TextField(null=True, blank=True)
-    venue_certification = models.FileField(upload_to='pdfs/',null=True, blank=True)
-    personal_identification = models.FileField(upload_to='pdfs/',null=True, blank=True)
+    venue_certification = models.FileField(upload_to='pdfs/venue/',null=True, blank=True)
+    personal_identification = models.FileField(upload_to='pdfs/personal/',null=True, blank=True)
     venue_owner = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)
     status = models.ForeignKey(StatusBooking, on_delete=models.CASCADE,null=True, blank=True)
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE,null=True, blank=True)
@@ -76,8 +77,8 @@ class CategoryOfEvent(models.Model):
     category_detail = models.CharField(max_length=45)
 
 class EventOfVenue(models.Model):
-    venue = models.ForeignKey(Venue, on_delete=models.CASCADE)
-    # venue_request = models.ForeignKey(Venue, on_delete=models.CASCADE)
+    venue = models.ForeignKey(Venue, on_delete=models.CASCADE,null=True, blank=True)
+    venue_request = models.ForeignKey(VenueRequest, on_delete=models.CASCADE,null=True, blank=True)
     CategoryOfEvent = models.ForeignKey(CategoryOfEvent, on_delete=models.CASCADE)
 
 class Review(models.Model):
@@ -85,6 +86,7 @@ class Review(models.Model):
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE, null=True,blank=True)
     reviewDetail = models.TextField()
     createAt = models.DateTimeField()
+    review_image = models.FileField(upload_to='images/reviews/',null=True, blank=True)
     point = models.IntegerField()
     Booking = models.ForeignKey(Booking, on_delete=models.CASCADE, null=True, blank=True)
 

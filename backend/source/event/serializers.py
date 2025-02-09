@@ -22,26 +22,28 @@ class RoleSerializer(serializers.ModelSerializer):
         model = Role
         fields = '__all__'
 
-# class AccountSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Account
-#         fields = '__all__'
-
 class UserSerializer(serializers.ModelSerializer):
+    role = serializers.CharField(source="detail.role.role_name", read_only=True)
+    print(role)
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name']
+        fields = ['id', 'username', 'email','role']
         extra_kwargs = {
             'password': {'write_only': True} 
         }
+
+    # def get_role(self, user):
+    #     try:
+    #         user_detail = UserDetail.objects.get(user=user.id)  # ดึงข้อมูล UserDetail ที่มี user ตรงกับ obj
+    #         return user_detail.role 
+    #     except UserDetail.DoesNotExist:
+    #         return None  
         
     def create(self, validated_data):
         user = User.objects.create_user(
             username=validated_data['username'],
             password=validated_data['password'],
-            email=validated_data.get('email', ''),
-            first_name=validated_data.get('first_name', ''),
-            last_name=validated_data.get('last_name', ''),
+            email=validated_data.get('email'),
         )
         return user
 
@@ -78,14 +80,6 @@ class BookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
         fields = '__all__'
-
-# class VenueApprovalSerializer(serializers.ModelSerializer):
-#     venue_request = VenueRequestSerializer()
-#     user = UserSerializer()
-
-    # class Meta:
-    #     model = VenueApproval
-    #     fields = '__all__'
 
 class CategoryOfEventSerializer(serializers.ModelSerializer):
     class Meta:

@@ -65,13 +65,6 @@ class BookingAdmin(admin.ModelAdmin):
     search_fields = ('id_booking', 'venue__venue_name')
     list_filter = ('check_in', 'check_out')
 
-
-# @admin.register(VenueApproval)
-# class VenueApprovalAdmin(admin.ModelAdmin):
-#     list_display = ('id', 'id_venue_approval', 'status', 'comment', 'datetime', 'venue_request', 'user')
-#     search_fields = ('id_venue_approval', 'status')
-
-
 @admin.register(CategoryOfEvent)
 class CategoryOfEventAdmin(admin.ModelAdmin):
     list_display = ('id', 'category_name', 'category_detail')
@@ -79,7 +72,7 @@ class CategoryOfEventAdmin(admin.ModelAdmin):
 
 
 @admin.register(EventOfVenue)
-class EvnetOfVenueAdmin(admin.ModelAdmin):
+class EventOfVenueAdmin(admin.ModelAdmin):
     list_display = ('id', 'venue', 'CategoryOfEvent')
     search_fields = ('venue__venue_name', 'CategoryOfEvent__category_name')
 
