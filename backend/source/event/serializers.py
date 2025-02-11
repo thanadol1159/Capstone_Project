@@ -27,18 +27,11 @@ class UserSerializer(serializers.ModelSerializer):
     print(role)
     class Meta:
         model = User
-        fields = ['id', 'username', 'email','role']
+        fields = ['id', 'username','password', 'email','role']
         extra_kwargs = {
             'password': {'write_only': True} 
         }
 
-    # def get_role(self, user):
-    #     try:
-    #         user_detail = UserDetail.objects.get(user=user.id)  # ดึงข้อมูล UserDetail ที่มี user ตรงกับ obj
-    #         return user_detail.role 
-    #     except UserDetail.DoesNotExist:
-    #         return None  
-        
     def create(self, validated_data):
         user = User.objects.create_user(
             username=validated_data['username'],
