@@ -110,7 +110,7 @@ export default function BookingPage() {
         check_in: new Date(formData.check_in).toISOString(),
         check_out: new Date(formData.check_out).toISOString(),
         total_price: totalPrice,
-        status_booking: 3,
+        status_booking: 2,
       };
 
       await apiJson.post("/bookings/", bookingData);

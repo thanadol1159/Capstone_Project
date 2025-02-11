@@ -30,7 +30,6 @@ const ApproveVenue = () => {
       await apiJson.put(`/venues/${venueId}/`, { status: 3 });
 
       await apiJson.put(`/venue-requests/${requestId}/`, { status: 3 });
-
       // Update state correctly
       setVenues((prevVenues) =>
         prevVenues.map((venue) =>

@@ -1,9 +1,10 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { apiJson } from "@/hook/api";
 import { login } from "@/hook/action";
 import { useRouter } from "next/navigation";
+import { useUserId } from "@/hook/userid";
 
 const SignUpPage = () => {
   const [username, setUsername] = useState("");
@@ -11,8 +12,46 @@ const SignUpPage = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUserRegistered, setIsUserRegistered] = useState(false); // ✅ Track registration state
   const router = useRouter();
   const dispatch = useDispatch();
+  const userId = useUserId(); 
+
+
+  useEffect(() => {
+    if (isUserRegistered && userId) {
+      const postUserDetails = async () => {
+        const today = new Date();
+        const formattedDate = today.toISOString().split("T")[0];
+
+        try {
+          const userDetailResponse = await apiJson.post("/user-details/", {
+            first_name: "-",
+            last_name: "-",
+            phone_number: "-",
+            email,
+            province: "-",
+            district: "-",
+            sub_district: "-",
+            address: "-",
+            dob: formattedDate,
+            user: userId,
+            role: 2,
+          });
+
+          if (userDetailResponse.status === 201) {
+            console.log("User details created successfully");
+            router.push("/"); // ✅ Redirect after successful user details submission
+          }
+        } catch (error: any) {
+          console.error("Failed to create user details:", error);
+          alert("Failed to create user details. Please try again.");
+        }
+      };
+
+      postUserDetails();
+    }
+  }, [isUserRegistered, userId, router]); // ✅ Runs when user is registered and userId is available
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,6 +64,7 @@ const SignUpPage = () => {
         return;
       }
 
+      // ✅ Step 1: Register the user
       const registerResponse = await apiJson.post("/users/", {
         username,
         email,
@@ -34,52 +74,27 @@ const SignUpPage = () => {
       if (registerResponse.status === 201) {
         alert(registerResponse.data.message);
 
-        const userId = registerResponse.data.id;
-
-        const userDetailResponse = await apiJson.post("/user-details/", {
-          first_name: "",
-          last_name: "",
-          phone_number: "",
-          email: email,
-          province: "",
-          district: "",
-          sub_district: "",
-          address: "",
-          dob: "",
-          user: userId,
-          role: 2,
+        // ✅ Step 2: Log in the user immediately after successful registration
+        const tokenResponse = await apiJson.post("/token/", {
+          username,
+          password,
         });
 
-        if (userDetailResponse.status === 201) {
-          console.log("User details created successfully");
-        }
+        const { access, refresh, expired } = tokenResponse.data;
+        dispatch(login(access, refresh, expired, username));
+
+        // ✅ Step 3: Set state to trigger `useEffect`
+        setIsUserRegistered(true);
       }
-
-      const response = await apiJson.post("/token/", {
-        username,
-        password,
-      });
-
-      const { access, refresh, expired } = response.data;
-      dispatch(login(access, refresh, expired, username));
-      router.push("/");
     } catch (error: any) {
-      if (error.response && error.response.data && error.response.data.error) {
+      console.error("Registration error:", error);
+      if (error.response?.data?.error) {
         alert(error.response.data.error);
       } else {
         alert("Registration failed. Please try again.");
       }
+      setIsSubmitting(false);
     }
-
-    setIsSubmitting(false);
-  };
-
-  const handleBack = () => {
-    router.back();
-  };
-
-  const handleLogin = () => {
-    router.push("/login");
   };
 
   return (
@@ -163,7 +178,7 @@ const SignUpPage = () => {
               Already have an account?{" "}
               <button
                 type="button"
-                onClick={handleLogin}
+                onClick={() => router.push("/login")}
                 className="text-[#1A9DB8] font-semibold hover:underline"
                 disabled={isSubmitting}
               >
@@ -175,7 +190,7 @@ const SignUpPage = () => {
           <div className="flex justify-center mt-6 space-x-10">
             <button
               type="button"
-              onClick={handleBack}
+              onClick={() => router.back()}
               className="py-2 px-12 border rounded-lg text-gray-700 hover:bg-gray-200 transition duration-200"
               disabled={isSubmitting}
             >
