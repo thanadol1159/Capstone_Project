@@ -33,6 +33,26 @@ const SignUpPage = () => {
 
       if (registerResponse.status === 201) {
         alert(registerResponse.data.message);
+
+        const userId = registerResponse.data.id;
+
+        const userDetailResponse = await apiJson.post("/user-details/", {
+          first_name: "",
+          last_name: "",
+          phone_number: "",
+          email: email,
+          province: "",
+          district: "",
+          sub_district: "",
+          address: "",
+          dob: "",
+          user: userId,
+          role: 2,
+        });
+
+        if (userDetailResponse.status === 201) {
+          console.log("User details created successfully");
+        }
       }
 
       const response = await apiJson.post("/token/", {
