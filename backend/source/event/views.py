@@ -12,7 +12,6 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import action
 from django.db import IntegrityError
 from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from datetime import datetime,date
@@ -48,9 +47,13 @@ from .serializers import (
     StatusBookingSerializer,
     ReviewSerializer,
     NotificationSerializer,
+    CustomTokenObtainPairSerializer,
 )
 
 # ViewSets define the view behavior.
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
 class RoleViewSet(viewsets.ModelViewSet):
     queryset = Role.objects.all()
@@ -84,6 +87,13 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            getIdUser =  serializer.data
+            print("created new user")
+            print(getIdUser.get_id())
+            # UserDetail.objects.filter(username=request.data.get('username')).update(
+            #     user=User.objects.get(username=request.data.get('username'))
+            # )
+
             return Response(
                 {"message": "User created successfully!", "data": serializer.data},
                 status=status.HTTP_201_CREATED,
