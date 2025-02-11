@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
+from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import (
     Role,
     # Account,
@@ -17,14 +19,31 @@ from .models import (
     Notifications,
 )
 
+class CustomAccessToken(AccessToken):
+    def __init__(self, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.payload['role'] = user.userdetail.role.role_name if hasattr(user, 'userdetail') else None
+
+class CustomRefreshToken(RefreshToken):
+    def __init__(self, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.payload['role'] = user.userdetail.role.role_name if hasattr(user, 'userdetail') else None
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def get_token(self, user):
+        token = super().get_token(user)
+
+        token['role'] = user.userdetail.role.role_name if hasattr(user, 'userdetail') else None
+
+        return token
+
 class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
         fields = '__all__'
 
 class UserSerializer(serializers.ModelSerializer):
-    role = serializers.CharField(source="detail.role.role_name", read_only=True)
-    print(role)
+    role = serializers.CharField(source="userdetail.role.role_name", read_only=True)
     class Meta:
         model = User
         fields = ['id', 'username','password', 'email','role']
