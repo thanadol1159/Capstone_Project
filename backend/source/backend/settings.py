@@ -92,7 +92,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 # ]
 ALLOWED_HOSTS = ['cp24nk1.sit.kmutt.ac.th', 'localhost', '127.0.0.1','capstone24.sit.kmutt.ac.th']
 ROOT_URLCONF = 'backend.urls'
-CSRF_TRUSTED_ORIGINS = ['https://capstone24.sit.kmutt.ac.th/nk1/']
+CSRF_TRUSTED_ORIGINS = ['https://capstone24.sit.kmutt.ac.th']
 SECURE_SSL_REDIRECT = False
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
