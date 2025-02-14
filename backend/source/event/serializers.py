@@ -32,9 +32,10 @@ class CustomRefreshToken(RefreshToken):
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def get_token(self, user):
         token = super().get_token(user)
-
-        token['role'] = user.userdetail.role.role_name if hasattr(user, 'userdetail') else None
-
+        try:
+            token['role'] = user.userdetail.role.role_name
+        except:
+            token['role'] = None
         return token
 
 class RoleSerializer(serializers.ModelSerializer):

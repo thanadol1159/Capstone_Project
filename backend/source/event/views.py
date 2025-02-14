@@ -87,9 +87,9 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            getIdUser =  serializer.data
+            user_id = serializer.data['id']
             print("created new user")
-            print(getIdUser.get_id())
+            print(f"User ID: {user_id}")
             # UserDetail.objects.filter(username=request.data.get('username')).update(
             #     user=User.objects.get(username=request.data.get('username'))
             # )
@@ -108,6 +108,11 @@ class UserViewSet(viewsets.ModelViewSet):
 class UserDetailViewSet(viewsets.ModelViewSet):
     queryset = UserDetail.objects.all()
     serializer_class = UserDetailSerializer
+
+    def get_permissions(self):
+        if self.action == 'create':
+            return [AllowAny()]
+        return [IsAuthenticated()]
 
 class VenueViewSet(viewsets.ModelViewSet):
     queryset = Venue.objects.all()

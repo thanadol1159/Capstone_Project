@@ -32,11 +32,11 @@ const BookingsPage = () => {
   };
 
   return (
-    <div className="py-5 bg-[#f8f3ef] min-h-screen">
+    <div className="py-5 bg-[#F2F8FF] min-h-screen">
       <div className="max-w-5xl mx-auto space-y-4">
-        <table className="w-full bg-[#f8f3ef] rounded-lg overflow-hidden shadow border-separate border-spacing-y-4 p-4">
+        <table className="w-full bg-[#E6F3FF] rounded-lg overflow-hidden shadow border-separate border-spacing-y-4 p-4">
           <thead>
-            <tr className="text-left text-[#492b26] font-bold border-b border-[#c6a89e]">
+            <tr className="text-left text-[#000000] font-bold border-b border-[#c6a89e]">
               <th className="py-4 px-6">PLACE NAME</th>
               <th className="py-4 px-6">DATE</th>
               <th className="py-4 px-6 text-center">STATUS</th>
@@ -64,20 +64,20 @@ const BookingsPage = () => {
 
               const statusColor =
                 booking.status_booking === 1
-                  ? "text-red-600"
+                  ? "text-[#F16161]"
                   : booking.status_booking === 2
-                  ? "text-yellow-600"
+                  ? "text-[#CBC420]"
                   : booking.status_booking === 3
-                  ? "text-green-600"
+                  ? "text-[#5AEE69]"
                   : "text-gray-600";
 
               return (
                 <React.Fragment key={booking.id}>
                   <tr className="border border-[#AC978A] bg-white">
-                    <td className="py-4 px-6 text-[#7e5046] font-bold">
+                    <td className="py-4 px-6 text-[#000000] font-bold">
                       {venue ? venue.venue_name : "Unknown"}
                     </td>
-                    <td className="py-4 px-6 text-[#7e5046]">
+                    <td className="py-4 px-6 text-[#304B84]">
                       {formattedDate}
                     </td>
                     <td className="py-4 px-6 text-center">
