@@ -114,11 +114,12 @@ MIDDLEWARE = [
 ]
 
 
-CORS_ALLOW_ALL_ORIGINS = True
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:3000",
-#     "http://cp24nk1.sit.kmutt.ac.th/",
-# ]
+# CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://cp24nk1.sit.kmutt.ac.th/",
+    "https://capstone24.sit.kmutt.ac.th/nk1/",
+]
 CSRF_TRUSTED_ORIGINS = ['https://capstone24.sit.kmutt.ac.th/']
 SECURE_SSL_REDIRECT = False
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
