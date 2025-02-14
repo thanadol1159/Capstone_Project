@@ -171,14 +171,14 @@ class BookingViewSet(viewsets.ModelViewSet):
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
 
-    def list(self, request, *args, **kwargs):
-        try:
-            user = User.objects.get(username=request.user.username)
-            queryset = Booking.objects.filter(user=user)
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def my_bookings(self, request):
 
+        try:
+            user = request.user
+            queryset = Booking.objects.filter(user=user)
             serializer = self.get_serializer(queryset, many=True)
             return Response(serializer.data)
-        
         except User.DoesNotExist:
             return Response(
                 {"error": "User not found"},

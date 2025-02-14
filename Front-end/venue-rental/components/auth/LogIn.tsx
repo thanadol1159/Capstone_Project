@@ -1,15 +1,29 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { apiJson } from "@/hook/api";
 import { login } from "@/hook/action";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
+import { useRole } from "@/hook/role";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [isUserLogIn, setIsUserLogIn] = useState(false);
   const router = useRouter();
   const dispatch = useDispatch();
+  const userRole = useRole();
+
+  useEffect(() => {
+    if (isUserLogIn && userRole) {
+      if (userRole) {
+        Cookies.set("role", userRole, { expires: 1 });
+      } else {
+        console.warn("User role is null, cookie not set.");
+      }
+    }
+  });
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -22,7 +36,9 @@ const LoginPage = () => {
 
       if (response.status === 200) {
         const { access, refresh, expired } = response.data;
+
         dispatch(login(access, refresh, expired, username));
+        setIsUserLogIn(true);
         router.push("/");
         console.log("Already logged in");
       } else {

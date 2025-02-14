@@ -5,6 +5,8 @@ import { apiJson } from "@/hook/api";
 import { login } from "@/hook/action";
 import { useRouter } from "next/navigation";
 import { useUserId } from "@/hook/userid";
+import { useRole } from "@/hook/role";
+import Cookies from "js-cookie"; // ✅ Import js-cookie
 
 const SignUpPage = () => {
   const [username, setUsername] = useState("");
@@ -12,11 +14,11 @@ const SignUpPage = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isUserRegistered, setIsUserRegistered] = useState(false); // ✅ Track registration state
+  const [isUserRegistered, setIsUserRegistered] = useState(false);
   const router = useRouter();
   const dispatch = useDispatch();
-  const userId = useUserId(); 
-
+  const userId = useUserId();
+  const userRole = useRole();
 
   useEffect(() => {
     if (isUserRegistered && userId) {
@@ -36,22 +38,27 @@ const SignUpPage = () => {
             address: "-",
             dob: formattedDate,
             user: userId,
-            role: 2,
+            role: 2, // Assuming default role is 2
           });
 
           if (userDetailResponse.status === 201) {
             console.log("User details created successfully");
-            router.push("/"); // ✅ Redirect after successful user details submission
+            router.push("/");
           }
         } catch (error: any) {
           console.error("Failed to create user details:", error);
           alert("Failed to create user details. Please try again.");
         }
       };
+      if (userRole) {
+        Cookies.set("role", userRole, { expires: 1 });
+      } else {
+        console.warn("User role is null, cookie not set.");
+      }
 
       postUserDetails();
     }
-  }, [isUserRegistered, userId, router]); // ✅ Runs when user is registered and userId is available
+  }, [isUserRegistered, userId, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,7 +71,6 @@ const SignUpPage = () => {
         return;
       }
 
-      // ✅ Step 1: Register the user
       const registerResponse = await apiJson.post("/users/", {
         username,
         email,
@@ -74,25 +80,22 @@ const SignUpPage = () => {
       if (registerResponse.status === 201) {
         alert(registerResponse.data.message);
 
-        // ✅ Step 2: Log in the user immediately after successful registration
         const tokenResponse = await apiJson.post("/token/", {
           username,
           password,
         });
 
         const { access, refresh, expired } = tokenResponse.data;
+
         dispatch(login(access, refresh, expired, username));
 
-        // ✅ Step 3: Set state to trigger `useEffect`
         setIsUserRegistered(true);
       }
     } catch (error: any) {
       console.error("Registration error:", error);
-      if (error.response?.data?.error) {
-        alert(error.response.data.error);
-      } else {
-        alert("Registration failed. Please try again.");
-      }
+      alert(
+        error.response?.data?.error || "Registration failed. Please try again."
+      );
       setIsSubmitting(false);
     }
   };

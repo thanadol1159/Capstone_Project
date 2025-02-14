@@ -14,7 +14,7 @@ const BookingsPage = () => {
     const fetchBookingAndVenues = async () => {
       try {
         const [bookingsResponse, venuesResponse] = await Promise.all([
-          apiJson.get("/bookings/"),
+          apiJson.get("bookings/my_bookings/"),
           apiJson.get("/venues/"),
         ]);
         setBookings(bookingsResponse.data);
