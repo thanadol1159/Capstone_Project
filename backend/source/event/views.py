@@ -87,12 +87,11 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            getIdUser =  serializer.data
-            print("created new user")
-            print(getIdUser.get_id())
-            # UserDetail.objects.filter(username=request.data.get('username')).update(
-            #     user=User.objects.get(username=request.data.get('username'))
-            # )
+
+            UserDetail.objects.create(
+                user=User.objects.get(username=username),
+                role=Role.objects.get(role_name='user')
+            )
 
             return Response(
                 {"message": "User created successfully!", "data": serializer.data},
