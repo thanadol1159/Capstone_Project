@@ -72,7 +72,6 @@ SWAGGER_SETTINGS = {
 #     'TOKEN_OBTAIN_SERIALIZER': 'event.serializers.CustomTokenObtainPairSerializer',
 # }
 
-
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=50),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
@@ -101,7 +100,6 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -118,14 +116,12 @@ CORS_ALLOW_ALL_ORIGINS = True
 # CORS_ALLOWED_ORIGINS = [
 #     "http://localhost:3000",
 #     "http://cp24nk1.sit.kmutt.ac.th/",
-#     "https://capstone24.sit.kmutt.ac.th/nk1/",
 # ]
+ALLOWED_HOSTS = ['cp24nk1.sit.kmutt.ac.th', 'localhost', '127.0.0.1','capstone24.sit.kmutt.ac.th']
+ROOT_URLCONF = 'backend.urls'
 CSRF_TRUSTED_ORIGINS = ['https://capstone24.sit.kmutt.ac.th/']
 SECURE_SSL_REDIRECT = False
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-ALLOWED_HOSTS = ['cp24nk1.sit.kmutt.ac.th', 'localhost', '127.0.0.1','capstone24.sit.kmutt.ac.th']
-ROOT_URLCONF = 'backend.urls'
 
 TEMPLATES = [
     {
@@ -210,6 +206,10 @@ USE_X_FORWARDED_HOST = True
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# แก้ไขให้ Django ส่ง URL ที่ถูกต้อง
+if os.getenv("DJANGO_ENV") == "production":
+    MEDIA_URL = "https://capstone24.sit.kmutt.ac.th/nk1/media/"
 
 # MINIO_STORAGE_MEDIA_BUCKET_NAME = 'media'
 # MINIO_STORAGE_STATIC_BUCKET_NAME = 'static'

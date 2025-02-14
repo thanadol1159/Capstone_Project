@@ -9,15 +9,15 @@ class Role(models.Model):
 
 class UserDetail(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE,null=True, blank=True,related_name="userdetail")
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30)
-    phone_number = models.CharField(max_length=10)
-    email = models.EmailField(max_length=45)
-    province = models.CharField(max_length=45)
-    district = models.CharField(max_length=45)
-    sub_district = models.CharField(max_length=45)
-    address = models.CharField(max_length=255)
-    dob = models.DateField()
+    first_name = models.CharField(max_length=30,null=True, blank=True)
+    last_name = models.CharField(max_length=30,null=True, blank=True)
+    phone_number = models.CharField(max_length=10,null=True, blank=True)
+    email = models.EmailField(max_length=45,null=True, blank=True)
+    province = models.CharField(max_length=45,null=True, blank=True)
+    district = models.CharField(max_length=45,null=True, blank=True)
+    sub_district = models.CharField(max_length=45,null=True, blank=True)
+    address = models.CharField(max_length=255,null=True, blank=True)
+    dob = models.DateField(null=True, blank=True)
     role = models.ForeignKey(Role, on_delete=models.CASCADE,null=True, blank=True)
 
 class TypeOfVenue(models.Model):
