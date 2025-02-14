@@ -186,7 +186,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # แก้ไขให้ Django ส่ง URL ที่ถูกต้อง
 if os.getenv("DJANGO_ENV") == "production":
-    MEDIA_URL = "https://capstone24.sit.kmutt.ac.th/nk1/backend/source/media/images/"
+    MEDIA_URL = "https://capstone24.sit.kmutt.ac.th/nk1/backend/source/media/"
 
 # MINIO_STORAGE_MEDIA_BUCKET_NAME = 'media'
 # MINIO_STORAGE_STATIC_BUCKET_NAME = 'static'
