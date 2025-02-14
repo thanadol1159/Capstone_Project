@@ -85,14 +85,18 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-
 CORS_ALLOW_ALL_ORIGINS = True
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:3000",
-#     "http://cp24nk1.sit.kmutt.ac.th/",
+#CORS_ALLOWED_ORIGINS = [
+   # "http://localhost:3000",
+  #  "http://cp24nk1.sit.kmutt.ac.th/",
+ #   "https://capstone24.sit.kmutt.ac.th/"
 # ]
 ALLOWED_HOSTS = ['cp24nk1.sit.kmutt.ac.th', 'localhost', '127.0.0.1','capstone24.sit.kmutt.ac.th']
 ROOT_URLCONF = 'backend.urls'
+CSRF_TRUSTED_ORIGINS = ['https://capstone24.sit.kmutt.ac.th/']
+SECURE_SSL_REDIRECT = False
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 
 TEMPLATES = [
     {
@@ -173,10 +177,13 @@ STATICFILES_DIRS = [
 
 # Ensure proper handling of reverse proxy
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE =  True
+
 USE_X_FORWARDED_HOST = True
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # แก้ไขให้ Django ส่ง URL ที่ถูกต้อง
 if os.getenv("DJANGO_ENV") == "production":
