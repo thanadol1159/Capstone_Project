@@ -174,7 +174,7 @@ export default function VenuePage() {
               (a, b) =>
                 new Date(a.createAt).getTime() - new Date(b.createAt).getTime()
             )
-            .map((review, index) => {
+            .map((review) => {
               const sortedBookings = bookings
                 .filter(
                   (booking) =>
@@ -187,7 +187,12 @@ export default function VenuePage() {
                     new Date(b.check_in).getTime()
                 );
 
-              const userBooking = sortedBookings[index] || null;
+              // Find the most recent booking before the review
+              const userBooking =
+                sortedBookings.find(
+                  (booking) =>
+                    new Date(booking.check_in) <= new Date(review.createAt)
+                ) || null;
 
               return (
                 <Review
@@ -196,8 +201,8 @@ export default function VenuePage() {
                   rating={review.point}
                   review={review.reviewDetail}
                   user={review.user}
-                  checkIn={userBooking.check_in}
-                  checkOut={userBooking.check_out}
+                  checkIn={userBooking?.check_in || "N/A"}
+                  checkOut={userBooking?.check_out || "N/A"}
                 />
               );
             })}
