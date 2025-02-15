@@ -105,9 +105,9 @@ export default function VenueEditPage() {
     return <div>Loading...</div>;
   }
 
-  const addNk1ToUrl = (url: string): string => {
-    return url.replace(/(\/images\/)/, "$1/nk1$2");
-  };
+  // const addNk1ToUrl = (url: string): string => {
+  //   return url.replace(/(\/images\/)/, "$1/nk1$2");
+  // };
 
   return (
     <div className="w-full max-w-lg mx-auto p-2 text-black">
@@ -116,11 +116,7 @@ export default function VenueEditPage() {
         <div className="overflow-hidden mt-6">
           <div className="p-0">
             <img
-              src={
-                venue.image
-                  ? addNk1ToUrl(venue.image)
-                  : "/placeholder-image.jpg"
-              }
+              src={venue.image ? venue.image : "/placeholder-image.jpg"}
               alt="Venue Preview"
               className="w-full h-48 object-scale-down"
             />
