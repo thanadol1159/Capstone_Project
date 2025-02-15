@@ -2,6 +2,7 @@ import React from "react";
 import { useDispatch } from "react-redux";
 import { logout } from "@/hook/action";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie"; 
 
 const LogoutButton: React.FC = () => {
   const dispatch = useDispatch();
@@ -10,6 +11,7 @@ const LogoutButton: React.FC = () => {
   const handleLogout = () => {
     const confirmed = window.confirm("Are you sure you want to log out?");
     if (confirmed) {
+      Cookies.remove("role");
       dispatch(logout());
       router.push("/login");
     }

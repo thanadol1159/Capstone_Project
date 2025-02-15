@@ -71,6 +71,7 @@ class UserViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         username = request.data.get('username')  
         password = request.data.get('password')
+        email = request.data.get('email') 
         
         if User.objects.filter(username=username).exists():
             return Response(
@@ -83,22 +84,43 @@ class UserViewSet(viewsets.ModelViewSet):
                 {"error": "Password must be at least 8 characters long"},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        
+       
+        user = User.objects.create_user(username=username, password=password, email=email)
+        role, _ = Role.objects.get_or_create(role_name="User")
 
-        serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            user_id = serializer.data['id']
-            print("created new user")
-            print(f"User ID: {user_id}")
-            # UserDetail.objects.filter(username=request.data.get('username')).update(
-            #     user=User.objects.get(username=request.data.get('username'))
-            # )
+        user_detail = UserDetail.objects.create(
+        user=user,
+        email=email,  
+        role=role  
+        )
 
-            return Response(
-                {"message": "User created successfully!", "data": serializer.data},
-                status=status.HTTP_201_CREATED,
-            )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+        {
+            "message": "User created successfully!",
+            "user_id": user.id,  
+            "user_detail_id": user_detail.id,  
+            "username": user.username,
+            "email": user.email,
+            "role": role.role_name
+        },
+        status=status.HTTP_201_CREATED,
+        )
+
+        # serializer = UserSerializer(data=request.data)
+        # if serializer.is_valid():
+        #     serializer.save()
+
+        #     UserDetail.objects.create(
+        #         user=User.objects.get(username=username),
+        #         role=Role.objects.get(role_name='user')
+        #     )
+
+        #     return Response(
+        #         {"message": "User created successfully!", "data": serializer.data},
+        #         status=status.HTTP_201_CREATED,
+        #     )
+        # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def list(self, request, *args, **kwargs):
         users = User.objects.all()  
@@ -202,37 +224,49 @@ class StatusBookingViewSet(viewsets.ModelViewSet):
     queryset = StatusBooking.objects.all()
     serializer_class = StatusBookingSerializer
 
+from rest_framework import status, viewsets
+from rest_framework.response import Response
+from datetime import datetime
+import pytz
+from .models import Booking, Review
+from .serializers import ReviewSerializer
+
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
 
     def create(self, request):
+        try:
+            user = request.user 
+            venue_id = request.data.get("venue")
 
+            if not venue_id:
+                return Response({"error": "Venue ID is required."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # checkout_bookings = bookings.checkout
-        zones = pytz.timezone("Asia/Jakarta")
-        currentDateAndTime = datetime.now(zones)
-        current_time = currentDateAndTime.strftime("%H:%M:%S")
-        # bkk =  pytz("Thailand/Bang_kok")
-        # booking = request.data.get('booking')
-        booking  =  Booking.objects.filter(id=1)
-        booking_status = booking[0].status_booking.status
-        booking_Time =  booking[0].check_out
-        print(booking_Time)
-        print(booking_status)
-        print(currentDateAndTime)
-        # change status of booking
+            
+            booking = Booking.objects.filter(user=user, venue_id=venue_id, status_booking=3).order_by('-check_out').first()
 
-        if booking_Time <  currentDateAndTime and booking_status == "approved":
-            return  Response(
-                {"message": "User has an active booking"},
-                status=status.HTTP_200_OK,
-            )
-        else:
-             return Response(
-                    {"error": "Cannot proceed, checkout time was not past current date"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+            if not booking:
+                return Response({"error": "No completed booking found for this venue."}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Ensure timezone-aware datetime comparison
+            zones = pytz.timezone("Asia/Jakarta")
+            current_time = datetime.now(zones)
+
+            if booking.check_out >= current_time:
+                return Response({"error": "Cannot proceed, checkout time has not passed yet."}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Proceed with creating the review
+            serializer = self.get_serializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save(user=user, venue_id=venue_id)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
         # if bookings.exists():
         #     expired_bookings = bookings.filter(checkout__lt=now)
 

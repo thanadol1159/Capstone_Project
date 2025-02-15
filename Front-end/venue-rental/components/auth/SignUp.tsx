@@ -6,7 +6,7 @@ import { login } from "@/hook/action";
 import { useRouter } from "next/navigation";
 import { useUserId } from "@/hook/userid";
 import { useRole } from "@/hook/role";
-import Cookies from "js-cookie"; // ✅ Import js-cookie
+import Cookies from "js-cookie";
 
 const SignUpPage = () => {
   const [username, setUsername] = useState("");
@@ -20,41 +20,45 @@ const SignUpPage = () => {
   const userId = useUserId();
   const userRole = useRole();
 
-  // useEffect(() => {
-  //   if (isUserRegistered && userId) {
-  //     const postUserDetails = async () => {
-  //       const today = new Date();
-  //       const formattedDate = today.toISOString().split("T")[0];
+  useEffect(() => {
+    if (isUserRegistered && userId) {
+      // const postUserDetails = async () => {
+      //   const today = new Date();
+      //   const formattedDate = today.toISOString().split("T")[0];
 
-  //       try {
-  //         const userDetailResponse = await apiJson.post("/user-details/", {
-  //           first_name: "-",
-  //           last_name: "-",
-  //           phone_number: "-",
-  //           email,
-  //           province: "-",
-  //           district: "-",
-  //           sub_district: "-",
-  //           address: "-",
-  //           dob: formattedDate,
-  //           user: userId,
-  //           role: 2, 
-  //         });
+      //   try {
+      //     const userDetailResponse = await apiJson.post("/user-details/", {
+      //       first_name: "-",
+      //       last_name: "-",
+      //       phone_number: "-",
+      //       email,
+      //       province: "-",
+      //       district: "-",
+      //       sub_district: "-",
+      //       address: "-",
+      //       dob: formattedDate,
+      //       user: userId,
+      //       role: 2,
+      //     });
 
-  //         if (userDetailResponse.status === 201) {
-  //           console.log("User details created successfully");
-  //           router.push("/");
-  //         }
-  //       } catch (error: any) {
-  //         console.error("Failed to create user details:", error);
-  //         alert("Failed to create user details. Please try again.");
-  //       }
-  //     };
-      
+      //     if (userDetailResponse.status === 201) {
+      //       console.log("User details created successfully");
+      //       router.push("/");
+      //     }
+      //   } catch (error: any) {
+      //     console.error("Failed to create user details:", error);
+      //     alert("Failed to create user details. Please try again.");
+      //   }
+      // };
 
-  //     postUserDetails();
-  //   }
-  // }, [isUserRegistered, userId, router]);
+      // postUserDetails();
+      if (userRole) {
+        Cookies.set("role", userRole, { expires: 365 });
+      } else {
+        console.warn("User role is null, cookie not set.");
+      }
+    }
+  }, [isUserRegistered, userId, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,14 +88,9 @@ const SignUpPage = () => {
         const { access, refresh, expired } = tokenResponse.data;
 
         dispatch(login(access, refresh, expired, username));
+        router.push("/");
 
-        if (userRole) {
-          Cookies.set("role", userRole, { expires: 1 });
-        } else {
-          console.warn("User role is null, cookie not set.");
-        }
-
-        // setIsUserRegistered(true);
+        setIsUserRegistered(true);
       }
     } catch (error: any) {
       console.error("Registration error:", error);

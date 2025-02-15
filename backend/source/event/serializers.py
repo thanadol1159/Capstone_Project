@@ -30,12 +30,16 @@ class CustomRefreshToken(RefreshToken):
         self.payload['role'] = user.userdetail.role.role_name if hasattr(user, 'userdetail') else None
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    def get_token(self, user):
+    def get_token(cls, user):
         token = super().get_token(user)
-        try:
-            token['role'] = user.userdetail.role.role_name
-        except:
-            token['role'] = None
+
+        token['user_id'] = user.id
+
+        if hasattr(user, 'userdetail') and user.userdetail.role:
+            token['role'] = user.userdetail.role.role_name 
+        else:
+            token['role'] = "User"  
+
         return token
 
 class RoleSerializer(serializers.ModelSerializer):

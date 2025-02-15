@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { Venue } from "@/types/venue";
+import { Booking } from "@/types/booking";
 import { VenueType } from "@/types/venueType";
 import { apiJson } from "@/hook/api";
 import { RootState } from "@/hook/store";
@@ -19,6 +20,7 @@ export default function VenuePage() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [typeVenue, setTypeVenue] = useState<VenueType | null>(null);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const router = useRouter();
 
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
@@ -31,6 +33,15 @@ export default function VenuePage() {
       } catch (error) {
         console.error("Error fetching venue:", error);
         setVenue(null);
+      }
+    };
+
+    const fetchBookings = async () => {
+      try {
+        const { data } = await apiJson.get(`/bookings?venue=${params.id}`);
+        setBookings(data);
+      } catch (error) {
+        console.error("Error fetching bookings:", error);
       }
     };
 
@@ -54,8 +65,11 @@ export default function VenuePage() {
     if (params.id) {
       fetchVenueDetail();
       fetchReviews();
+      fetchBookings();
     }
   }, [params.id]);
+
+  console.log(bookings);
 
   useEffect(() => {
     const fetchVenueType = async () => {
@@ -157,15 +171,38 @@ export default function VenuePage() {
       <div className="mt-8">
         <h2 className="text-xl font-semibold mb-4">Reviews</h2>
         <div className="space-y-4">
-          {reviews.map((review) => (
-            <Review
-              key={review.id}
-              date={review.createAt}
-              rating={review.point}
-              review={review.reviewDetail}
-              user={review.user}
-            />
-          ))}
+          {reviews
+            .sort(
+              (a, b) =>
+                new Date(a.createAt).getTime() - new Date(b.createAt).getTime()
+            ) 
+            .map((review, index) => {
+              const sortedBookings = bookings
+                .filter(
+                  (booking) =>
+                    booking.user === review.user &&
+                    booking.venue === review.venue
+                )
+                .sort(
+                  (a, b) =>
+                    new Date(a.check_in).getTime() -
+                    new Date(b.check_in).getTime()
+                );
+
+              const userBooking = sortedBookings[index] || null;
+
+              return (
+                <Review
+                  key={review.id}
+                  date={review.createAt}
+                  rating={review.point}
+                  review={review.reviewDetail}
+                  user={review.user}
+                  checkIn={userBooking.check_in}
+                  checkOut={userBooking.check_out}
+                />
+              );
+            })}
         </div>
       </div>
 
