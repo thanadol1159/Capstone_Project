@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { apiJson } from "@/hook/api";
 import { Star } from "lucide-react";
 import { useUserId } from "@/hook/userid";
+import { Booking } from "@/types/booking";
 
 export default function ReviewCreate() {
   const params = useParams();
@@ -13,6 +14,10 @@ export default function ReviewCreate() {
   const [hoverRating, setHoverRating] = useState(0);
   const [remainingReviews, setRemainingReviews] = useState(0);
   const [hasBooking, setHasBooking] = useState(false);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [selectedBookingId, setSelectedBookingId] = useState<number | null>(
+    null
+  );
 
   const userId = useUserId();
   const venueId = params.id;
@@ -29,21 +34,26 @@ export default function ReviewCreate() {
         const reviews = reviewsResponse.data;
 
         const userVenueBookings = bookings.filter(
-          (booking: any) =>
+          (booking: Booking) =>
             booking.user === userId &&
             booking.venue === Number(venueId) &&
             booking.status_booking === 3 &&
-            new Date(booking.check_out) < new Date()
+            new Date(booking.check_out) < new Date() &&
+            !booking.isReview
         );
+        console.log("Eligible Bookings:", userVenueBookings);
 
+        setBookings(userVenueBookings);
         setHasBooking(userVenueBookings.length > 0);
 
-        const userReviewsCount = reviews.filter(
+        const userReviews = reviews.filter(
           (review: any) =>
             review.user === userId && review.venue === Number(venueId)
-        ).length;
+        );
 
-        setRemainingReviews(userVenueBookings.length - userReviewsCount);
+        console.log("User Reviews:", userReviews);
+
+        setRemainingReviews(userVenueBookings.length);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -63,19 +73,31 @@ export default function ReviewCreate() {
       return;
     }
 
+    if (!selectedBookingId) {
+      alert("Please select a booking to review.");
+      return;
+    }
+
     try {
       await apiJson.post("/reviews/", {
         user: userId,
         venue: venueId,
+        booking: selectedBookingId,
         reviewDetail: reviewText,
         point: rating,
         createAt: new Date().toISOString(),
       });
 
+      await apiJson.patch(`/bookings/${selectedBookingId}/`, {
+        isReview: true,
+      });
+
       setRemainingReviews((prev) => prev - 1);
       setReviewText("");
       setRating(0);
-      router.push("/nk1")
+      setSelectedBookingId(null);
+
+      router.push("/nk1");
     } catch (error) {
       console.error("Error submitting review:", error);
       alert("Failed to submit review");
@@ -99,6 +121,10 @@ export default function ReviewCreate() {
     </div>
   );
 
+  console.log("User ID:", userId);
+  console.log("Venue ID:", venueId);
+  console.log("Remaining Reviews:", remainingReviews);
+  console.log("selectedBookingId", selectedBookingId);
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 text-black">
       <h1 className="text-2xl font-bold mb-6 text-center">Write a Review</h1>
@@ -116,6 +142,31 @@ export default function ReviewCreate() {
             You can submit {remainingReviews} more{" "}
             {remainingReviews === 1 ? "review" : "reviews"} for this venue.
           </p>
+
+          {/* Booking Selection */}
+          <div className="mb-6">
+            <label className="block text-lg mb-2">Select Booking:</label>
+            <select
+              value={selectedBookingId || ""}
+              onChange={(e) => setSelectedBookingId(Number(e.target.value))}
+              className="w-full p-3 border rounded-lg"
+            >
+              <option value="" disabled>
+                Choose a booking
+              </option>
+              {bookings.map((booking) => (
+                <option key={booking.id} value={booking.id}>
+                  {`Booking ID: ${booking.id} (Check-in: ${new Date(
+                    booking.check_in
+                  ).toLocaleDateString()}, Check-out: ${new Date(
+                    booking.check_out
+                  ).toLocaleDateString()})`}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Rating */}
           <div className="mb-6">
             <label className="block text-lg mb-2">Your Rating:</label>
             <StarRating />
@@ -123,6 +174,8 @@ export default function ReviewCreate() {
               {rating > 0 ? `${rating} out of 5 stars` : "Select your rating"}
             </p>
           </div>
+
+          {/* Review Text */}
           <div className="mb-6">
             <label htmlFor="review" className="block text-lg mb-2">
               Your Review:
@@ -135,6 +188,8 @@ export default function ReviewCreate() {
               placeholder="Share your experience about this venue..."
             />
           </div>
+
+          {/* Buttons */}
           <div className="flex justify-end space-x-4">
             <button
               onClick={() => router.push(`/nk1/venue/${venueId}`)}

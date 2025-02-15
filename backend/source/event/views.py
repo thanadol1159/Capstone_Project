@@ -245,11 +245,12 @@ class StatusBookingViewSet(viewsets.ModelViewSet):
     queryset = StatusBooking.objects.all()
     serializer_class = StatusBookingSerializer
 
-from rest_framework import status, viewsets
+from rest_framework import viewsets, status
 from rest_framework.response import Response
+from django.utils import timezone
 from datetime import datetime
 import pytz
-from .models import Booking, Review
+from .models import Review, Booking
 from .serializers import ReviewSerializer
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -258,36 +259,61 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         try:
-            user = request.user 
+            user = request.user
             venue_id = request.data.get("venue")
+            booking_id = request.data.get("booking")
 
-            if not venue_id:
-                return Response({"error": "Venue ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+            # Validate required fields
+            if not venue_id or not booking_id:
+                return Response(
+                    {"error": "Venue ID and Booking ID are required."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-            
-            booking = Booking.objects.filter(user=user, venue_id=venue_id, status_booking=3).order_by('-check_out').first()
+            # Fetch the booking
+            booking = Booking.objects.filter(
+                id=booking_id,
+                user=user,
+                venue_id=venue_id,
+                status_booking__status="approved",  
+            ).first()
 
             if not booking:
-                return Response({"error": "No completed booking found for this venue."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"error": "No completed booking found for this venue."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-            # Ensure timezone-aware datetime comparison
             zones = pytz.timezone("Asia/Jakarta")
             current_time = datetime.now(zones)
 
             if booking.check_out >= current_time:
-                return Response({"error": "Cannot proceed, checkout time has not passed yet."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"error": "Cannot proceed, checkout time has not passed yet."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            # Ensure the booking hasn't already been reviewed
+            if booking.isReview:
+                return Response(
+                    {"error": "This booking has already been reviewed."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
             # Proceed with creating the review
             serializer = self.get_serializer(data=request.data)
             if serializer.is_valid():
-                serializer.save(user=user, venue_id=venue_id)
+                serializer.save(user=user, venue_id=venue_id, Booking=booking)
+
+                booking.isReview = True
+                booking.save()
+
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
         # if bookings.exists():
         #     expired_bookings = bookings.filter(checkout__lt=now)
 
@@ -306,6 +332,28 @@ class ReviewViewSet(viewsets.ModelViewSet):
         #         status=status.HTTP_404_NOT_FOUND,
         #     )
 
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from .models import Notifications
+from .serializers import NotificationSerializer
+
 class NotificationViewset(viewsets.ModelViewSet):
     queryset = Notifications.objects.all()
     serializer_class = NotificationSerializer
+
+    @action(detail=False, methods=['DELETE'], url_path='delete-read')
+    def delete_read(self, request):
+        user_id = request.data.get('userId')
+        if not user_id:
+            return Response(
+                {"error": "User ID is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+
+        Notifications.objects.filter(user_id=user_id, isRead=True).delete()
+        return Response(
+            {"message": "Read notifications deleted"},
+            status=status.HTTP_200_OK
+        )

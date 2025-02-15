@@ -9,6 +9,7 @@ import { VenueType } from "@/types/venueType";
 import { apiJson } from "@/hook/api";
 import { RootState } from "@/hook/store";
 import Review from "@/components/ui/ReviewsBox";
+import { Star, StarHalf } from "lucide-react";
 
 const addNk1ToUrl = (url: string): string => {
   return url ? url.replace(/(\/images\/)/, "$1/nk1$2") : "";
@@ -168,44 +169,102 @@ export default function VenuePage() {
 
       <div className="mt-8">
         <h2 className="text-xl font-semibold mb-4">Reviews</h2>
-        <div className="space-y-4">
-          {reviews
-            .sort(
-              (a, b) =>
-                new Date(a.createAt).getTime() - new Date(b.createAt).getTime()
-            )
-            .map((review) => {
-              const sortedBookings = bookings
-                .filter(
-                  (booking) =>
-                    booking.user === review.user &&
-                    booking.venue === review.venue
-                )
-                .sort(
-                  (a, b) =>
-                    new Date(a.check_in).getTime() -
-                    new Date(b.check_in).getTime()
-                );
-
-              // Find the most recent booking before the review
-              const userBooking =
-                sortedBookings.find(
-                  (booking) =>
-                    new Date(booking.check_in) <= new Date(review.createAt)
-                ) || null;
-
-              return (
-                <Review
-                  key={review.id}
-                  date={review.createAt}
-                  rating={review.point}
-                  review={review.reviewDetail}
-                  user={review.user}
-                  checkIn={userBooking?.check_in || "N/A"}
-                  checkOut={userBooking?.check_out || "N/A"}
+        <div className="bg-gray-50 p-6 rounded-lg mb-6">
+          <div className="flex flex-col">
+            <div className="flex space-x-2 items-center">
+              <span className="text-3xl font-bold">
+                {reviews.length > 0
+                  ? (
+                      reviews.reduce((sum, review) => sum + review.point, 0) /
+                      reviews.length
+                    ).toFixed(1)
+                  : "0.0"}
+              </span>
+              <div className="flex ">
+                <Star
+                  className="w-7 h-7 text-yellow-500"
+                  fill={"currentColor"}
                 />
+              </div>
+            </div>
+            <div>
+              <span className="text-gray-600">{reviews.length} ratings</span>
+            </div>
+          </div>
+          <div className="mt-4 space-y-2">
+            {[5, 4, 3, 2, 1].map((star) => {
+              const count = reviews.filter(
+                (review) => review.point === star
+              ).length;
+              const percentage = (count / reviews.length) * 100;
+              return (
+                <div key={star} className="flex items-center space-x-2">
+                  {/* Replace numeric star rating with Star icons */}
+                  <div className="flex space-x-1">
+                    {[...Array(star)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className="w-4 h-4 text-yellow-500"
+                        fill="currentColor"
+                      />
+                    ))}
+                  </div>
+                  <div className="flex-1 bg-gray-200 rounded-full h-2.5">
+                    <div
+                      className="bg-yellow-400 h-2.5 rounded-full"
+                      style={{ width: `${percentage}%` }}
+                    ></div>
+                  </div>
+                  <span className="w-10 text-gray-600 text-right">{count}</span>
+                </div>
               );
             })}
+          </div>
+        </div>
+        <div className="space-y-4">
+          {reviews.length > 0 ? (
+            reviews
+              .sort(
+                (a, b) =>
+                  new Date(a.createAt).getTime() -
+                  new Date(b.createAt).getTime()
+              )
+              .map((review) => {
+                const sortedBookings = bookings
+                  .filter(
+                    (booking) =>
+                      booking.user === review.user &&
+                      booking.venue === review.venue
+                  )
+                  .sort(
+                    (a, b) =>
+                      new Date(a.check_in).getTime() -
+                      new Date(b.check_in).getTime()
+                  );
+
+                const userBooking =
+                  sortedBookings.find(
+                    (booking) =>
+                      new Date(booking.check_in) <= new Date(review.createAt)
+                  ) || null;
+
+                return (
+                  <Review
+                    key={review.id}
+                    date={review.createAt}
+                    rating={review.point}
+                    review={review.reviewDetail}
+                    user={review.user}
+                    checkIn={userBooking?.check_in || "N/A"}
+                    checkOut={userBooking?.check_out || "N/A"}
+                  />
+                );
+              })
+          ) : (
+            <div className="text-center text-gray-500 py-4">
+              No reviews yet. Be the first to write one!
+            </div>
+          )}
         </div>
       </div>
 

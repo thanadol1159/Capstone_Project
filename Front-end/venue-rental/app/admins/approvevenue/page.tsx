@@ -25,23 +25,55 @@ const ApproveVenue = () => {
     setExpanded(expanded === id ? null : id);
   };
 
-  const approveVenue = async (venueId: number, requestId: number) => {
+  const sendNotification = async (userId: number) => {
+    try {
+      await apiJson.post("/notifications/", {
+        notifications_type: "Admin approve",
+        create_at: new Date().toISOString(),
+        message: "Admin has approved your venue!",
+        user: userId,
+      });
+    } catch (error) {
+      console.error("Error sending notification:", error);
+    }
+  };
+
+  const sendNotificationRejected = async (userId: number) => {
+    try {
+      await apiJson.post("/notifications/", {
+        notifications_type: "Admin Rejected",
+        create_at: new Date().toISOString(),
+        message: "Admin has Rejected your venue!",
+        user: userId,
+      });
+    } catch (error) {
+      console.error("Error sending notification:", error);
+    }
+  };
+
+  const approveVenue = async (
+    venueId: number,
+    requestId: number,
+    venueOwner: number
+  ) => {
     try {
       await apiJson.put(`/venues/${venueId}/`, { status: 3 });
-
       await apiJson.put(`/venue-requests/${requestId}/`, { status: 3 });
+
       setVenues((prevVenues) =>
         prevVenues.map((venue) =>
           venue.id === requestId ? { ...venue, status: 3 } : venue
         )
       );
       setExpanded(null);
+
+      sendNotification(venueOwner);
     } catch (error) {
       console.error("Error approving venue:", error);
     }
   };
 
-  const rejectVenue = async (venueId: number, requestId: number) => {
+  const rejectVenue = async (venueId: number, requestId: number,venueOwner: number) => {
     try {
       await apiJson.put(`/venues/${venueId}/`, { status: 1 });
       await apiJson.put(`/venue-requests/${requestId}/`, { status: 1 });
@@ -52,6 +84,8 @@ const ApproveVenue = () => {
         )
       );
       setExpanded(null);
+
+      sendNotificationRejected(venueOwner);
     } catch (error) {
       console.error("Error rejecting venue:", error);
     }
@@ -105,13 +139,15 @@ const ApproveVenue = () => {
                 <div className="flex justify-end mt-3">
                   <button
                     className="px-4 py-2 border rounded text-gray-700 mr-2 border-[#3F6B96]"
-                    onClick={() => rejectVenue(venue.venue, venue.id)}
+                    onClick={() => rejectVenue(venue.venue, venue.id,venue.venue_owner)}
                   >
                     Deny
                   </button>
                   <button
                     className="px-4 py-2 bg-[#3F6B96] text-white rounded"
-                    onClick={() => approveVenue(venue.venue, venue.id)}
+                    onClick={() =>
+                      approveVenue(venue.venue, venue.id, venue.venue_owner)
+                    }
                   >
                     Approve
                   </button>

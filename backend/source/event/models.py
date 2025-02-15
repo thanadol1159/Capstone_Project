@@ -72,6 +72,7 @@ class Booking(models.Model):
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE, null=True,blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)
     status_booking = models.ForeignKey(StatusBooking, on_delete=models.CASCADE, null=True,blank=True)
+    isReview = models.BooleanField(default=False)
 
 class CategoryOfEvent(models.Model):
     category_name = models.CharField(max_length=45)
@@ -89,10 +90,11 @@ class Review(models.Model):
     createAt = models.DateTimeField()
     review_image = models.FileField(upload_to='images/reviews/',null=True, blank=True)
     point = models.IntegerField()
-    Booking = models.ForeignKey(Booking, on_delete=models.CASCADE, null=True, blank=True)
+    booking = models.ForeignKey(Booking, on_delete=models.CASCADE, null=True, blank=True)
 
 class Notifications(models.Model):
     notifications_type =  models.CharField(max_length=45,)
     create_at = models.DateTimeField()
     message =  models.TextField(null=True,blank=True)
     user  = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)
+    isRead = models.BooleanField(default=False)

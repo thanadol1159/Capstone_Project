@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  assetPrefix: "https://capstone24.sit.kmutt.ac.th/nk1/",
+  // assetPrefix: "https://capstone24.sit.kmutt.ac.th/nk1/",
 };
 
 export default nextConfig;

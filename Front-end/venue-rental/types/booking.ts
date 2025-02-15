@@ -6,4 +6,5 @@ export interface Booking {
   check_out: string;
   total_price: number | null;
   status_booking: number;
+  isReview: boolean;
 }

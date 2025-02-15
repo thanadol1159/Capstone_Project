@@ -23,11 +23,11 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  const url = request.nextUrl;
-  if (url.protocol === "http:") {
-    url.protocol = "https:";
-    return NextResponse.redirect(url);
-  }
+  // const url = request.nextUrl;
+  // if (url.protocol === "http:") {
+  //   url.protocol = "https:";
+  //   return NextResponse.redirect(url);
+  // }
 }
 
 export const config = {

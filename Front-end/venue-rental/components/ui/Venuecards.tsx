@@ -10,26 +10,26 @@ export default function VenueCard({
   category_event,
   onDetailClick,
 }: Venue) {
-  const [blobUrl, setBlobUrl] = useState<string | null>(null);
+  // const [blobUrl, setBlobUrl] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function fetchImageBlob() {
-      if (!image) return;
-      try {
-        const response = await fetch(image); 
-        const blob = await response.blob(); 
-        const url = URL.createObjectURL(blob);
-        setBlobUrl(url);
-      } catch (error) {
-        console.error("Error loading image:", error);
-      }
-    }
+  // useEffect(() => {
+  //   async function fetchImageBlob() {
+  //     if (!image) return;
+  //     try {
+  //       const response = await fetch(image); 
+  //       const blob = await response.blob(); 
+  //       const url = URL.createObjectURL(blob);
+  //       setBlobUrl(url);
+  //     } catch (error) {
+  //       console.error("Error loading image:", error);
+  //     }
+  //   }
 
-    fetchImageBlob();
-    return () => {
-      if (blobUrl) URL.revokeObjectURL(blobUrl); 
-    };
-  }, [image]);
+  //   fetchImageBlob();
+  //   return () => {
+  //     if (blobUrl) URL.revokeObjectURL(blobUrl); 
+  //   };
+  // }, [image]);
 
   const categoryColors: Record<string, string> = {
     Meeting: "bg-[#E5D59B] text-[#5E4444] bg-opacity-70",
@@ -44,7 +44,7 @@ export default function VenueCard({
     <div className="bg-white rounded-lg shadow-sm border-[2.5px] border-[#3F6B96]">
       <div className="p-4">
         <img
-          src={blobUrl || "/placeholder-image.jpg"} 
+          src={image || "/placeholder-image.jpg"} 
           alt={venue_name}
           className="w-full h-36 object-cover rounded-t-lg"
         />
@@ -58,7 +58,7 @@ export default function VenueCard({
         </div>
 
         <div className="flex items-center gap-2 text-black mb-4">
-          <img src="/nk1/logo/location_icon.png" alt="Location Icon" />
+          <img src="/logo/location_icon.png" alt="Location Icon" />
           <span className="text-sm">{location}</span>
         </div>
 
