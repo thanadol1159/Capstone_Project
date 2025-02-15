@@ -18,7 +18,11 @@ const LoginPage = () => {
   useEffect(() => {
     if (isUserLogIn && userRole) {
       if (userRole) {
-        Cookies.set("role", userRole, { expires: 365 });
+        Cookies.set("role", userRole, {
+          expires: 365,
+          secure: true, 
+          sameSite: "Strict",
+        });
       } else {
         console.warn("User role is null, cookie not set.");
       }

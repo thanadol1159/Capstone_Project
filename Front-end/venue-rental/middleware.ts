@@ -19,7 +19,7 @@ export function middleware(request: NextRequest) {
   for (const route in protectedRoutes) {
     if (path.startsWith(route) && role !== protectedRoutes[route]) {
       console.warn(`Unauthorized access to "${path}". Redirecting...`);
-      return NextResponse.redirect(new URL("/", request.url));
+      return NextResponse.redirect(new URL("/nk1", request.url));
     }
   }
 
