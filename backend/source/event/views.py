@@ -15,6 +15,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from datetime import datetime,date
+from django.db.models import Q
 import pytz
 
 from .models import (
@@ -193,17 +194,37 @@ class VenueRequestViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
 
+
+
+
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]  # Default permission for list/retrieve
+
+    def get_permissions(self):
+
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [AllowAny]
+        return [permission() for permission in permission_classes]
+
+    def list(self, request, *args, **kwargs):
+        venue_id = self.request.query_params.get('venue')
+        if venue_id:
+            queryset = self.queryset.filter(venue_id=venue_id)
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+        return Response(
+            {"error": "Venue ID is required"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def my_bookings(self, request):
-
         try:
-            user = request.user
-            queryset = Booking.objects.filter(user=user)
+            queryset = self.queryset.filter(user=request.user)
             serializer = self.get_serializer(queryset, many=True)
             return Response(serializer.data)
         except User.DoesNotExist:
