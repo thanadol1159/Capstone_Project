@@ -10,9 +10,9 @@ import { apiJson } from "@/hook/api";
 import { RootState } from "@/hook/store";
 import Review from "@/components/ui/ReviewsBox";
 
-// const addNk1ToUrl = (url: string): string => {
-//   return url ? url.replace(/(\/images\/)/, "$1/nk1$2") : "";
-// };
+const addNk1ToUrl = (url: string): string => {
+  return url ? url.replace(/(\/images\/)/, "$1/nk1$2") : "";
+};
 
 export default function VenuePage() {
   const params = useParams();
@@ -21,7 +21,6 @@ export default function VenuePage() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [typeVenue, setTypeVenue] = useState<VenueType | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
-  const [blobUrl, setBlobUrl] = useState<string | null>(null);
   const router = useRouter();
 
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
@@ -118,30 +117,8 @@ export default function VenuePage() {
     return <div>Venue not found</div>;
   }
 
-  const imageUrl = venue.image;
+  const imageUrl = venue.image ? venue.image : "/placeholder-image.jpg";
   const venueType = typeVenue?.type_name || "Unknown Type";
-
-  //   ? addNk1ToUrl(venue.image)
-  //   : "/placeholder-image.jpg";
-
-  // useEffect(() => {
-  //   async function fetchImageBlob() {
-  //     if (!imageUrl) return;
-  //     try {
-  //       const response = await fetch(imageUrl);
-  //       const blob = await response.blob();
-  //       const url = URL.createObjectURL(blob);
-  //       setBlobUrl(url);
-  //     } catch (error) {
-  //       console.error("Error loading image:", error);
-  //     }
-  //   }
-
-  //   fetchImageBlob();
-  //   return () => {
-  //     if (blobUrl) URL.revokeObjectURL(blobUrl);
-  //   };
-  // }, [imageUrl]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 text-black ">
