@@ -120,7 +120,29 @@ export default function VenuePage() {
   const imageUrl = venue.image
     ? addNk1ToUrl(venue.image)
     : "/placeholder-image.jpg";
-  const venueType = typeVenue?.type_name || "Unknown Type"; // Fallback in case typeVenue is null
+  const venueType = typeVenue?.type_name || "Unknown Type";
+
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const imageUrl = venue.image;
+    async function fetchImageBlob() {
+      if (!imageUrl) return;
+      try {
+        const response = await fetch(imageUrl);
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        setBlobUrl(url);
+      } catch (error) {
+        console.error("Error loading image:", error);
+      }
+    }
+
+    fetchImageBlob();
+    return () => {
+      if (blobUrl) URL.revokeObjectURL(blobUrl);
+    };
+  }, [imageUrl]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 text-black ">
@@ -129,7 +151,7 @@ export default function VenuePage() {
       </h1>
       <div className="relative w-full aspect-[20/10]">
         <img
-          src={imageUrl}
+          src={blobUrl || "/placeholder-image.jpg"}
           alt={venue.venue_name}
           className="rounded-lg object-cover w-[80%] mx-auto"
         />
@@ -175,7 +197,7 @@ export default function VenuePage() {
             .sort(
               (a, b) =>
                 new Date(a.createAt).getTime() - new Date(b.createAt).getTime()
-            ) 
+            )
             .map((review, index) => {
               const sortedBookings = bookings
                 .filter(

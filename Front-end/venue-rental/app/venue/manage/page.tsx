@@ -183,9 +183,35 @@ const AddVenuePage = () => {
     );
   };
 
-  const addNk1ToUrl = (url: string): string => {
-    return url.replace(/(\/images\/)/, "$1/nk1$2");
+  const [blobUrls, setBlobUrls] = useState<{ [key: number]: string }>({});
+
+  const createBlobUrl = async (imageUrl: string, venueId: number) => {
+    if (!imageUrl) return;
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      setBlobUrls((prev) => ({ ...prev, [venueId]: url }));
+    } catch (error) {
+      console.error("Error loading image:", error);
+    }
   };
+  useEffect(() => {
+    if (venues) {
+      venues.forEach((venue) => {
+        if (venue.image) {
+          createBlobUrl(venue.image, venue.id);
+        }
+      });
+    }
+
+    // Cleanup function to revoke blob URLs
+    return () => {
+      Object.values(blobUrls).forEach((url) => {
+        URL.revokeObjectURL(url);
+      });
+    };
+  }, [venues]);
 
   return (
     <div className="container mx-auto p-14 space-y-6">
@@ -280,7 +306,7 @@ const AddVenuePage = () => {
                 <img
                   src={
                     venue.image
-                      ? addNk1ToUrl(venue.image)
+                      ? blobUrls[venue.id] || venue.image
                       : "/placeholder-image.jpg"
                   }
                   alt={venue.venue_name}

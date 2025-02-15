@@ -16,9 +16,9 @@ export default function VenueCard({
     async function fetchImageBlob() {
       if (!image) return;
       try {
-        const response = await fetch(image); // โหลดรูปจาก API
-        const blob = await response.blob(); // แปลงเป็น Blob
-        const url = URL.createObjectURL(blob); // สร้าง Blob URL
+        const response = await fetch(image); 
+        const blob = await response.blob(); 
+        const url = URL.createObjectURL(blob);
         setBlobUrl(url);
       } catch (error) {
         console.error("Error loading image:", error);
@@ -27,7 +27,7 @@ export default function VenueCard({
 
     fetchImageBlob();
     return () => {
-      if (blobUrl) URL.revokeObjectURL(blobUrl); // ล้าง Blob URL เมื่อ component unmount
+      if (blobUrl) URL.revokeObjectURL(blobUrl); 
     };
   }, [image]);
 
@@ -44,7 +44,7 @@ export default function VenueCard({
     <div className="bg-white rounded-lg shadow-sm border-[2.5px] border-[#3F6B96]">
       <div className="p-4">
         <img
-          src={blobUrl || "/placeholder-image.jpg"} // ใช้ Blob URL ถ้ามี
+          src={blobUrl || "/placeholder-image.jpg"} 
           alt={venue_name}
           className="w-full h-36 object-cover rounded-t-lg"
         />
