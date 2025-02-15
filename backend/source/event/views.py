@@ -200,18 +200,21 @@ class VenueRequestViewSet(viewsets.ModelViewSet):
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
-    permission_classes = [AllowAny]  # Default permission for list/retrieve
+    permission_classes = [AllowAny]
 
     def get_permissions(self):
-
+        """
+        Override to set specific permissions for different actions
+        """
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             permission_classes = [IsAuthenticated]
         else:
             permission_classes = [AllowAny]
         return [permission() for permission in permission_classes]
 
-    def list(self, request, *args, **kwargs):
-        venue_id = self.request.query_params.get('venue')
+    @action(detail=False, methods=['get'], url_path='venue=(?P<venue_id>[^/.]+)')
+    def venue_bookings(self, request, venue_id=None):
+
         if venue_id:
             queryset = self.queryset.filter(venue_id=venue_id)
             serializer = self.get_serializer(queryset, many=True)

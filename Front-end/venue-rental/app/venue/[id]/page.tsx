@@ -38,7 +38,7 @@ export default function VenuePage() {
 
     const fetchBookings = async () => {
       try {
-        const { data } = await apiJson.get(`/bookings/?venue=${params.id}/`);
+        const { data } = await apiJson.get(`/bookings/venue=${params.id}/`);
         setBookings(data);
       } catch (error) {
         console.error("Error fetching bookings:", error);
