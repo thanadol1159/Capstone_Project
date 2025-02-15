@@ -203,9 +203,6 @@ class BookingViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
 
     def get_permissions(self):
-        """
-        Override to set specific permissions for different actions
-        """
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             permission_classes = [IsAuthenticated]
         else:
