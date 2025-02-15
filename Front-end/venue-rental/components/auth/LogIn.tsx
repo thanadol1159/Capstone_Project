@@ -43,6 +43,7 @@ const LoginPage = () => {
         const { access, refresh, expired } = response.data;
 
         dispatch(login(access, refresh, expired, username));
+        setIsUserLogIn(true)
         router.push("/nk1");
         console.log("Already logged in");
       } else {
