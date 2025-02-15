@@ -46,7 +46,51 @@ const apiFormData = axios.create({
 //   },
 // });
 
-// Function to refresh the access token
+// Function to refresh the access token 
+// production
+// const refreshAccessToken = async () => {
+//   try {
+//     const state = store.getState();
+//     const { refreshToken } = state.auth;
+
+//     if (!refreshToken) {
+//       throw new Error("No refresh token available");
+//     }
+
+//     const response = await axios.post(
+//       "http://capstone24.sit.kmutt.ac.th:8080/nk1/api/token/refresh/",
+//       {
+//         refresh: refreshToken,
+//       }
+//     );
+
+//     const { access } = response.data;
+
+//     const decoded: any = jwtDecode(access);
+
+//     store.dispatch({
+//       type: "REFRESH_TOKEN",
+//       payload: {
+//         accessToken: access,
+//         refreshToken: refreshToken,
+//         tokenExpired: decoded.exp * 1000,
+//       },
+//     });
+
+//     return access;
+//   } catch (error) {
+//     console.error("Failed to refresh token:", error);
+
+//     // Log out
+//     store.dispatch(logout());
+//     persistor.purge();
+
+//     return null;
+//   }
+// };
+
+
+//Develop
 const refreshAccessToken = async () => {
   try {
     const state = store.getState();

@@ -1,13 +1,13 @@
 from django.contrib import admin
 from .models import (
     Role,
-    Account,
+    # Account,
     UserDetail,
     TypeOfVenue,
     Venue,
     VenueRequest,
     Booking,
-    VenueApproval,
+    # VenueApproval,
     CategoryOfEvent,
     EventOfVenue,
     StatusBooking,
@@ -23,15 +23,15 @@ class RoleAdmin(admin.ModelAdmin):
     search_fields = ('role_name',)
 
 
-@admin.register(Account)
-class AccountAdmin(admin.ModelAdmin):
-    list_display = ('id', 'username', 'creation_date', 'last_login')
-    search_fields = ('username',)
+# @admin.register(Account)
+# class AccountAdmin(admin.ModelAdmin):
+#     list_display = ('id', 'user', 'creation_date', 'last_login')
+#     search_fields = ('user',)
 
 
 @admin.register(UserDetail)
 class UserDetailAdmin(admin.ModelAdmin):
-    list_display = ('id', 'account', 'first_name', 'last_name', 'email', 'phone_number')
+    list_display = ('id', 'first_name', 'last_name', 'email', 'phone_number')
     search_fields = ('first_name', 'last_name', 'email')
     list_filter = ('province', 'district', 'sub_district')
 
@@ -65,13 +65,6 @@ class BookingAdmin(admin.ModelAdmin):
     search_fields = ('id_booking', 'venue__venue_name')
     list_filter = ('check_in', 'check_out')
 
-
-@admin.register(VenueApproval)
-class VenueApprovalAdmin(admin.ModelAdmin):
-    list_display = ('id', 'id_venue_approval', 'status', 'comment', 'datetime', 'venue_request', 'account')
-    search_fields = ('id_venue_approval', 'status')
-
-
 @admin.register(CategoryOfEvent)
 class CategoryOfEventAdmin(admin.ModelAdmin):
     list_display = ('id', 'category_name', 'category_detail')
@@ -79,8 +72,8 @@ class CategoryOfEventAdmin(admin.ModelAdmin):
 
 
 @admin.register(EventOfVenue)
-class EvnetOfVenueAdmin(admin.ModelAdmin):
-    list_display = ('id', 'venue', 'venue_request', 'CategoryOfEvent')
+class EventOfVenueAdmin(admin.ModelAdmin):
+    list_display = ('id', 'venue', 'CategoryOfEvent')
     search_fields = ('venue__venue_name', 'CategoryOfEvent__category_name')
 
 @admin.register(StatusBooking)
@@ -90,8 +83,8 @@ class StatusBookingAdmin(admin.ModelAdmin):
 
 @admin.register(Review)
 class Review(admin.ModelAdmin):
-    list_display = ('id','account','venue','reviewDetail','createAt','point')
+    list_display = ('id','user','venue','reviewDetail','createAt','point')
 
 @admin.register(Notifications)
 class Notifications(admin.ModelAdmin):
-    list_display =  ('id','notifications_type','create_at','sender')
+    list_display =  ('id','notifications_type','create_at','user')

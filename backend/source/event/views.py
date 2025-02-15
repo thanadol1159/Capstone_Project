@@ -10,21 +10,22 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import action
-
+from django.db import IntegrityError
 from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from .models import Account
 from django.core.exceptions import ValidationError
+from django.utils import timezone
+from datetime import datetime,date
+import pytz
 
 from .models import (
     Role,
-    Account,
+    # Account,
     UserDetail,
     Venue,
     TypeOfVenue,
     VenueRequest,
     Booking,
-    VenueApproval,
+    # VenueApproval,
     CategoryOfEvent,
     EventOfVenue,
     StatusBooking,
@@ -33,89 +34,107 @@ from .models import (
 )
 from .serializers import (
     RoleSerializer,
-    AccountSerializer,
+    # AccountSerializer,
+    UserSerializer,
     UserDetailSerializer,
     VenueSerializer,
     TypeOfvanueSerializer,
     VenueRequestSerializer,
     BookingSerializer,
-    VenueApprovalSerializer,
+    # VenueApprovalSerializer,
     CategoryOfEventSerializer,
     EventOfVenueSerializer,
     StatusBookingSerializer,
     ReviewSerializer,
     NotificationSerializer,
+    CustomTokenObtainPairSerializer,
 )
 
 # ViewSets define the view behavior.
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
 class RoleViewSet(viewsets.ModelViewSet):
     queryset = Role.objects.all()
     serializer_class = RoleSerializer
     
-class AccountViewSet(viewsets.ModelViewSet):
-    queryset = Account.objects.all()
-    serializer_class = AccountSerializer
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
     def get_permissions(self):
         if self.action == 'create':
             return [AllowAny()]
         return [IsAuthenticated()]
-    
-    def create(self, request, *args, **kwargs):
-        username = request.data.get('username')
-        password = request.data.get('password')
-        if not username or not password:
-            return Response(
-                {"error": "Username and password are required"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
 
-        if Account.objects.filter(username=username).exists() or  User.objects.filter(username=username).exists():
+    def create(self, request, *args, **kwargs):
+        username = request.data.get('username')  
+        password = request.data.get('password')
+        email = request.data.get('email') 
+        
+        if User.objects.filter(username=username).exists():
             return Response(
                 {"error": "Username already exists"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-
-        if len(password) <  8  :
+        
+        if len(password) < 8:
             return Response(
-                {"error": "password are required length more than 8 charactor"},
+                {"error": "Password must be at least 8 characters long"},
                 status=status.HTTP_400_BAD_REQUEST
+            )
+        
+       
+        user = User.objects.create_user(username=username, password=password, email=email)
+        role, _ = Role.objects.get_or_create(role_name="User")
+
+        user_detail = UserDetail.objects.create(
+        user=user,
+        email=email,  
+        role=role  
         )
-        
-        try:
-            User.objects.create_user(username=username, password=password)
-            Account.objects.create(username=username, password=make_password(password))
-            return Response(
-                {"message": "Account and User created successfully!"},
-                status=status.HTTP_201_CREATED
-            )
 
-        except Exception as e:
-            return Response(
-                {"error": f"An error occurred: {str(e)}"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+        return Response(
+        {
+            "message": "User created successfully!",
+            "user_id": user.id,  
+            "user_detail_id": user_detail.id,  
+            "username": user.username,
+            "email": user.email,
+            "role": role.role_name
+        },
+        status=status.HTTP_201_CREATED,
+        )
 
-class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    @classmethod
-    def get_token(cls, user):
-        token = super().get_token(user)
-        
-        try:
-            account = Account.objects.get(username=user.username)
-            token['account_id'] = account.id  
-        except Account.DoesNotExist:
-            token['account_id'] = None 
-        
-        return token
+        # serializer = UserSerializer(data=request.data)
+        # if serializer.is_valid():
+        #     serializer.save()
 
-class CustomTokenObtainPairView(TokenObtainPairView):
-    serializer_class = CustomTokenObtainPairSerializer
-    permission_classes = [AllowAny]
-    
+        #     UserDetail.objects.create(
+        #         user=User.objects.get(username=username),
+        #         role=Role.objects.get(role_name='user')
+        #     )
+
+        #     return Response(
+        #         {"message": "User created successfully!", "data": serializer.data},
+        #         status=status.HTTP_201_CREATED,
+        #     )
+        # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def list(self, request, *args, **kwargs):
+        users = User.objects.all()  
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 class UserDetailViewSet(viewsets.ModelViewSet):
     queryset = UserDetail.objects.all()
     serializer_class = UserDetailSerializer
+
+    def get_permissions(self):
+        if self.action == 'create':
+            return [AllowAny()]
+        return [IsAuthenticated()]
 
 class VenueViewSet(viewsets.ModelViewSet):
     queryset = Venue.objects.all()
@@ -129,15 +148,15 @@ class VenueViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def my_venues(self, request):
         try:
-            account = Account.objects.get(username=request.user.username)
-            venues = Venue.objects.filter(venue_owner=account)
+            user = User.objects.get(username=request.user.username)
+            venues = Venue.objects.filter(venue_owner=user)
             
             serializer = self.get_serializer(venues, many=True)
             return Response(serializer.data)
         
-        except Account.DoesNotExist:
+        except User.DoesNotExist:
             return Response(
-                {"error": "Account not found"}, 
+                {"error": "user not found"}, 
                 status=status.HTTP_404_NOT_FOUND
             )
 
@@ -162,15 +181,15 @@ class VenueRequestViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def my_venues(self, request):
         try:
-            account = Account.objects.get(username=request.user.username)
-            venues = Venue.objects.filter(venue_owner=account)
+            user = User.objects.get(username=request.user.username)
+            venues = Venue.objects.filter(venue_owner=user)
             
             serializer = self.get_serializer(venues, many=True)
             return Response(serializer.data)
         
-        except Account.DoesNotExist:
+        except User.DoesNotExist:
             return Response(
-                {"error": "Account not found"}, 
+                {"error": "user not found"}, 
                 status=status.HTTP_404_NOT_FOUND
             )
 
@@ -179,23 +198,19 @@ class BookingViewSet(viewsets.ModelViewSet):
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
 
-    def list(self, request, *args, **kwargs):
-        try:
-            account = Account.objects.get(username=request.user.username)
-            queryset = Booking.objects.filter(account=account)
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def my_bookings(self, request):
 
+        try:
+            user = request.user
+            queryset = Booking.objects.filter(user=user)
             serializer = self.get_serializer(queryset, many=True)
             return Response(serializer.data)
-        
-        except Account.DoesNotExist:
+        except User.DoesNotExist:
             return Response(
-                {"error": "Account not found"},
+                {"error": "User not found"},
                 status=status.HTTP_404_NOT_FOUND
             )
-
-class VenueApprovalViewSet(viewsets.ModelViewSet):
-    queryset = VenueApproval.objects.all()
-    serializer_class = VenueApprovalSerializer
 
 class CategoryOfEventViewSet(viewsets.ModelViewSet):
     queryset = CategoryOfEvent.objects.all()
@@ -209,30 +224,66 @@ class StatusBookingViewSet(viewsets.ModelViewSet):
     queryset = StatusBooking.objects.all()
     serializer_class = StatusBookingSerializer
 
-# class Home(APIView):
-#     authentication_classes = [JWTAuthentication]
-#     permission_classes = [IsAuthenticated]
-
-#     def get(self, request):
-#         content = {'message': 'Hello, World!'}
-#         return Response(content)
-    
-# class SuperuserOnlyAPIView(APIView):
-#     def get(self, request):
-#         if request.user.is_superuser:
-#             return Response({"message": "You are a superuser!"})
-#         return Response({"message": "Access denied"}, status=403)
-
-# class AccountLoginView(APIView):
-#     def post(self, request):
-#         serializer = AccountLoginSerializer(data=request.data)
-#         if serializer.is_valid():
-#             return Response(serializer.validated_data, status=status.HTTP_200_OK)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+from rest_framework import status, viewsets
+from rest_framework.response import Response
+from datetime import datetime
+import pytz
+from .models import Booking, Review
+from .serializers import ReviewSerializer
 
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+
+    def create(self, request):
+        try:
+            user = request.user 
+            venue_id = request.data.get("venue")
+
+            if not venue_id:
+                return Response({"error": "Venue ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+            
+            booking = Booking.objects.filter(user=user, venue_id=venue_id, status_booking=3).order_by('-check_out').first()
+
+            if not booking:
+                return Response({"error": "No completed booking found for this venue."}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Ensure timezone-aware datetime comparison
+            zones = pytz.timezone("Asia/Jakarta")
+            current_time = datetime.now(zones)
+
+            if booking.check_out >= current_time:
+                return Response({"error": "Cannot proceed, checkout time has not passed yet."}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Proceed with creating the review
+            serializer = self.get_serializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save(user=user, venue_id=venue_id)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # if bookings.exists():
+        #     expired_bookings = bookings.filter(checkout__lt=now)
+
+        #     if expired_bookings.exists():
+        #         return Response(
+        #             {"error": "Cannot proceed, checkout time has already passed"},
+        #             status=status.HTTP_400_BAD_REQUEST,
+        #         )
+        #     return Response(
+        #         {"message": "User has an active booking"},
+        #         status=status.HTTP_200_OK,
+        #     )
+        # else:
+        #     return Response(
+        #         {"error": "No booking found for this user"},
+        #         status=status.HTTP_404_NOT_FOUND,
+        #     )
 
 class NotificationViewset(viewsets.ModelViewSet):
     queryset = Notifications.objects.all()

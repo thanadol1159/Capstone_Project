@@ -3,17 +3,18 @@
 import React, { useState, useEffect } from "react";
 import { Venue } from "@/types/venue";
 import axios from "axios";
-import { apiFormData } from "@/hook/api";
+import { apiFormData, apiJson } from "@/hook/api";
 import { useRouter } from "next/navigation";
-import { useAccountId } from "@/hook/userid";
+import { useUserId } from "@/hook/userid";
 import { useSelector } from "react-redux";
 import { RootState } from "@/hook/store";
 
 export default function ManageVenue() {
   const router = useRouter();
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
-  const accountId = useAccountId();
-  console.log(accountId);
+  const userId = useUserId();
+  const [statusId, setStatusId] = useState<number | null>(null);
+  // console.log(accountId);
   const [venueData, setVenueData] = useState<Partial<Venue>>({
     venue_type: 0,
     venue_name: "",
@@ -29,7 +30,8 @@ export default function ManageVenue() {
     additional_information: "",
     venue_certification: "",
     personal_identification: "",
-    venue_owner: Number(accountId),
+    venue_owner: Number(userId),
+    status: 0,
   });
 
   const [files, setFiles] = useState({
@@ -70,36 +72,69 @@ export default function ManageVenue() {
   };
 
   useEffect(() => {
+    const fetchStatus = async () => {
+      try {
+        const response = await apiJson.get("/status-bookings/");
+        if (response.status === 200) {
+          const pendingStatus = response.data.find(
+            (status: { status: string }) =>
+              status.status.toLowerCase() === "pending"
+          );
+
+          setVenueData((prev) => ({
+            ...prev,
+            status: pendingStatus ? pendingStatus.id : 2,
+          }));
+        }
+      } catch (error) {
+        console.error("Error fetching status:", error);
+      }
+    };
+
+    fetchStatus();
     handleNoAuth();
-  });
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      // Create FormData instance
       const formData = new FormData();
-
       Object.entries(venueData).forEach(([key, value]) => {
         if (value !== null && value !== "") {
           formData.append(key, value.toString());
         }
       });
-
       Object.entries(files).forEach(([key, file]) => {
         if (file) {
           formData.append(key, file);
         }
       });
 
-      // Make POST request
-      const response = await apiFormData.post("/venues/", formData);
+      console.log("Venue Data before submit:", venueData);
 
-      if (response.status === 201 || response.status === 200) {
-        router.push("/nk1/venue/manage");
+      const venueResponse = await apiFormData.post("/venues/", formData);
+
+      if (venueResponse.status === 201 || venueResponse.status === 200) {
+        const venueId = venueResponse.data.id;
+
+        formData.append("venue", venueId);
+
+        const requestResponse = await apiFormData.post(
+          "/venue-requests/",
+          formData
+        );
+
+        if (requestResponse.status === 201 || requestResponse.status === 200) {
+          router.push("/nk1/venue/manage");
+        } else {
+          console.error("Error creating venue request:", requestResponse);
+        }
+      } else {
+        console.error("Error creating venue:", venueResponse);
       }
     } catch (err) {
-      console.error("Error creating venue:", err);
+      console.error("Error:", err);
     }
   };
 

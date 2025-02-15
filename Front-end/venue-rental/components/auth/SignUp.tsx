@@ -1,10 +1,13 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { useDispatch } from "react-redux";
 import { apiJson } from "@/hook/api";
 import { login } from "@/hook/action";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { useUserId } from "@/hook/userid";
+import { useRole } from "@/hook/role";
+import Cookies from "js-cookie";
 
 const SignUpPage = () => {
   const [username, setUsername] = useState("");
@@ -12,8 +15,51 @@ const SignUpPage = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUserRegistered, setIsUserRegistered] = useState(false);
   const router = useRouter();
   const dispatch = useDispatch();
+  const userId = useUserId();
+  const userRole = useRole();
+
+  useEffect(() => {
+    if (isUserRegistered && userId) {
+      // const postUserDetails = async () => {
+      //   const today = new Date();
+      //   const formattedDate = today.toISOString().split("T")[0];
+
+      //   try {
+      //     const userDetailResponse = await apiJson.post("/user-details/", {
+      //       first_name: "-",
+      //       last_name: "-",
+      //       phone_number: "-",
+      //       email,
+      //       province: "-",
+      //       district: "-",
+      //       sub_district: "-",
+      //       address: "-",
+      //       dob: formattedDate,
+      //       user: userId,
+      //       role: 2,
+      //     });
+
+      //     if (userDetailResponse.status === 201) {
+      //       console.log("User details created successfully");
+      //       router.push("/");
+      //     }
+      //   } catch (error: any) {
+      //     console.error("Failed to create user details:", error);
+      //     alert("Failed to create user details. Please try again.");
+      //   }
+      // };
+
+      // postUserDetails();
+      if (userRole) {
+        Cookies.set("role", userRole, { expires: 365 });
+      } else {
+        console.warn("User role is null, cookie not set.");
+      }
+    }
+  }, [isUserRegistered, userId, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +72,7 @@ const SignUpPage = () => {
         return;
       }
 
-      const registerResponse = await apiJson.post("/accounts/", {
+      const registerResponse = await apiJson.post("/users/", {
         username,
         email,
         password,
@@ -34,32 +80,27 @@ const SignUpPage = () => {
 
       if (registerResponse.status === 201) {
         alert(registerResponse.data.message);
+
+        const tokenResponse = await apiJson.post("/token/", {
+          username,
+          password,
+        });
+
+        const { access, refresh, expired } = tokenResponse.data;
+
+        dispatch(login(access, refresh, expired, username));
+        router.push("/");
+
+        setIsUserRegistered(true);
       }
-
-      const response = await apiJson.post("/token/", {
-        username,
-        password,
-      });
-
-      const { access, refresh, expired } = response.data;
-      dispatch(login(access, refresh, expired, username));
-
-      router.push("/nk1");
-    } catch (error) {
-      console.error("Error signing up:", error);
-      alert("Registration failed. Please try again.");
+    } catch (error: any) {
+      console.error("Registration error:", error);
+      alert(
+        error.response?.data?.error || "Registration failed. Please try again."
+      );
+      setIsSubmitting(false);
     }
-
-    setIsSubmitting(false);
   };
-
-  const handleBack = () => {
-    router.back();
-  };
-
-  // const handleLogin = () => {
-  //   router.push("/login");
-  // };
 
   return (
     <div className="flex items-center justify-center h-screen">
@@ -154,7 +195,7 @@ const SignUpPage = () => {
           <div className="flex justify-center mt-6 space-x-10">
             <button
               type="button"
-              onClick={handleBack}
+              onClick={() => router.back()}
               className="py-2 px-12 border rounded-lg text-gray-700 hover:bg-gray-200 transition duration-200"
               disabled={isSubmitting}
             >

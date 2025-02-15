@@ -30,7 +30,9 @@ export default function VenueRental() {
     const matchesCategory =
       selectedCategory === "All" || venue.category_event === selectedCategory;
     const matchesSearch = venue.venue_name.toLowerCase().includes(searchQuery);
-    return matchesCategory && matchesSearch;
+    const matchesStatus = venue.status === 3; // Ensure only venues with status 3 are shown
+
+    return matchesCategory && matchesSearch && matchesStatus;
   });
 
   return (
@@ -46,8 +48,8 @@ export default function VenueRental() {
                 onClick={() => handleCategoryClick(category)}
                 className={`px-12 py-1 rounded-lg ${
                   category === selectedCategory
-                    ? "bg-[#AC978A] text-black font-bold"
-                    : "bg-gray-200 text-black font-bold"
+                    ? "bg-[#335473] text-white font-semibold"
+                    : "bg-[#BCCFE1] text-[#7397BB] font-semibold"
                 }`}
               >
                 {category}

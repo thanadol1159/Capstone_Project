@@ -122,9 +122,7 @@ const AddVenuePage = () => {
       if (venues) {
         const ownerNamePromises = venues.map(async (venue) => {
           try {
-            const response = await apiJson.get(
-              `/accounts/${venue.venue_owner}/`
-            );
+            const response = await apiJson.get(`/users/${venue.venue_owner}/`);
             return {
               venueId: venue.id,
               ownerName: response.data.username,
@@ -301,6 +299,16 @@ const AddVenuePage = () => {
                 </p>
                 <p>รายละเอียด: {venue.additional_information}</p>
                 <p>ประเภทกิจกรรม: {venue.category_event}</p>
+                <div className="flex gap-1">
+                  <p>Status:</p>
+                  {venue.status === 3 ? (
+                    <p className="text-green-600 font-semibold">Approved</p>
+                  ) : venue.status === 2 ? (
+                    <p className="text-yellow-500 font-semibold">Pending</p>
+                  ) : venue.status === 1 ? (
+                    <p className="text-red-600 font-semibold">Rejected</p>
+                  ) : null}
+                </div>
               </div>
             </div>
 

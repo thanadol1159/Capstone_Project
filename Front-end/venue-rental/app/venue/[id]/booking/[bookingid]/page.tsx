@@ -8,7 +8,7 @@ import { format, differenceInDays } from "date-fns";
 // import { JwtPayload } from "jwt-decode";
 // import { RootState } from "@/hook/store";
 // import { useSelector } from "react-redux";
-import { useAccountId } from "@/hook/userid";
+import { useUserId } from "@/hook/userid";
 
 interface BookingFormData {
   check_in: string;
@@ -33,9 +33,9 @@ export default function BookingPage() {
     check_out?: string;
   }>({});
 
-  const accountId = useAccountId();
+  const userId = useUserId();
 
-  console.log(accountId);
+  console.log(userId);
 
   useEffect(() => {
     const fetchVenueDetail = async () => {
@@ -82,21 +82,6 @@ export default function BookingPage() {
       [name]: value,
     }));
   };
-
-  // const accessToken = useSelector((state: RootState) => state.auth.accessToken);
-
-  // const accountId = useMemo(() => {
-  //   if (!accessToken) return null;
-
-  //   try {
-  //     const decoded = jwtDecode<CustomJwtPayload>(accessToken);
-  //     return decoded.user_id;
-  //   } catch (error) {
-  //     console.error("Failed to decode token", error);
-  //     return null;
-  //   }
-  // }, [accessToken]);
-
   // Calculate total nights and total price
   const totalNights = useMemo(() => {
     if (!venue) return 0;
@@ -120,11 +105,12 @@ export default function BookingPage() {
     try {
       setIsSubmitting(true);
       const bookingData = {
-        account: accountId,
+        user: userId,
         venue: params.id,
         check_in: new Date(formData.check_in).toISOString(),
         check_out: new Date(formData.check_out).toISOString(),
         total_price: totalPrice,
+        status_booking: 2,
       };
 
       await apiJson.post("/bookings/", bookingData);

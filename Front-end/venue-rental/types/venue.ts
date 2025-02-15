@@ -34,5 +34,6 @@ export interface Venue {
   venue_certification: string;
   personal_identification: string;
   venue_owner: number;
+  status: number;
   onDetailClick?: (id: number) => void;
 }

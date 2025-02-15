@@ -1,14 +1,17 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth.models import User
+from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import (
     Role,
-    Account,
+    # Account,
     UserDetail,
     Venue,
     TypeOfVenue,
     VenueRequest,
     Booking,
-    VenueApproval,
+    # VenueApproval,
     CategoryOfEvent,
     EventOfVenue,
     StatusBooking,
@@ -16,19 +19,52 @@ from .models import (
     Notifications,
 )
 
+class CustomAccessToken(AccessToken):
+    def __init__(self, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.payload['role'] = user.userdetail.role.role_name if hasattr(user, 'userdetail') else None
+
+class CustomRefreshToken(RefreshToken):
+    def __init__(self, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.payload['role'] = user.userdetail.role.role_name if hasattr(user, 'userdetail') else None
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        token['user_id'] = user.id
+
+        if hasattr(user, 'userdetail') and user.userdetail.role:
+            token['role'] = user.userdetail.role.role_name 
+        else:
+            token['role'] = "User"  
+
+        return token
+
 class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
         fields = '__all__'
 
-class AccountSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
+    role = serializers.CharField(source="userdetail.role.role_name", read_only=True)
     class Meta:
-        model = Account
-        fields = '__all__'
+        model = User
+        fields = ['id', 'username','password', 'email','role']
+        extra_kwargs = {
+            'password': {'write_only': True} 
+        }
+
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            password=validated_data['password'],
+            email=validated_data.get('email'),
+        )
+        return user
 
 class UserDetailSerializer(serializers.ModelSerializer):
-    account = AccountSerializer()
-
     class Meta:
         model = UserDetail
         fields = '__all__'
@@ -54,20 +90,12 @@ class StatusBookingSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class BookingSerializer(serializers.ModelSerializer):
-    account  = serializers.PrimaryKeyRelatedField(queryset=Account.objects.all())
+    user  = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     venue = serializers.PrimaryKeyRelatedField(queryset=Venue.objects.all())
     StatusBooking = StatusBookingSerializer(read_only=True)
 
     class Meta:
         model = Booking
-        fields = '__all__'
-
-class VenueApprovalSerializer(serializers.ModelSerializer):
-    venue_request = VenueRequestSerializer()
-    account = AccountSerializer()
-
-    class Meta:
-        model = VenueApproval
         fields = '__all__'
 
 class CategoryOfEventSerializer(serializers.ModelSerializer):
@@ -85,8 +113,9 @@ class EventOfVenueSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ReviewSerializer(serializers.ModelSerializer):
-    account  = serializers.PrimaryKeyRelatedField(queryset=Account.objects.all())
+    user  = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     venue = serializers.PrimaryKeyRelatedField(queryset=Venue.objects.all())
+    # booking =  serializers.PrimaryKeyRelatedField(querys=Booking.objects.all())
 
     class  Meta:
         model = Review

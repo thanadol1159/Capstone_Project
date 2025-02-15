@@ -4,9 +4,11 @@ import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { Venue } from "@/types/venue";
+import { Booking } from "@/types/booking";
 import { VenueType } from "@/types/venueType";
 import { apiJson } from "@/hook/api";
 import { RootState } from "@/hook/store";
+import Review from "@/components/ui/ReviewsBox";
 
 const addNk1ToUrl = (url: string): string => {
   return url ? url.replace(/(\/images\/)/, "$1/nk1$2") : "";
@@ -15,8 +17,10 @@ const addNk1ToUrl = (url: string): string => {
 export default function VenuePage() {
   const params = useParams();
   const [venue, setVenue] = useState<Venue | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [typeVenue, setTypeVenue] = useState<VenueType | null>(null);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const router = useRouter();
 
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
@@ -32,10 +36,40 @@ export default function VenuePage() {
       }
     };
 
+    const fetchBookings = async () => {
+      try {
+        const { data } = await apiJson.get(`/bookings?venue=${params.id}`);
+        setBookings(data);
+      } catch (error) {
+        console.error("Error fetching bookings:", error);
+      }
+    };
+
+    const fetchReviews = async () => {
+      try {
+        const venueId = params.id;
+        const { data } = await apiJson.get(`/reviews`);
+
+        const filteredReviews = data.filter(
+          (review: { venue: number }) => review.venue === Number(venueId)
+        );
+
+        console.log("Filtered Reviews:", filteredReviews);
+        setReviews(filteredReviews);
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
+        setReviews([]);
+      }
+    };
+
     if (params.id) {
       fetchVenueDetail();
+      fetchReviews();
+      fetchBookings();
     }
   }, [params.id]);
+
+  console.log(bookings);
 
   useEffect(() => {
     const fetchVenueType = async () => {
@@ -53,6 +87,14 @@ export default function VenuePage() {
 
     fetchVenueType();
   }, [venue]);
+
+  const handleCreateReview = () => {
+    if (!accessToken) {
+      setShowLoginModal(true);
+      return;
+    }
+    router.push(`/venue/${params.id}/review/create`);
+  };
 
   const handleBack = () => {
     router.push("/nk1");
@@ -125,6 +167,45 @@ export default function VenuePage() {
           <span>{venueType}</span>
         </div>
       </div>
+
+      <div className="mt-8">
+        <h2 className="text-xl font-semibold mb-4">Reviews</h2>
+        <div className="space-y-4">
+          {reviews
+            .sort(
+              (a, b) =>
+                new Date(a.createAt).getTime() - new Date(b.createAt).getTime()
+            ) 
+            .map((review, index) => {
+              const sortedBookings = bookings
+                .filter(
+                  (booking) =>
+                    booking.user === review.user &&
+                    booking.venue === review.venue
+                )
+                .sort(
+                  (a, b) =>
+                    new Date(a.check_in).getTime() -
+                    new Date(b.check_in).getTime()
+                );
+
+              const userBooking = sortedBookings[index] || null;
+
+              return (
+                <Review
+                  key={review.id}
+                  date={review.createAt}
+                  rating={review.point}
+                  review={review.reviewDetail}
+                  user={review.user}
+                  checkIn={userBooking.check_in}
+                  checkOut={userBooking.check_out}
+                />
+              );
+            })}
+        </div>
+      </div>
+
       <div className="flex justify-end mt-6 space-x-10">
         <button
           type="button"
@@ -138,6 +219,12 @@ export default function VenuePage() {
           className="py-2 px-12 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 transition duration-200"
         >
           {accessToken ? "Book Now" : "Login to Book"}
+        </button>
+        <button
+          onClick={handleCreateReview}
+          className="py-2 px-12 bg-white text-[#7A90A4] font-semibold rounded-lg border border-[#3F6B96]"
+        >
+          {accessToken ? "Write a Review" : "Login to Review"}
         </button>
       </div>
 
