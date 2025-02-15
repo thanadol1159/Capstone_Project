@@ -183,12 +183,19 @@ const AddVenuePage = () => {
     );
   };
 
+  const addNk1ToUrl = (url: string): string => {
+    return url ? url.replace(/(\/images\/)/, "$1/nk1$2") : "";
+  };
+
   const [blobUrls, setBlobUrls] = useState<{ [key: number]: string }>({});
 
   const createBlobUrl = async (imageUrl: string, venueId: number) => {
     if (!imageUrl) return;
+
+    const modifiedUrl = addNk1ToUrl(imageUrl);
+
     try {
-      const response = await fetch(imageUrl);
+      const response = await fetch(modifiedUrl);
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       setBlobUrls((prev) => ({ ...prev, [venueId]: url }));
@@ -196,6 +203,7 @@ const AddVenuePage = () => {
       console.error("Error loading image:", error);
     }
   };
+
   useEffect(() => {
     if (venues) {
       venues.forEach((venue) => {

@@ -117,15 +117,14 @@ export default function VenuePage() {
     return <div>Venue not found</div>;
   }
 
-  const imageUrl = venue.image
-    ? addNk1ToUrl(venue.image)
-    : "/placeholder-image.jpg";
+  const imageUrl = venue.image;
+  //   ? addNk1ToUrl(venue.image)
+  //   : "/placeholder-image.jpg";
   const venueType = typeVenue?.type_name || "Unknown Type";
 
   const [blobUrl, setBlobUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    const imageUrl = venue.image;
     async function fetchImageBlob() {
       if (!imageUrl) return;
       try {
@@ -151,7 +150,7 @@ export default function VenuePage() {
       </h1>
       <div className="relative w-full aspect-[20/10]">
         <img
-          src={blobUrl || "/placeholder-image.jpg"}
+          src={imageUrl}
           alt={venue.venue_name}
           className="rounded-lg object-cover w-[80%] mx-auto"
         />
