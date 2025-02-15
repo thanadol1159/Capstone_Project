@@ -193,7 +193,7 @@ USE_TZ = True
 # STATIC_URL = 'static/'
 
 # Static files configuration
-STATIC_URL = '/static/'
+STATIC_URL = 'https://capstone24.sit.kmutt.ac.th/nk1/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
