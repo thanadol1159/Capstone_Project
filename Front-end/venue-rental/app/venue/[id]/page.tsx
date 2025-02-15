@@ -93,7 +93,7 @@ export default function VenuePage() {
       setShowLoginModal(true);
       return;
     }
-    router.push(`/venue/${params.id}/review/create`);
+    router.push(`/nk1/venue/${params.id}/review/create`);
   };
 
   const handleBack = () => {

@@ -89,7 +89,7 @@ const SignUpPage = () => {
         const { access, refresh, expired } = tokenResponse.data;
 
         dispatch(login(access, refresh, expired, username));
-        router.push("/");
+        router.push("/nk1");
 
         setIsUserRegistered(true);
       }
