@@ -65,8 +65,7 @@ const Review: React.FC<ReviewProps> = ({
               </div>
             </div>
             <div>
-              <p>
-                <span className="font-semibold">Stay at: </span>
+              <p className="text-gray-300">
                 {formatDate(checkIn)} - {formatDate(checkOut)}
               </p>
             </div>
