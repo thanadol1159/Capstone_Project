@@ -75,6 +75,7 @@ export default function ReviewCreate() {
       setRemainingReviews((prev) => prev - 1);
       setReviewText("");
       setRating(0);
+      router.push("/nk1")
     } catch (error) {
       console.error("Error submitting review:", error);
       alert("Failed to submit review");
@@ -136,7 +137,7 @@ export default function ReviewCreate() {
           </div>
           <div className="flex justify-end space-x-4">
             <button
-              onClick={() => router.push(`/venue/${venueId}`)}
+              onClick={() => router.push(`/nk1/venue/${venueId}`)}
               className="py-2 px-6 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100"
             >
               Cancel

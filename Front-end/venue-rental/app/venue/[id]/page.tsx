@@ -38,7 +38,7 @@ export default function VenuePage() {
 
     const fetchBookings = async () => {
       try {
-        const { data } = await apiJson.get(`/bookings?venue=${params.id}`);
+        const { data } = await apiJson.get(`/bookings?venue=${params.id}/`);
         setBookings(data);
       } catch (error) {
         console.error("Error fetching bookings:", error);
@@ -48,7 +48,7 @@ export default function VenuePage() {
     const fetchReviews = async () => {
       try {
         const venueId = params.id;
-        const { data } = await apiJson.get(`/reviews`);
+        const { data } = await apiJson.get(`/reviews/`);
 
         const filteredReviews = data.filter(
           (review: { venue: number }) => review.venue === Number(venueId)
@@ -93,7 +93,7 @@ export default function VenuePage() {
       setShowLoginModal(true);
       return;
     }
-    router.push(`/nk1/venue/${params.id}/review/create`);
+    router.push(`/nk1/venue/${params.id}/review/create/`);
   };
 
   const handleBack = () => {
@@ -105,7 +105,7 @@ export default function VenuePage() {
       setShowLoginModal(true);
       return;
     }
-    router.push(`/nk1/venue/${params.id}/booking/create`);
+    router.push(`/nk1/venue/${params.id}/booking/create/`);
   };
 
   const handleLogin = () => {
