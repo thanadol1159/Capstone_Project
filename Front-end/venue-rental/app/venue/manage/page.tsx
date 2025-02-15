@@ -187,39 +187,39 @@ const AddVenuePage = () => {
     return url ? url.replace(/(\/images\/)/, "$1/nk1$2") : "";
   };
 
-  const [blobUrls, setBlobUrls] = useState<{ [key: number]: string }>({});
+  // const [blobUrls, setBlobUrls] = useState<{ [key: number]: string }>({});
 
-  const createBlobUrl = async (imageUrl: string, venueId: number) => {
-    if (!imageUrl) return;
+  // const createBlobUrl = async (imageUrl: string, venueId: number) => {
+  //   if (!imageUrl) return;
 
-    const modifiedUrl = addNk1ToUrl(imageUrl);
+  //   const modifiedUrl = addNk1ToUrl(imageUrl);
 
-    try {
-      const response = await fetch(modifiedUrl);
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      setBlobUrls((prev) => ({ ...prev, [venueId]: url }));
-    } catch (error) {
-      console.error("Error loading image:", error);
-    }
-  };
+  //   try {
+  //     const response = await fetch(modifiedUrl);
+  //     const blob = await response.blob();
+  //     const url = URL.createObjectURL(blob);
+  //     setBlobUrls((prev) => ({ ...prev, [venueId]: url }));
+  //   } catch (error) {
+  //     console.error("Error loading image:", error);
+  //   }
+  // };
 
-  useEffect(() => {
-    if (venues) {
-      venues.forEach((venue) => {
-        if (venue.image) {
-          createBlobUrl(venue.image, venue.id);
-        }
-      });
-    }
+  // useEffect(() => {
+  //   if (venues) {
+  //     venues.forEach((venue) => {
+  //       if (venue.image) {
+  //         createBlobUrl(venue.image, venue.id);
+  //       }
+  //     });
+  //   }
 
-    // Cleanup function to revoke blob URLs
-    return () => {
-      Object.values(blobUrls).forEach((url) => {
-        URL.revokeObjectURL(url);
-      });
-    };
-  }, [venues]);
+  //   // Cleanup function to revoke blob URLs
+  //   return () => {
+  //     Object.values(blobUrls).forEach((url) => {
+  //       URL.revokeObjectURL(url);
+  //     });
+  //   };
+  // }, [venues]);
 
   return (
     <div className="container mx-auto p-14 space-y-6">
@@ -312,11 +312,7 @@ const AddVenuePage = () => {
               {/* Venue Image */}
               <div className="relative w-32 h-32 rounded-lg overflow-hidden">
                 <img
-                  src={
-                    venue.image
-                      ? blobUrls[venue.id] || venue.image
-                      : "/placeholder-image.jpg"
-                  }
+                  src={venue.image ? venue.image : "/placeholder-image.jpg"}
                   alt={venue.venue_name}
                   className="object-cover w-full h-full rounded-lg border-4 border-[#B67373]"
                 />
