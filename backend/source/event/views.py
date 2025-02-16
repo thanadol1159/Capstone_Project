@@ -32,6 +32,7 @@ from .models import (
     StatusBooking,
     Review,
     Notifications,
+    FavoriteVenue,
 )
 from .serializers import (
     RoleSerializer,
@@ -49,6 +50,7 @@ from .serializers import (
     ReviewSerializer,
     NotificationSerializer,
     CustomTokenObtainPairSerializer,
+    FavoriteVenueSerializer
 )
 
 # ViewSets define the view behavior.
@@ -359,3 +361,33 @@ class NotificationViewset(viewsets.ModelViewSet):
             {"message": "Read notifications deleted"},
             status=status.HTTP_200_OK
         )
+    
+class FavoriteVenueViewSet(viewsets.ModelViewSet):
+    serializer_class = FavoriteVenueSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return FavoriteVenue.objects.filter(user=self.request.user)
+
+    def create(self, request):
+        venue_id = request.data.get("venue_id")
+        if not venue_id:
+            return Response({"error": "Venue ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        venue = Venue.objects.filter(id=venue_id).first()
+        if not venue:
+            return Response({"error": "Venue not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        favorite, created = FavoriteVenue.objects.get_or_create(user=request.user, venue=venue)
+        if not created:
+            return Response({"message": "Venue is already in favorites"}, status=status.HTTP_200_OK)
+
+        return Response(FavoriteVenueSerializer(favorite).data, status=status.HTTP_201_CREATED)
+
+    def destroy(self, request, pk=None):
+        favorite = FavoriteVenue.objects.filter(user=request.user, venue_id=pk).first()
+        if not favorite:
+            return Response({"error": "Favorite venue not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        favorite.delete()
+        return Response({"message": "Venue removed from favorites"}, status=status.HTTP_204_NO_CONTENT)

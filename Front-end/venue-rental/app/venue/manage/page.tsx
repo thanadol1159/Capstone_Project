@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/hook/store";
 import { useRouter } from "next/navigation";
 import { Venue } from "@/types/venue";
+import { Plus, ArrowRight } from "lucide-react";
 
 interface SlidingStates {
   [key: number]: boolean;
@@ -183,48 +184,12 @@ const AddVenuePage = () => {
     );
   };
 
-  const addNk1ToUrl = (url: string): string => {
-    return url ? url.replace(/(\/images\/)/, "$1/nk1$2") : "";
-  };
-
-  // const [blobUrls, setBlobUrls] = useState<{ [key: number]: string }>({});
-
-  // const createBlobUrl = async (imageUrl: string, venueId: number) => {
-  //   if (!imageUrl) return;
-
-  //   const modifiedUrl = addNk1ToUrl(imageUrl);
-
-  //   try {
-  //     const response = await fetch(modifiedUrl);
-  //     const blob = await response.blob();
-  //     const url = URL.createObjectURL(blob);
-  //     setBlobUrls((prev) => ({ ...prev, [venueId]: url }));
-  //   } catch (error) {
-  //     console.error("Error loading image:", error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   if (venues) {
-  //     venues.forEach((venue) => {
-  //       if (venue.image) {
-  //         createBlobUrl(venue.image, venue.id);
-  //       }
-  //     });
-  //   }
-
-  //   // Cleanup function to revoke blob URLs
-  //   return () => {
-  //     Object.values(blobUrls).forEach((url) => {
-  //       URL.revokeObjectURL(url);
-  //     });
-  //   };
-  // }, [venues]);
-
   return (
     <div className="container mx-auto p-14 space-y-6">
       <div className="flex w-full justify-between my-2">
-        <p className="text-xl font-semibold text-black">Manage & Add Venue</p>
+        <p className="text-xl font-semibold text-[#3F6B96]">
+          Manage & Add Venue
+        </p>
         <button
           onClick={Checkboxmode}
           className={`text-xl font-semibold transition-colors ${
@@ -251,9 +216,10 @@ const AddVenuePage = () => {
 
       {/* Add Venue Card */}
       <Link href="/nk1/venue/manage/add" className="text-xl font-semibold">
-        <div className="bg-gray-100 hover:bg-gray-200 transition-colors cursor-pointer rounded-lg">
-          <div className="flex flex-col items-center justify-center py-12">
-            <span className="text-gray-600">เพิ่มสถานที่ของคุณ</span>
+        <div className="bg-[#7397BB] hover:bg-[#E6F3FF] transition-colors cursor-pointer rounded-lg text-white hover:text-black">
+          <div className="flex flex-col items-center justify-center py-12 space-y-2">
+            <Plus size={100} strokeWidth={3} />
+            <span>เพิ่มสถานที่ของคุณ</span>
           </div>
         </div>
       </Link>
@@ -269,6 +235,15 @@ const AddVenuePage = () => {
           <p className="text-black text-lg underline">เลือกทั้งหมด</p>
         </div>
       )}
+
+      <div className="flex p-5 justify-between items-center bg-[#E6F3FF] border border-[#7297BB] rounded-lg text-xl font-semibold">
+        <div className="flex-s">
+          <p className="text-[#335473]">Venue Approvement</p>
+        </div>
+        <div className="flex items-center space-x-2">
+          <ArrowRight color="#335473" size={40} />
+        </div>
+      </div>
 
       {/* Existing Venue Cards */}
       {venues?.map((venue: Venue) => (
@@ -296,7 +271,7 @@ const AddVenuePage = () => {
 
           {/* Sliding Venue Card */}
           <div
-            className={`relative flex-grow bg-gray-100 p-6 rounded-lg border overflow-hidden transition-transform duration-300 ${
+            className={`relative flex-grow bg-[#E6F3FF] p-6 rounded-lg border overflow-hidden transition-transform duration-300 ${
               slidingCheckboxStates[venue.id]
                 ? "translate-x-10"
                 : "translate-x-0"
@@ -304,7 +279,7 @@ const AddVenuePage = () => {
           >
             <div className="flex justify-between">
               <p className="font-bold text-black mb-2">{venue.venue_name}</p>
-              <button onClick={Buttonmode} className="text-[#B67373] underline">
+              <button onClick={Buttonmode} className="text-[#3F6B96] underline">
                 Edit
               </button>
             </div>
@@ -314,7 +289,7 @@ const AddVenuePage = () => {
                 <img
                   src={venue.image ? venue.image : "/placeholder-image.jpg"}
                   alt={venue.venue_name}
-                  className="object-cover w-full h-full rounded-lg border-4 border-[#B67373]"
+                  className="object-cover w-full h-full rounded-lg border-4 border-[#3F6B96]"
                 />
               </div>
 

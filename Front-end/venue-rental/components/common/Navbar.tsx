@@ -83,8 +83,12 @@ const Navigation = () => {
     (notification) => !notification.isRead
   ).length;
 
-  if (pathname === "/nk1/login" || pathname === "/nk1/signup") {
-    return <div className="hidden" />;
+  // if (pathname === "/nk1/login" || pathname === "/nk1/signup") {
+  //   return null;
+  // }
+
+  if (pathname === "/login" || pathname === "/signup" ) {
+    return null;
   }
 
   const navItems = accessToken

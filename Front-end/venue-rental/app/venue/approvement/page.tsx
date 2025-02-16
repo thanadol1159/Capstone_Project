@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { apiJson } from "@/hook/api";
 import { Booking } from "@/types/booking";
@@ -7,13 +6,14 @@ import { Venue } from "@/types/venue";
 import { useUserId } from "@/hook/userid";
 import { format } from "date-fns";
 
-const ApproveBooking = () => {
+const ShowVenueRequest = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [userNames, setUserNames] = useState<{ [key: number]: string }>({});
   const [venues, setVenues] = useState<Venue[]>([]);
   const [expanded, setExpanded] = useState<number | null>(null);
   const userId = useUserId();
 
+  // Fetch venues owned by the logged-in user
   useEffect(() => {
     if (!userId) return;
     const fetchVenues = async () => {
@@ -30,16 +30,15 @@ const ApproveBooking = () => {
     fetchVenues();
   }, [userId]);
 
-  console.log(venues);
-
+  // Fetch bookings only for the owned venues
   useEffect(() => {
     if (venues.length === 0) return;
     const fetchBookingsRequest = async () => {
       try {
+        const venueIds = venues.map((venue) => venue.id); // Get all owned venue IDs
         const response = await apiJson.get("/bookings/");
-        const venueIds = new Set(venues.map((venue) => venue.id));
-        const filteredBookings = response.data.filter((booking: Booking) =>
-          venueIds.has(booking.venue)
+        const filteredBookings = response.data.filter(
+          (booking: Booking) => venueIds.includes(booking.venue) // Only get bookings for owned venues
         );
         setBookings(filteredBookings);
       } catch (error) {
@@ -49,6 +48,7 @@ const ApproveBooking = () => {
     fetchBookingsRequest();
   }, [venues]);
 
+  // Fetch user names related to the bookings
   useEffect(() => {
     if (bookings.length === 0) return;
     const fetchUserNames = async () => {
@@ -81,37 +81,9 @@ const ApproveBooking = () => {
     setExpanded(expanded === id ? null : id);
   };
 
-  const approveBooking = async (bookingId: number) => {
-    try {
-      await apiJson.patch(`/bookings/${bookingId}/`, { status_booking: 3 });
-      setBookings((prevBookings) =>
-        prevBookings.map((booking) =>
-          booking.id === bookingId ? { ...booking, status_booking: 3 } : booking
-        )
-      );
-      setExpanded(null);
-    } catch (error) {
-      console.error("Error approving booking:", error);
-    }
-  };
-
-  const rejectBooking = async (bookingId: number) => {
-    try {
-      await apiJson.patch(`/bookings/${bookingId}/`, { status_booking: 1 });
-      setBookings((prevBookings) =>
-        prevBookings.map((booking) =>
-          booking.id === bookingId ? { ...booking, status_booking: 1 } : booking
-        )
-      );
-      setExpanded(null);
-    } catch (error) {
-      console.error("Error rejecting booking:", error);
-    }
-  };
-
   return (
     <div className="p-6 text-black">
-      <h2 className="text-xl font-semibold mb-4">Approve Booking</h2>
+      <h2 className="text-xl font-semibold mb-4">Venue Requests</h2>
       <div className="p-6 bg-gray-100 rounded-lg">
         {bookings.map((booking) => {
           const formattedCheckIn = booking.check_in
@@ -120,7 +92,6 @@ const ApproveBooking = () => {
           const formattedCheckOut = booking.check_out
             ? format(new Date(booking.check_out), "dd MMM yyyy").toUpperCase()
             : "Unknown Check-out Date";
-
           const venue = venues.find((venue) => venue.id === booking.venue);
           const venueName = venue ? venue.venue_name : "Unknown Venue";
 
@@ -149,15 +120,12 @@ const ApproveBooking = () => {
                     <p className="text-red-600 font-semibold">Rejected</p>
                   ) : null}
 
-                  {booking.status_booking !== 1 &&
-                    booking.status_booking !== 3 && (
-                      <button
-                        className="text-gray-600 underline"
-                        onClick={() => toggleExpand(booking.id)}
-                      >
-                        {expanded === booking.id ? "Hide" : "Detail"}
-                      </button>
-                    )}
+                  <button
+                    className="text-gray-600 underline"
+                    onClick={() => toggleExpand(booking.id)}
+                  >
+                    {expanded === booking.id ? "Hide" : "Detail"}
+                  </button>
                 </div>
               </div>
 
@@ -177,20 +145,6 @@ const ApproveBooking = () => {
                   <p>
                     <strong>Total Price:</strong> {booking.total_price}
                   </p>
-                  <div className="flex justify-end mt-3">
-                    <button
-                      className="px-4 py-2 border rounded text-gray-700 mr-2 border-[#3F6B96]"
-                      onClick={() => rejectBooking(booking.id)}
-                    >
-                      Deny
-                    </button>
-                    <button
-                      className="px-4 py-2 bg-[#3F6B96] text-white rounded"
-                      onClick={() => approveBooking(booking.id)}
-                    >
-                      Approve
-                    </button>
-                  </div>
                 </div>
               )}
             </div>
@@ -201,4 +155,4 @@ const ApproveBooking = () => {
   );
 };
 
-export default ApproveBooking;
+export default ShowVenueRequest;

@@ -88,16 +88,16 @@ const BookingsPage = () => {
                     <td className="py-4 px-6 text-center">
                       <button
                         onClick={() => toggleDropdown(booking.id)}
-                        className="text-[#7e5046] font-bold underline hover:text-[#492b26]"
+                        className="text-[#304B84] font-bold underline hover:text-[#492b26]"
                       >
                         Detail
                       </button>
                     </td>
                   </tr>
                   {openDropdownId === booking.id && (
-                    <tr className="bg-[#f9f6f4] border border-[#AC978A]">
+                    <tr className="bg-[#F2F8FF] border border-[#AC978A]">
                       <td colSpan={4} className="p-4">
-                        <div className="text-[#7e5046]">
+                        <div className="text-[#304B84]">
                           <p>
                             <strong>Booking ID:</strong> {booking.id}
                           </p>

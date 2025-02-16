@@ -98,3 +98,11 @@ class Notifications(models.Model):
     message =  models.TextField(null=True,blank=True)
     user  = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)
     isRead = models.BooleanField(default=False)
+
+class FavoriteVenue(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="favorite_venues")
+    venue = models.ForeignKey("Venue", on_delete=models.CASCADE, related_name="favorited_by")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "venue")

@@ -40,6 +40,7 @@ from event.views import (
     ReviewViewSet,
     NotificationViewset,
     CustomTokenObtainPairView,
+    FavoriteVenueViewSet,
 )
 
 # Create a router and register our viewsets with it.
@@ -57,6 +58,7 @@ router.register(r'event-of-venues', EventOfVenueViewSet)
 router.register(r'status-bookings', StatusBookingViewSet, basename='status-booking')
 router.register(r'reviews',ReviewViewSet)
 router.register(r'notifications',NotificationViewset)
+router.register(r'favorites', FavoriteVenueViewSet, basename='favorite')
 
 
 schema_view = get_schema_view(

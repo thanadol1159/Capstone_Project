@@ -17,6 +17,7 @@ from .models import (
     StatusBooking,
     Review,
     Notifications,
+    FavoriteVenue,
 )
 
 class CustomAccessToken(AccessToken):
@@ -124,4 +125,12 @@ class ReviewSerializer(serializers.ModelSerializer):
 class NotificationSerializer(serializers.ModelSerializer):
     class  Meta:
         model = Notifications
+        fields = '__all__'
+
+class FavoriteVenueSerializer(serializers.ModelSerializer):
+    user  = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    venue = serializers.PrimaryKeyRelatedField(queryset=Venue.objects.all())
+
+    class Meta:
+        model = FavoriteVenue
         fields = '__all__'
