@@ -43,7 +43,7 @@ const Navigation = () => {
 
     if (accessToken && userId) {
       fetchNotifications();
-      const intervalId = setInterval(fetchNotifications, 10000);
+      const intervalId = setInterval(fetchNotifications, 30000);
       return () => clearInterval(intervalId);
     }
   }, [accessToken, userId]);
@@ -65,15 +65,12 @@ const Navigation = () => {
     }
   };
 
-  // Function to delete all read notifications
   const deleteReadNotifications = async () => {
     try {
-      // Send a request to delete all read notifications for the current user
       await apiJson.delete("/notifications/delete-read/", {
         data: { userId },
       });
 
-      // Update the state to remove read notifications
       setNotifications(
         notifications.filter((notification) => !notification.isRead)
       );
@@ -82,7 +79,6 @@ const Navigation = () => {
     }
   };
 
-  // Calculate unread count directly from notifications
   const unreadCount = notifications.filter(
     (notification) => !notification.isRead
   ).length;
@@ -196,7 +192,7 @@ const Navigation = () => {
             </button>
 
             {showNotifications && (
-              <div className="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg border overflow-hidden">
+              <div className="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg border overflow-hidden z-10">
                 <div className="p-2 bg-gray-50 border-b flex justify-between items-center">
                   <h3 className="font-semibold text-gray-700">Notifications</h3>
                   <button
@@ -214,8 +210,8 @@ const Navigation = () => {
                         onClick={() => handleNotificationClick(notification.id)}
                         className={`p-3 border-b cursor-pointer hover:bg-gray-50 ${
                           notification.isRead
-                            ? "bg-white"
-                            : "bg-gray-300 font-bold"
+                            ? "bg-[#f2f6fc]"
+                            : "bg-white font-bold "
                         }`}
                       >
                         <p className="text-sm text-gray-800">

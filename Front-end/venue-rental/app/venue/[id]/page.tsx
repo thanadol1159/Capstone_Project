@@ -133,161 +133,185 @@ export default function VenuePage() {
           className="rounded-lg object-cover w-[80%] mx-auto"
         />
       </div>
-      <div className="space-y-4 mt-6">
-        <div className="flex items-center gap-4">
-          <span className="font-semibold">Venue Name:</span>
-          <span>{venue.venue_name}</span>
+      <div className="mt-8 bg-[#E6F3FF] relative rounded-md p-2">
+        {/* Details header */}
+        <div className="absolute top-0 left-0 bg-[#3F6B96] px-6 py-2 text-white rounded-tl-md rounded-br-md">
+          <p className="text-xl font-semibold">Details</p>
         </div>
-        <div className="flex items-center gap-4">
-          <span className="font-semibold">Price:</span>
-          <span>
-            {new Intl.NumberFormat("en-US", {
-              style: "currency",
-              currency: "THB",
-            }).format(venue.price)}
-          </span>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="font-semibold">Capacity:</span>
-          <span>{venue.capacity} people</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="font-semibold">Parking Space:</span>
-          <span>{venue.parking_space} spots</span>
-        </div>
-        {venue.additional_information && (
-          <div>
-            <span className="font-semibold">Additional Information:</span>
-            <p className="text-gray-600">{venue.additional_information}</p>
+
+        {/* Main content */}
+        <div className="pt-20 px-6 pb-6">
+          <div className="bg-gray-50 p-6 rounded-lg space-y-4">
+            <div className="flex items-center gap-4">
+              <span className="font-semibold w-32">Venue Name:</span>
+              <span>{venue.venue_name}</span>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <span className="font-semibold w-32">Price:</span>
+              <span>
+                {new Intl.NumberFormat("en-US", {
+                  style: "currency",
+                  currency: "THB",
+                }).format(venue.price)}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <span className="font-semibold w-32">Capacity:</span>
+              <span>{venue.capacity} people</span>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <span className="font-semibold w-32">Parking Space:</span>
+              <span>{venue.parking_space} spots</span>
+            </div>
+
+            {venue.additional_information && (
+              <div className="flex gap-4">
+                <span className="font-semibold w-32">
+                  Additional Information:
+                </span>
+                <p className="text-gray-600 flex-1">
+                  {venue.additional_information}
+                </p>
+              </div>
+            )}
+
+            <div className="flex items-center gap-4">
+              <span className="font-semibold w-32">Type:</span>
+              <span>{venueType}</span>
+            </div>
           </div>
-        )}
-        <div className="flex items-center gap-4">
-          <span className="font-semibold">Type:</span>
-          <span>{venueType}</span>
+        </div>
+        <div className="flex justify-end mt-6 space-x-10">
+          <button
+            type="button"
+            onClick={handleBack}
+            className="py-2 px-12 border border-[#304B84] rounded-lg text-[#304B84] bg-white hover:bg-gray-200 transition duration-200"
+          >
+            Back
+          </button>
+          <button
+            onClick={handleBooking}
+            className="py-2 px-12 bg-[#304B84] text-white font-semibold rounded-lg hover:bg-gray-800 transition duration-200"
+          >
+            {accessToken ? "Book" : "Login to Book"}
+          </button>
+          <button
+            onClick={handleCreateReview}
+            className="py-2 px-12 bg-white text-[#7A90A4] font-semibold rounded-lg border border-[#3F6B96]"
+          >
+            {accessToken ? "Write a Review" : "Login to Review"}
+          </button>
         </div>
       </div>
 
-      <div className="mt-8">
-        <h2 className="text-xl font-semibold mb-4">Reviews</h2>
-        <div className="bg-gray-50 p-6 rounded-lg mb-6">
-          <div className="flex flex-col">
-            <div className="flex space-x-2 items-center">
-              <span className="text-3xl font-bold">
-                {reviews.length > 0
-                  ? (
-                      reviews.reduce((sum, review) => sum + review.point, 0) /
-                      reviews.length
-                    ).toFixed(1)
-                  : "0.0"}
-              </span>
-              <div className="flex ">
-                <Star
-                  className="w-7 h-7 text-yellow-500"
-                  fill={"currentColor"}
-                />
+      <div className="mt-8 bg-[#E6F3FF] relative rounded-md">
+        <div className="absolute top-0 left-0 bg-[#3F6B96] px-6 py-2 text-white rounded-tl-md rounded-br-md">
+          <p className="text-xl font-semibold">Reviews</p>
+        </div>
+
+        {/* Main content - Added padding to prevent overlap with header */}
+        <div className="pt-20 px-6 pb-6">
+          {/* Rating summary box */}
+          <div className="bg-gray-50 p-6 rounded-lg mb-6">
+            <div className="flex flex-row justify-between space-x-10">
+              {/* Left side */}
+              <div className="flex flex-col justify-center items-center pl-4">
+                <div className="flex space-x-2 items-center ">
+                  <span className="text-3xl font-bold">
+                    {reviews.length > 0
+                      ? (
+                          reviews.reduce(
+                            (sum, review) => sum + review.point,
+                            0
+                          ) / reviews.length
+                        ).toFixed(1)
+                      : "0.0"}
+                  </span>
+                  <Star
+                    className="w-7 h-7 text-[#335473]"
+                    fill={"currentColor"}
+                  />
+                </div>
+                <div>
+                  <span className="text-gray-600">
+                    {reviews.length} ratings
+                  </span>
+                </div>
+              </div>
+
+              <div className="border border-[#C9D9EB]"></div>
+
+              {/* Right side */}
+              <div className="space-y-2 right-side flex-1">
+                {[5, 4, 3, 2, 1].map((star) => {
+                  const count = reviews.filter(
+                    (review) => review.point === star
+                  ).length;
+                  const percentage =
+                    reviews.length === 0 ? 0 : (count / reviews.length) * 100;
+                  return (
+                    <div key={star} className="flex items-center space-x-2">
+                      <div className="flex space-x-1">
+                        {[...Array(star)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className="w-4 h-4 text-[#335473]"
+                            fill="currentColor"
+                          />
+                        ))}
+                      </div>
+                      <div className="flex-1 bg-gray-200 rounded-full h-2.5">
+                        <div
+                          className="bg-[#335473] h-2.5 rounded-full"
+                          style={{ width: `${percentage}%` }}
+                        ></div>
+                      </div>
+                      <span className="w-10 text-gray-600 text-right">
+                        {count}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
-            <div>
-              <span className="text-gray-600">{reviews.length} ratings</span>
-            </div>
           </div>
-          <div className="mt-4 space-y-2">
-            {[5, 4, 3, 2, 1].map((star) => {
-              const count = reviews.filter(
-                (review) => review.point === star
-              ).length;
-              const percentage = (count / reviews.length) * 100;
-              return (
-                <div key={star} className="flex items-center space-x-2">
-                  {/* Replace numeric star rating with Star icons */}
-                  <div className="flex space-x-1">
-                    {[...Array(star)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className="w-4 h-4 text-yellow-500"
-                        fill="currentColor"
-                      />
-                    ))}
-                  </div>
-                  <div className="flex-1 bg-gray-200 rounded-full h-2.5">
-                    <div
-                      className="bg-yellow-400 h-2.5 rounded-full"
-                      style={{ width: `${percentage}%` }}
-                    ></div>
-                  </div>
-                  <span className="w-10 text-gray-600 text-right">{count}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-        <div className="space-y-4">
-          {reviews.length > 0 ? (
-            reviews
-              .sort(
-                (a, b) =>
-                  new Date(a.createAt).getTime() -
-                  new Date(b.createAt).getTime()
-              )
-              .map((review) => {
-                const sortedBookings = bookings
-                  .filter(
-                    (booking) =>
-                      booking.user === review.user &&
-                      booking.venue === review.venue
-                  )
-                  .sort(
-                    (a, b) =>
-                      new Date(a.check_in).getTime() -
-                      new Date(b.check_in).getTime()
+
+          {/* Reviews list */}
+          <div className="space-y-4">
+            {reviews.length > 0 ? (
+              reviews
+                .sort(
+                  (a, b) =>
+                    new Date(a.createAt).getTime() -
+                    new Date(b.createAt).getTime()
+                )
+                .map((review) => {
+                  const booking = bookings.find(
+                    (booking) => booking.id === review.booking
                   );
 
-                const userBooking =
-                  sortedBookings.find(
-                    (booking) =>
-                      new Date(booking.check_in) <= new Date(review.createAt)
-                  ) || null;
-
-                return (
-                  <Review
-                    key={review.id}
-                    date={review.createAt}
-                    rating={review.point}
-                    review={review.reviewDetail}
-                    user={review.user}
-                    checkIn={userBooking?.check_in || "N/A"}
-                    checkOut={userBooking?.check_out || "N/A"}
-                  />
-                );
-              })
-          ) : (
-            <div className="text-center text-gray-500 py-4">
-              No reviews yet. Be the first to write one!
-            </div>
-          )}
+                  return (
+                    <Review
+                      key={review.id}
+                      date={review.createAt}
+                      rating={review.point}
+                      review={review.reviewDetail}
+                      user={review.user}
+                      checkIn={booking?.check_in || "N/A"}
+                      checkOut={booking?.check_out || "N/A"}
+                    />
+                  );
+                })
+            ) : (
+              <div className="text-center text-[#7397BB] py-4">
+                -- No reviews yet. Be the first to write one! --
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-
-      <div className="flex justify-end mt-6 space-x-10">
-        <button
-          type="button"
-          onClick={handleBack}
-          className="py-2 px-12 border border-black rounded-lg text-gray-700 hover:bg-gray-200 transition duration-200"
-        >
-          Back
-        </button>
-        <button
-          onClick={handleBooking}
-          className="py-2 px-12 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 transition duration-200"
-        >
-          {accessToken ? "Book Now" : "Login to Book"}
-        </button>
-        <button
-          onClick={handleCreateReview}
-          className="py-2 px-12 bg-white text-[#7A90A4] font-semibold rounded-lg border border-[#3F6B96]"
-        >
-          {accessToken ? "Write a Review" : "Login to Review"}
-        </button>
       </div>
 
       {showLoginModal && (

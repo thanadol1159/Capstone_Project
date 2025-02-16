@@ -245,14 +245,6 @@ class StatusBookingViewSet(viewsets.ModelViewSet):
     queryset = StatusBooking.objects.all()
     serializer_class = StatusBookingSerializer
 
-from rest_framework import viewsets, status
-from rest_framework.response import Response
-from django.utils import timezone
-from datetime import datetime
-import pytz
-from .models import Review, Booking
-from .serializers import ReviewSerializer
-
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
@@ -260,22 +252,31 @@ class ReviewViewSet(viewsets.ModelViewSet):
     def create(self, request):
         try:
             user = request.user
-            venue_id = request.data.get("venue")
-            booking_id = request.data.get("booking")
+            venue_id = int(request.data.get("venue", 0))
+            booking_id = int(request.data.get("booking", 0))
 
-            # Validate required fields
             if not venue_id or not booking_id:
                 return Response(
                     {"error": "Venue ID and Booking ID are required."},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-            # Fetch the booking
+            approved_status = StatusBooking.objects.filter(status="approved").first()
+            if not approved_status:
+                return Response(
+                    {"error": "Approved status not found."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            print(f"Booking ID: {booking_id}")
+            print(f"User: {user.id}")
+            print(f"Venue ID: {venue_id}")
+            print(f"Approved Status: {approved_status.id}")
+
             booking = Booking.objects.filter(
                 id=booking_id,
                 user=user,
                 venue_id=venue_id,
-                status_booking__status="approved",  
+                status_booking=approved_status,  
             ).first()
 
             if not booking:
@@ -287,23 +288,24 @@ class ReviewViewSet(viewsets.ModelViewSet):
             zones = pytz.timezone("Asia/Jakarta")
             current_time = datetime.now(zones)
 
+            if not booking.check_out:
+                return Response({"error": "Booking check-out time is missing."}, status=status.HTTP_400_BAD_REQUEST)
+
             if booking.check_out >= current_time:
                 return Response(
                     {"error": "Cannot proceed, checkout time has not passed yet."},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-            # Ensure the booking hasn't already been reviewed
             if booking.isReview:
                 return Response(
                     {"error": "This booking has already been reviewed."},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-            # Proceed with creating the review
             serializer = self.get_serializer(data=request.data)
             if serializer.is_valid():
-                serializer.save(user=user, venue_id=venue_id, Booking=booking)
+                serializer.save(user=user, venue_id=venue_id, booking=booking) 
 
                 booking.isReview = True
                 booking.save()

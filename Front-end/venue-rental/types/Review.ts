@@ -5,4 +5,5 @@ interface Review {
   createAt: string;
   point: number;
   reviewDetail: string;
+  booking: number
 }
