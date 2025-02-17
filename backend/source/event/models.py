@@ -83,15 +83,27 @@ class EventOfVenue(models.Model):
     venue_request = models.ForeignKey(VenueRequest, on_delete=models.CASCADE,null=True, blank=True)
     CategoryOfEvent = models.ForeignKey(CategoryOfEvent, on_delete=models.CASCADE)
 
+# class Review(models.Model):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)
+#     venue = models.ForeignKey(Venue, on_delete=models.CASCADE, null=True,blank=True)
+#     reviewDetail = models.TextField()
+#     createAt = models.DateTimeField()
+#     review_image = models.FileField(upload_to='images/reviews/',null=True, blank=True)
+#     point = models.IntegerField()
+#     booking = models.ForeignKey(Booking, on_delete=models.CASCADE, null=True, blank=True)
+
 class Review(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)
-    venue = models.ForeignKey(Venue, on_delete=models.CASCADE, null=True,blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    venue = models.ForeignKey(Venue, on_delete=models.CASCADE, null=True, blank=True)
     reviewDetail = models.TextField()
     createAt = models.DateTimeField()
-    review_image = models.FileField(upload_to='images/reviews/',null=True, blank=True)
     point = models.IntegerField()
     booking = models.ForeignKey(Booking, on_delete=models.CASCADE, null=True, blank=True)
 
+class ReviewImage(models.Model):
+    review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name="images")
+    image = models.ImageField(upload_to="images/reviews/")
+    
 class Notifications(models.Model):
     notifications_type =  models.CharField(max_length=45,)
     create_at = models.DateTimeField()

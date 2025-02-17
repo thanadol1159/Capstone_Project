@@ -18,6 +18,7 @@ from .models import (
     Review,
     Notifications,
     FavoriteVenue,
+    ReviewImage,
 )
 
 class CustomAccessToken(AccessToken):
@@ -113,15 +114,32 @@ class EventOfVenueSerializer(serializers.ModelSerializer):
         model = EventOfVenue
         fields = '__all__'
 
+class Base64ImageField(serializers.ImageField):
+    def to_internal_value(self, data):
+        if isinstance(data, str) and data.startswith("data:image"):
+            format, imgstr = data.split(";base64,")  
+            ext = format.split("/")[-1]  
+            return ContentFile(base64.b64decode(imgstr), name=f"temp.{ext}")  
+        return super().to_internal_value(data)
+
 class ReviewSerializer(serializers.ModelSerializer):
-    user  = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
-    venue = serializers.PrimaryKeyRelatedField(queryset=Venue.objects.all())
-    # booking =  serializers.PrimaryKeyRelatedField(querys=Booking.objects.all())
+    review_images = serializers.ListField(
+        child=Base64ImageField(), write_only=True
+    )
 
-    class  Meta:
+    class Meta:
         model = Review
-        fields = '__all__'
+        fields = "__all__"
 
+    def create(self, validated_data):
+        images_data = validated_data.pop("review_images", [])  
+        review = Review.objects.create(**validated_data)
+
+        for image_data in images_data:
+            ReviewImage.objects.create(review=review, image=image_data)
+
+        return review
+    
 class NotificationSerializer(serializers.ModelSerializer):
     class  Meta:
         model = Notifications
