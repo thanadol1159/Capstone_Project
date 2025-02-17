@@ -83,13 +83,13 @@ const Navigation = () => {
     (notification) => !notification.isRead
   ).length;
 
-  // if (pathname === "/nk1/login" || pathname === "/nk1/signup") {
-  //   return null;
-  // }
-
-  if (pathname === "/login" || pathname === "/signup" ) {
+  if (pathname === "/nk1/login" || pathname === "/nk1/signup") {
     return null;
   }
+
+  // if (pathname === "/login" || pathname === "/signup" ) {
+  //   return null;
+  // }
 
   const navItems = accessToken
     ? [
@@ -101,6 +101,10 @@ const Navigation = () => {
             { label: "Book Venue", href: "/nk1/venue/booking" },
             { label: "Manage & Add Venue", href: "/nk1/venue/manage" },
           ],
+        },
+        {
+          label: "Favourite",
+          href: "/nk1/favourite",
         },
       ]
     : [{ label: "Venue Rental", href: "/nk1" }];
@@ -114,11 +118,11 @@ const Navigation = () => {
   };
 
   return (
-    <nav className="w-full bg-[#335473] border-b border-gray-200 shadow-[rgba(0,0,0,0.2)_0px_4px_4px_0px]">
+    <nav className="w-full bg-[#335473] border-b border-gray-200 shadow-[rgba(0,0,0,0.2)_0px_4px_4px_0px] z-20">
       <div className="px-4 h-14 flex items-center justify-between">
         <div className="flex items-center space-x-8">
           <Link href="/nk1" className="text-xl font-semibold">
-            <img src="/logo/logo.png" alt="EVENT Logo" />
+            <img src="/logo/logo2.png" alt="EVENT Logo" />
           </Link>
 
           <div className="flex items-center space-x-6">

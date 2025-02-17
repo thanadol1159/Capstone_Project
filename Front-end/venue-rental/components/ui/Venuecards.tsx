@@ -6,6 +6,7 @@ import { apiJson } from "@/hook/api";
 import { useUserId } from "@/hook/userid";
 import { useSelector } from "react-redux";
 import { RootState } from "@/hook/store";
+import { MapPin } from "lucide-react";
 
 export default function VenueCard({
   id,
@@ -14,7 +15,7 @@ export default function VenueCard({
   location,
   category_event,
   onDetailClick,
-  onRemoveFavorite, 
+  onRemoveFavorite,
 }: Venue & { onRemoveFavorite?: () => void }) {
   const [isFavorite, setIsFavorite] = useState(false);
   const userId = useUserId();
@@ -43,17 +44,16 @@ export default function VenueCard({
       return alert("Please log in to favorite venues.");
 
     const previousFavoriteState = isFavorite;
-    setIsFavorite(!previousFavoriteState); 
+    setIsFavorite(!previousFavoriteState);
 
     try {
       if (previousFavoriteState) {
         await apiJson.delete(`/favorites/${id}/`);
-        onRemoveFavorite?.(); 
+        onRemoveFavorite?.();
       } else {
         await apiJson.post("/favorites/", { venue_id: id, user_id: userId });
       }
 
-      // Re-fetch favorites after toggling
       const response = await apiJson.get("/favorites/");
       const isFavorited = response.data.some(
         (fav: any) => fav.venue === id && fav.user === userId
@@ -113,9 +113,9 @@ export default function VenueCard({
           )}
         </div>
 
-        <div className="flex items-center gap-2 text-black mb-4">
-          <img src="/logo/location_icon.png" alt="Location Icon" />
-          <span className="text-sm">{location}</span>
+        <div className="flex items-center gap-1 text-black mb-4">
+          <MapPin size={20} color="#000000" strokeWidth={1} />
+          <span className="text-sm my-auto">{location}</span>
         </div>
 
         <button
