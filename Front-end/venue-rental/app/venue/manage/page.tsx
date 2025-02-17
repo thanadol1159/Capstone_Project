@@ -236,14 +236,17 @@ const AddVenuePage = () => {
         </div>
       )}
 
-      <div className="flex p-5 justify-between items-center bg-[#E6F3FF] border border-[#7297BB] rounded-lg text-xl font-semibold">
+      <Link
+        href="/nk1/venue/approvement"
+        className="flex p-5 justify-between items-center bg-[#E6F3FF] hover:bg-[#7397BB] border border-[#7297BB] rounded-lg text-xl font-semibold"
+      >
         <div className="flex-s">
           <p className="text-[#335473]">Venue Approvement</p>
         </div>
         <div className="flex items-center space-x-2">
           <ArrowRight color="#335473" size={40} />
         </div>
-      </div>
+      </Link>
 
       {/* Existing Venue Cards */}
       {venues?.map((venue: Venue) => (

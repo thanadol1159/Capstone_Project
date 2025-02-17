@@ -6,18 +6,6 @@ import Navigation from "@/components/common/Navbar";
 import Sidebar from "@/components/common/Sidebar";
 import ReduxProvider from "@/components/common/ReduxProvider";
 
-// Uncomment and adjust Geist fonts if needed
-// const geistSans = localFont({
-//   src: "./fonts/GeistVF.woff",
-//   variable: "--font-geist-sans",
-//   weight: "100 900",
-// });
-// const geistMono = localFont({
-//   src: "./fonts/GeistMonoVF.woff",
-//   variable: "--font-geist-mono",
-//   weight: "100 900",
-// });
-
 const prompt = Prompt({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
@@ -36,13 +24,17 @@ export default function RootLayout({
 }>) {
   return (
     <html className={`${prompt.variable}`}>
-      <body className="bg-[#F2F8FF] h-screen">
+      <body className="bg-[#F2F8FF] h-screen overflow-hidden">
         <ReduxProvider>
           <div className="h-screen bg-[#F2F8FF] flex flex-col">
             <Navigation />
-            <div className="flex flex-1 h-screen">
+            <div className="flex flex-1 h-[calc(100vh-64px)] relative">
               <Sidebar />
-              <main className={`flex-1 ${prompt.className}`}>{children}</main>
+              <main
+                className={`flex-1 ml-[50px] overflow-y-auto h-full p-4 ${prompt.className}`}
+              >
+                <div className="pb-4">{children}</div>
+              </main>
             </div>
           </div>
         </ReduxProvider>

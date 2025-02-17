@@ -1,81 +1,45 @@
 "use client";
 import { useEffect, useState } from "react";
 import { apiJson } from "@/hook/api";
-import { Booking } from "@/types/booking";
 import { Venue } from "@/types/venue";
 import { useUserId } from "@/hook/userid";
 import { format } from "date-fns";
 
+// Define a type for venue requests
+interface VenueRequest {
+  id: number;
+  venue: number;
+  venue_name: string;
+  location: string;
+  category_event: string;
+  number_of_rooms: number;
+  additional_information: string;
+  status: number;
+  venue_owner: number;
+  created_at?: string;
+}
+
 const ShowVenueRequest = () => {
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [userNames, setUserNames] = useState<{ [key: number]: string }>({});
-  const [venues, setVenues] = useState<Venue[]>([]);
+  const [venueRequests, setVenueRequests] = useState<VenueRequest[]>([]);
   const [expanded, setExpanded] = useState<number | null>(null);
   const userId = useUserId();
 
-  // Fetch venues owned by the logged-in user
   useEffect(() => {
     if (!userId) return;
-    const fetchVenues = async () => {
+    const fetchVenueRequests = async () => {
       try {
-        const response = await apiJson.get("/venues/");
-        const ownedVenues = response.data.filter(
-          (venue: Venue) => venue.venue_owner === userId
+        const response = await apiJson.get("/venue-requests/");
+        // Filter venue requests where the venue owner is the current user
+        const filteredRequests = response.data.filter(
+          (request: VenueRequest) => request.venue_owner === userId
         );
-        setVenues(ownedVenues);
+        setVenueRequests(filteredRequests);
       } catch (error) {
-        console.error("Error fetching venues:", error);
+        console.error("Error fetching venue requests:", error);
       }
     };
-    fetchVenues();
+    fetchVenueRequests();
   }, [userId]);
-
-  // Fetch bookings only for the owned venues
-  useEffect(() => {
-    if (venues.length === 0) return;
-    const fetchBookingsRequest = async () => {
-      try {
-        const venueIds = venues.map((venue) => venue.id); // Get all owned venue IDs
-        const response = await apiJson.get("/bookings/");
-        const filteredBookings = response.data.filter(
-          (booking: Booking) => venueIds.includes(booking.venue) // Only get bookings for owned venues
-        );
-        setBookings(filteredBookings);
-      } catch (error) {
-        console.error("Error fetching bookings:", error);
-      }
-    };
-    fetchBookingsRequest();
-  }, [venues]);
-
-  // Fetch user names related to the bookings
-  useEffect(() => {
-    if (bookings.length === 0) return;
-    const fetchUserNames = async () => {
-      const userPromises = bookings.map(async (booking) => {
-        try {
-          const response = await apiJson.get(`/users/${booking.user}/`);
-          return {
-            userId: booking.user,
-            userName: response.data.full_name || response.data.username,
-          };
-        } catch (error) {
-          console.error(`Error fetching user ${booking.user}:`, error);
-          return {
-            userId: booking.user,
-            userName: "Unknown",
-          };
-        }
-      });
-      const userResults = await Promise.all(userPromises);
-      const userMap = userResults.reduce((acc: any, result) => {
-        acc[result.userId] = result.userName;
-        return acc;
-      }, {});
-      setUserNames(userMap);
-    };
-    fetchUserNames();
-  }, [bookings]);
 
   const toggleExpand = (id: number) => {
     setExpanded(expanded === id ? null : id);
@@ -83,73 +47,89 @@ const ShowVenueRequest = () => {
 
   return (
     <div className="p-6 text-black">
-      <h2 className="text-xl font-semibold mb-4">Venue Requests</h2>
+      <h2 className="text-xl font-semibold mb-4">My Venue Requests</h2>
       <div className="p-6 bg-gray-100 rounded-lg">
-        {bookings.map((booking) => {
-          const formattedCheckIn = booking.check_in
-            ? format(new Date(booking.check_in), "dd MMM yyyy").toUpperCase()
-            : "Unknown Check-in Date";
-          const formattedCheckOut = booking.check_out
-            ? format(new Date(booking.check_out), "dd MMM yyyy").toUpperCase()
-            : "Unknown Check-out Date";
-          const venue = venues.find((venue) => venue.id === booking.venue);
-          const venueName = venue ? venue.venue_name : "Unknown Venue";
+        {venueRequests.length === 0 ? (
+          <p className="text-center text-gray-500">
+            You have no venue requests
+          </p>
+        ) : (
+          venueRequests.map((venueRequest) => {
+            const formattedDate = venueRequest.created_at
+              ? format(
+                  new Date(venueRequest.created_at),
+                  "dd MMM yyyy"
+                ).toUpperCase()
+              : "Unknown Date";
 
-          return (
-            <div
-              key={booking.id}
-              className="bg-white p-4 mb-4 rounded-lg shadow border border-[#3F6B96]"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">{venueName}</p>
-                  <p className="text-gray-500">
-                    Booked by: {userNames[booking.user] || "Loading..."}
-                  </p>
-                  <p className="text-gray-500">
-                    Check-in: {formattedCheckIn} | Check-out:{" "}
-                    {formattedCheckOut}
-                  </p>
-                </div>
-                <div className="flex items-center gap-3">
-                  {booking.status_booking === 3 ? (
-                    <p className="text-green-600 font-semibold">Approved</p>
-                  ) : booking.status_booking === 2 ? (
-                    <p className="text-yellow-500 font-semibold">Pending</p>
-                  ) : booking.status_booking === 1 ? (
-                    <p className="text-red-600 font-semibold">Rejected</p>
-                  ) : null}
+            return (
+              <div
+                key={venueRequest.id}
+                className="bg-white p-4 mb-4 rounded-lg shadow border border-[#3F6B96]"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">{venueRequest.venue_name}</p>
+                    <p className="text-gray-500">{venueRequest.location}</p>
+                    {venueRequest.created_at && (
+                      <p className="text-gray-500">
+                        Submitted on: {formattedDate}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {venueRequest.status === 3 ? (
+                      <p className="text-green-600 font-semibold">Approved</p>
+                    ) : venueRequest.status === 2 ? (
+                      <p className="text-yellow-500 font-semibold">Pending</p>
+                    ) : venueRequest.status === 1 ? (
+                      <p className="text-red-600 font-semibold">Rejected</p>
+                    ) : null}
 
-                  <button
-                    className="text-gray-600 underline"
-                    onClick={() => toggleExpand(booking.id)}
-                  >
-                    {expanded === booking.id ? "Hide" : "Detail"}
-                  </button>
+                    <button
+                      className="text-gray-600 underline"
+                      onClick={() => toggleExpand(venueRequest.id)}
+                    >
+                      {expanded === venueRequest.id ? "Hide" : "Detail"}
+                    </button>
+                  </div>
                 </div>
+
+                {expanded === venueRequest.id && (
+                  <div className="mt-4 p-3 border rounded bg-gray-50">
+                    <p>
+                      <strong>Venue Name:</strong> {venueRequest.venue_name}
+                    </p>
+                    <p>
+                      <strong>Location:</strong> {venueRequest.location}
+                    </p>
+                    <p>
+                      <strong>Category:</strong> {venueRequest.category_event}
+                    </p>
+                    <p>
+                      <strong>Number of Rooms:</strong>{" "}
+                      {venueRequest.number_of_rooms}
+                    </p>
+                    <p>
+                      <strong>Additional Information:</strong>{" "}
+                      {venueRequest.additional_information}
+                    </p>
+                    <p>
+                      <strong>Status:</strong>{" "}
+                      {venueRequest.status === 3
+                        ? "Approved"
+                        : venueRequest.status === 2
+                        ? "Pending"
+                        : venueRequest.status === 1
+                        ? "Rejected"
+                        : "Unknown"}
+                    </p>
+                  </div>
+                )}
               </div>
-
-              {expanded === booking.id && (
-                <div className="mt-4 p-3 border rounded bg-gray-50">
-                  <p>
-                    <strong>Venue:</strong> {venueName}
-                  </p>
-                  <p>
-                    <strong>User:</strong>{" "}
-                    {userNames[booking.user] || "Loading..."}
-                  </p>
-                  <p>
-                    <strong>Date:</strong> Check-in: {formattedCheckIn} |
-                    Check-out: {formattedCheckOut}
-                  </p>
-                  <p>
-                    <strong>Total Price:</strong> {booking.total_price}
-                  </p>
-                </div>
-              )}
-            </div>
-          );
-        })}
+            );
+          })
+        )}
       </div>
     </div>
   );

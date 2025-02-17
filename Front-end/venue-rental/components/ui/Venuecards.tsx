@@ -54,7 +54,6 @@ export default function VenueCard({
         await apiJson.post("/favorites/", { venue_id: id, user_id: userId });
       }
 
-      // Re-fetch favorites after toggling
       const response = await apiJson.get("/favorites/");
       const isFavorited = response.data.some(
         (fav: any) => fav.venue === id && fav.user === userId
@@ -114,9 +113,9 @@ export default function VenueCard({
           )}
         </div>
 
-        <div className="flex items-center gap-2 text-black mb-4">
-          <MapPin size={40} color="#000000" strokeWidth={1} />
-          <span className="text-sm">{location}</span>
+        <div className="flex items-center gap-1 text-black mb-4">
+          <MapPin size={20} color="#000000" strokeWidth={1} />
+          <span className="text-sm my-auto">{location}</span>
         </div>
 
         <button
