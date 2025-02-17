@@ -8,12 +8,13 @@ import { Booking } from "@/types/booking";
 import { VenueType } from "@/types/venueType";
 import { apiJson } from "@/hook/api";
 import { RootState } from "@/hook/store";
-import Review from "@/components/ui/ReviewsBox";
+import Reviews from "@/components/ui/ReviewsBox";
+import { Review } from "@/types/Review";
 import { Star, StarHalf } from "lucide-react";
 
-const addNk1ToUrl = (url: string): string => {
-  return url ? url.replace(/(\/images\/)/, "$1/nk1$2") : "";
-};
+// const addNk1ToUrl = (url: string): string => {
+//   return url ? url.replace(/(\/images\/)/, "$1/nk1$2") : "";
+// };
 
 export default function VenuePage() {
   const params = useParams();
@@ -294,7 +295,7 @@ export default function VenuePage() {
                   );
 
                   return (
-                    <Review
+                    <Reviews
                       key={review.id}
                       date={review.createAt}
                       rating={review.point}

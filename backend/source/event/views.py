@@ -314,14 +314,14 @@ class ReviewViewSet(viewsets.ModelViewSet):
             if serializer.is_valid():
                 serializer.save(user=user, venue_id=venue_id, booking=booking) 
                 
-                review = Review.objects.create(
-                user=user,
-                venue_id=venue_id,
-                booking=booking,
-                createAt=creat_at,
-                reviewDetail=review_detail,
-                point=point
-            )
+            #     review = Review.objects.create(
+            #     user=user,
+            #     venue_id=venue_id,
+            #     booking=booking,
+            #     createAt=creat_at,
+            #     reviewDetail=review_detail,
+            #     point=point
+            # )
 
                 # บันทึกไฟล์ภาพจาก Base64
                 for index, image_base64 in enumerate(review_images):

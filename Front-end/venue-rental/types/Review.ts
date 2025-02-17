@@ -1,9 +1,10 @@
-interface Review {
+export interface Review {
   id: number;
   user: number;
   venue: number;
-  createAt: string;
-  point: number;
+  booking: number;
   reviewDetail: string;
-  booking: number
+  point: number;
+  createAt: string;
+  review_images: string[];
 }

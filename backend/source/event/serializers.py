@@ -125,6 +125,7 @@ class Base64ImageField(serializers.ImageField):
 class ReviewSerializer(serializers.ModelSerializer):
     review_images = serializers.ListField(
         child=Base64ImageField(), write_only=True
+        , required=False, allow_null=True
     )
 
     class Meta:
