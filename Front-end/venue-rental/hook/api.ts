@@ -4,47 +4,47 @@ import { store, persistor } from "@/hook/store";
 import { logout } from "@/hook/action";
 import { useRouter } from "next/navigation";
 
-// const apiJson = axios.create({
-//   baseURL: "https://capstone24.sit.kmutt.ac.th/nk1/api/",
-//   headers: {
-//     "Content-Type": "application/json",
-//   },
-// });
-
-// const apiFormData = axios.create({
-//   baseURL: "https://capstone24.sit.kmutt.ac.th/nk1/api/",
-//   headers: {
-//     "Content-Type": "multipart/form-data",
-//   },
-// });
-
-// const apiJson = axios.create({
-//   baseURL: "http://capstone24.sit.kmutt.ac.th:8080/nk1/api/",
-//   headers: {
-//     "Content-Type": "application/json",
-//   },
-// });
-
-// const apiFormData = axios.create({
-//   baseURL: "http://capstone24.sit.kmutt.ac.th:8080/nk1/api/",
-//   headers: {
-//     "Content-Type": "multipart/form-data",
-//   },
-// });
-
 const apiJson = axios.create({
-  baseURL: "http://localhost:8080/api/",
+  baseURL: "https://capstone24.sit.kmutt.ac.th/nk1/api/",
   headers: {
     "Content-Type": "application/json",
   },
 });
 
 const apiFormData = axios.create({
-  baseURL: "http://localhost:8080/api/",
+  baseURL: "https://capstone24.sit.kmutt.ac.th/nk1/api/",
   headers: {
     "Content-Type": "multipart/form-data",
   },
 });
+
+// const apiJson = axios.create({
+//   baseURL: "http://capstone24.sit.kmutt.ac.th:8080/nk1/api/",
+//   headers: {
+//     "Content-Type": "application/json",
+//   },
+// });
+
+// const apiFormData = axios.create({
+//   baseURL: "http://capstone24.sit.kmutt.ac.th:8080/nk1/api/",
+//   headers: {
+//     "Content-Type": "multipart/form-data",
+//   },
+// });
+
+// const apiJson = axios.create({
+//   baseURL: "http://localhost:8080/api/",
+//   headers: {
+//     "Content-Type": "application/json",
+//   },
+// });
+
+// const apiFormData = axios.create({
+//   baseURL: "http://localhost:8080/api/",
+//   headers: {
+//     "Content-Type": "multipart/form-data",
+//   },
+// });
 
 // Function to refresh the access token 
 // production

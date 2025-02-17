@@ -122,7 +122,7 @@ const Navigation = () => {
       <div className="px-4 h-14 flex items-center justify-between">
         <div className="flex items-center space-x-8">
           <Link href="/nk1" className="text-xl font-semibold">
-            <img src="/logo/logo2.png" alt="EVENT Logo" />
+            <img src="/nk1/logo/logo2.png" alt="EVENT Logo" />
           </Link>
 
           <div className="flex items-center space-x-6">
