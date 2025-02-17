@@ -258,69 +258,121 @@ class ReviewViewSet(viewsets.ModelViewSet):
             user = request.user
             venue_id = int(request.data.get("venue", 0))
             booking_id = int(request.data.get("booking", 0))
+            creat_at = request.data.get("createAt", "")
             review_detail = request.data.get("reviewDetail", "")
             point = request.data.get("point", 0)
-            review_images = request.data.get("review_images", [])  # รับรูปภาพเป็น Base64
-
+            review_images = request.data.get("review_images", [])
             if not venue_id or not booking_id:
-                return Response({"error": "Venue ID and Booking ID are required."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"error": "Venue ID and Booking ID are required."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
             approved_status = StatusBooking.objects.filter(status="approved").first()
             if not approved_status:
-                return Response({"error": "Approved status not found."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"error": "Approved status not found."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            print(f"Booking ID: {booking_id}")
+            print(f"User: {user.id}")
+            print(f"Venue ID: {venue_id}")
+            print(f"Approved Status: {approved_status.id}")
 
             booking = Booking.objects.filter(
                 id=booking_id,
                 user=user,
                 venue_id=venue_id,
-                status_booking=approved_status,
+                status_booking=approved_status,  
             ).first()
 
             if not booking:
-                return Response({"error": "No completed booking found for this venue."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"error": "No completed booking found for this venue."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-            # ตรวจสอบว่า Check-out แล้วหรือยัง
             zones = pytz.timezone("Asia/Jakarta")
             current_time = datetime.now(zones)
 
-            if not booking.check_out or booking.check_out >= current_time:
-                return Response({"error": "Cannot proceed, checkout time has not passed yet."}, status=status.HTTP_400_BAD_REQUEST)
+            if not booking.check_out:
+                return Response({"error": "Booking check-out time is missing."}, status=status.HTTP_400_BAD_REQUEST)
+
+            if booking.check_out >= current_time:
+                return Response(
+                    {"error": "Cannot proceed, checkout time has not passed yet."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
             if booking.isReview:
-                return Response({"error": "This booking has already been reviewed."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"error": "This booking has already been reviewed."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-            # บันทึก Review โดยยังไม่ใส่รูป
-            review = Review.objects.create(
+            serializer = self.get_serializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save(user=user, venue_id=venue_id, booking=booking) 
+                
+                review = Review.objects.create(
                 user=user,
                 venue_id=venue_id,
                 booking=booking,
+                createAt=creat_at,
                 reviewDetail=review_detail,
                 point=point
             )
 
-            # บันทึกไฟล์ภาพจาก Base64
-            for index, image_base64 in enumerate(review_images):
-                format, imgstr = image_base64.split(';base64,')  # แยกข้อมูล Base64
-                ext = format.split('/')[-1]  # ดึงนามสกุลไฟล์ (เช่น jpg, png)
+                # บันทึกไฟล์ภาพจาก Base64
+                for index, image_base64 in enumerate(review_images):
+                    format, imgstr = image_base64.split(';base64,')  # แยกข้อมูล Base64
+                    ext = format.split('/')[-1]  # ดึงนามสกุลไฟล์ (เช่น jpg, png)
 
-                # ตั้งชื่อไฟล์ให้ไม่ซ้ำกัน
-                file_name = f"review_{review.id}_{index}.{ext}"
-                
-                # แปลง Base64 เป็นไฟล์
-                review_image = ContentFile(base64.b64decode(imgstr), name=file_name)
-                
-                # บันทึกลงใน review_image (FileField)
-                review.review_image.save(file_name, review_image)
+                    # ตั้งชื่อไฟล์ให้ไม่ซ้ำกัน
+                    file_name = f"review_{review.id}_{index}.{ext}"
+                    
+                    # แปลง Base64 เป็นไฟล์
+                    review_image = ContentFile(base64.b64decode(imgstr), name=file_name)
+                    
+                    # บันทึกลงใน review_image (FileField)
+                    review.review_image.save(file_name, review_image)
 
-            # อัปเดตว่า Booking นี้ถูก Review แล้ว
-            booking.isReview = True
-            booking.save()
+                # อัปเดตว่า Booking นี้ถูก Review แล้ว
+                booking.isReview = True
+                booking.save()
 
-            return Response(ReviewSerializer(review).data, status=status.HTTP_201_CREATED)
+                booking.isReview = True
+                booking.save()
+
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+        # if bookings.exists():
+        #     expired_bookings = bookings.filter(checkout__lt=now)
+
+        #     if expired_bookings.exists():
+        #         return Response(
+        #             {"error": "Cannot proceed, checkout time has already passed"},
+        #             status=status.HTTP_400_BAD_REQUEST,
+        #         )
+        #     return Response(
+        #         {"message": "User has an active booking"},
+        #         status=status.HTTP_200_OK,
+        #     )
+        # else:
+        #     return Response(
+        #         {"error": "No booking found for this user"},
+        #         status=status.HTTP_404_NOT_FOUND,
+        #     )
+
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from .models import Notifications
+from .serializers import NotificationSerializer
 
 class NotificationViewset(viewsets.ModelViewSet):
     queryset = Notifications.objects.all()
