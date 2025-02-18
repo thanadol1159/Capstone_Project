@@ -81,7 +81,33 @@ const ApproveBooking = () => {
     setExpanded(expanded === id ? null : id);
   };
 
-  const approveBooking = async (bookingId: number) => {
+  const sendNotification = async (userId: number) => {
+    try {
+      await apiJson.post("/notifications/", {
+        notifications_type: "User approve",
+        create_at: new Date().toISOString(),
+        message: "Your Booking has got approved!",
+        user: userId,
+      });
+    } catch (error) {
+      console.error("Error sending notification:", error);
+    }
+  };
+
+  const sendNotificationRejected = async (userId: number) => {
+    try {
+      await apiJson.post("/notifications/", {
+        notifications_type: "User Rejected",
+        create_at: new Date().toISOString(),
+        message: "Your Booking has got rejected!",
+        user: userId,
+      });
+    } catch (error) {
+      console.error("Error sending notification:", error);
+    }
+  };
+
+  const approveBooking = async (bookingId: number, venue_owner: number) => {
     try {
       await apiJson.patch(`/bookings/${bookingId}/`, { status_booking: 3 });
       setBookings((prevBookings) =>
@@ -90,12 +116,14 @@ const ApproveBooking = () => {
         )
       );
       setExpanded(null);
+
+      sendNotification(venue_owner);
     } catch (error) {
       console.error("Error approving booking:", error);
     }
   };
 
-  const rejectBooking = async (bookingId: number) => {
+  const rejectBooking = async (bookingId: number, venue_owner: number) => {
     try {
       await apiJson.patch(`/bookings/${bookingId}/`, { status_booking: 1 });
       setBookings((prevBookings) =>
@@ -104,6 +132,8 @@ const ApproveBooking = () => {
         )
       );
       setExpanded(null);
+
+      sendNotificationRejected(venue_owner);
     } catch (error) {
       console.error("Error rejecting booking:", error);
     }
@@ -180,13 +210,13 @@ const ApproveBooking = () => {
                   <div className="flex justify-end mt-3">
                     <button
                       className="px-4 py-2 border rounded text-gray-700 mr-2 border-[#3F6B96]"
-                      onClick={() => rejectBooking(booking.id)}
+                      onClick={() => rejectBooking(booking.id,booking.user)}
                     >
                       Deny
                     </button>
                     <button
                       className="px-4 py-2 bg-[#3F6B96] text-white rounded"
-                      onClick={() => approveBooking(booking.id)}
+                      onClick={() => approveBooking(booking.id,booking.user)}
                     >
                       Approve
                     </button>
