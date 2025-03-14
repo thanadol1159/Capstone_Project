@@ -21,6 +21,10 @@ from .models import (
     Notifications,
     FavoriteVenue,
     ReviewImage,
+    VenueImage,
+    VenueFile,
+    VenueRequestFile,
+    VenueRequestImage,
 )
 
 class CustomAccessToken(AccessToken):
@@ -68,25 +72,74 @@ class UserSerializer(serializers.ModelSerializer):
         )
         return user
 
+class Base64ImageField(serializers.ImageField):
+    def to_internal_value(self, data):
+        if isinstance(data, str) and data.startswith("data:image"):
+            format, imgstr = data.split(";base64,")  
+            ext = format.split("/")[-1]  
+            return ContentFile(base64.b64decode(imgstr), name=f"temp.{ext}")  
+        return super().to_internal_value(data)
+    
 class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserDetail
         fields = '__all__'
 
 class VenueSerializer(serializers.ModelSerializer):
+    venue_images = serializers.ListField(
+        child=Base64ImageField(), write_only=True, required=False, allow_null=True
+    )
+
+    venue_certification_url = serializers.SerializerMethodField()
+    personal_identification_url = serializers.SerializerMethodField()
+
+    def get_venue_certification_url(self, obj):
+        request = self.context.get('request')
+        if obj.venue_certification:
+            return request.build_absolute_uri(obj.venue_certification.url)
+        return None
+
+    def get_personal_identification_url(self, obj):
+        request = self.context.get('request')
+        if obj.personal_identification:
+            return request.build_absolute_uri(obj.personal_identification.url)
+        return None
+    
     class Meta:
         model = Venue
         fields = '__all__'
 
+    def create(self, validated_data):
+        images_data = validated_data.pop("venue_images", [])  
+        venue = Venue.objects.create(**validated_data)
+
+        for image_data in images_data:
+            VenueImage.objects.create(venue=venue, image=image_data)
+
+        return venue
+
+    
 class TypeOfvanueSerializer(serializers.ModelSerializer):
     class Meta:
         model = TypeOfVenue
         fields = '__all__'
 
 class VenueRequestSerializer(serializers.ModelSerializer):
+    venueRequest_images = serializers.ListField(
+        child=Base64ImageField(), write_only=True, required=False, allow_null=True
+    )
+
     class Meta:
         model = VenueRequest
         fields = '__all__'
+
+    def create(self, validated_data):
+        images_data = validated_data.pop("venueRequest_images", [])  
+        venue_request = VenueRequest.objects.create(**validated_data) 
+        for image_data in images_data:
+            VenueRequestImage.objects.create(venue_request=venue_request, image=image_data)
+
+        return venue_request
 
 class StatusBookingSerializer(serializers.ModelSerializer):
     class Meta:
@@ -116,13 +169,6 @@ class EventOfVenueSerializer(serializers.ModelSerializer):
         model = EventOfVenue
         fields = '__all__'
 
-class Base64ImageField(serializers.ImageField):
-    def to_internal_value(self, data):
-        if isinstance(data, str) and data.startswith("data:image"):
-            format, imgstr = data.split(";base64,")  
-            ext = format.split("/")[-1]  
-            return ContentFile(base64.b64decode(imgstr), name=f"temp.{ext}")  
-        return super().to_internal_value(data)
 
 class ReviewSerializer(serializers.ModelSerializer):
     review_images = serializers.ListField(
