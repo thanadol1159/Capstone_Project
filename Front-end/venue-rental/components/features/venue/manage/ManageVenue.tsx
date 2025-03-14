@@ -14,11 +14,10 @@ export default function ManageVenue() {
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
   const userId = useUserId();
   const [statusId, setStatusId] = useState<number | null>(null);
-  // console.log(accountId);
+
   const [venueData, setVenueData] = useState<Partial<Venue>>({
     venue_type: 0,
     venue_name: "",
-    image: "",
     location: "",
     category_event: "",
     price: 0,
@@ -28,17 +27,18 @@ export default function ManageVenue() {
     parking_space: 0,
     outdoor_spaces: null,
     additional_information: "",
-    venue_certification: "",
-    personal_identification: "",
     venue_owner: Number(userId),
     status: 0,
   });
 
   const [files, setFiles] = useState({
-    image: null as File | null,
+    images: [] as File[],
     venue_certification: null as File | null,
     personal_identification: null as File | null,
   });
+
+  // For image preview
+  const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -54,7 +54,7 @@ export default function ManageVenue() {
 
   const handleFileChange = (
     e: React.ChangeEvent<HTMLInputElement>,
-    fieldName: keyof typeof files
+    fieldName: "venue_certification" | "personal_identification"
   ) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -63,6 +63,35 @@ export default function ManageVenue() {
         [fieldName]: file,
       }));
     }
+  };
+
+  // Handle multiple image uploads
+  const handleImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = e.target.files;
+    if (selectedFiles && selectedFiles.length > 0) {
+      // Convert FileList to Array and add to existing files
+      const newImages = Array.from(selectedFiles);
+      setFiles((prev) => ({
+        ...prev,
+        images: [...prev.images, ...newImages],
+      }));
+
+      // Create preview URLs for the images
+      const newPreviewUrls = newImages.map((file) => URL.createObjectURL(file));
+      setImagePreviewUrls((prev) => [...prev, ...newPreviewUrls]);
+    }
+  };
+
+  // Remove image from selection
+  const removeImage = (index: number) => {
+    setFiles((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+    }));
+
+    // Revoke the URL to free memory
+    URL.revokeObjectURL(imagePreviewUrls[index]);
+    setImagePreviewUrls((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleNoAuth = () => {
@@ -93,36 +122,105 @@ export default function ManageVenue() {
 
     fetchStatus();
     handleNoAuth();
+
+    // Clean up preview URLs when component unmounts
+    return () => {
+      imagePreviewUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
   }, []);
+
+  const convertImagesToBase64 = async (files: File[]): Promise<string[]> => {
+    const promises = files.map((file) => {
+      return new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          resolve(reader.result as string);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    });
+
+    return Promise.all(promises);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      const formData = new FormData();
+      // Convert images to base64
+      const base64Images = await convertImagesToBase64(files.images);
+
+      // Create venue first
+      const venueFormData = new FormData();
+
+      // Add venue data
       Object.entries(venueData).forEach(([key, value]) => {
         if (value !== null && value !== "") {
-          formData.append(key, value.toString());
+          venueFormData.append(key, value.toString());
         }
       });
-      Object.entries(files).forEach(([key, file]) => {
-        if (file) {
-          formData.append(key, file);
-        }
+
+      // Add certification and ID
+      if (files.venue_certification) {
+        venueFormData.append("venue_certification", files.venue_certification);
+      }
+
+      if (files.personal_identification) {
+        venueFormData.append(
+          "personal_identification",
+          files.personal_identification
+        );
+      }
+
+      // Add images
+      base64Images.forEach((base64Image, index) => {
+        venueFormData.append(`venue_images[${index}]`, base64Image);
       });
 
       console.log("Venue Data before submit:", venueData);
 
-      const venueResponse = await apiFormData.post("/venues/", formData);
+      const venueResponse = await apiFormData.post("/venues/", venueFormData);
 
       if (venueResponse.status === 201 || venueResponse.status === 200) {
         const venueId = venueResponse.data.id;
 
-        formData.append("venue", venueId);
+        // Create venue request with the same data
+        const requestFormData = new FormData();
+
+        // Add venue data
+        Object.entries(venueData).forEach(([key, value]) => {
+          if (value !== null && value !== "") {
+            requestFormData.append(key, value.toString());
+          }
+        });
+
+        // Link to the venue
+        requestFormData.append("venue", venueId);
+
+        // Add certification and ID
+        if (files.venue_certification) {
+          requestFormData.append(
+            "venue_certification",
+            files.venue_certification
+          );
+        }
+
+        if (files.personal_identification) {
+          requestFormData.append(
+            "personal_identification",
+            files.personal_identification
+          );
+        }
+
+        // Add images
+        base64Images.forEach((base64Image, index) => {
+          requestFormData.append(`venueRequest_images[${index}]`, base64Image);
+        });
 
         const requestResponse = await apiFormData.post(
           "/venue-requests/",
-          formData
+          requestFormData
         );
 
         if (requestResponse.status === 201 || requestResponse.status === 200) {
@@ -140,12 +238,6 @@ export default function ManageVenue() {
 
   return (
     <div className="max-w-full mx-auto p-6 text-black">
-      {/* <div className="flex items-center gap-2 mb-6 text-sm">
-        <span className="text-black">Rental Management</span>
-        <span className="text-black">&gt;</span>
-        <span className="text-gray-900">Add Venue</span>
-      </div> */}
-
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="bg-gray-50 p-6 rounded-lg space-y-4">
           <div className="flex items-center gap-4">
@@ -199,23 +291,47 @@ export default function ManageVenue() {
             />
           </div>
 
-          <div className="flex items-center gap-4">
-            <span className="w-32 font-medium">Image :</span>
-            <input
-              type="file"
-              name="image"
-              onChange={(e) => handleFileChange(e, "image")}
-              accept="image/*"
-              className="hidden"
-              id="image-upload"
-              required
-            />
-            <label
-              htmlFor="image-upload"
-              className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md cursor-pointer"
-            >
-              {files.image ? files.image.name : "Attach File"}
-            </label>
+          <div className="flex items-start gap-4">
+            <span className="w-32 font-medium pt-2">Images :</span>
+            <div className="flex-1">
+              <input
+                type="file"
+                name="images"
+                onChange={handleImagesChange}
+                accept="image/*"
+                className="hidden"
+                id="images-upload"
+                multiple
+                required={files.images.length === 0}
+              />
+              <label
+                htmlFor="images-upload"
+                className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md cursor-pointer mb-3"
+              >
+                Upload Images
+              </label>
+
+              {imagePreviewUrls.length > 0 && (
+                <div className="grid grid-cols-3 gap-3 mt-2">
+                  {imagePreviewUrls.map((url, index) => (
+                    <div key={index} className="relative">
+                      <img
+                        src={url}
+                        alt={`preview ${index}`}
+                        className="h-24 w-24 object-cover rounded-md"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center gap-4">
@@ -274,16 +390,6 @@ export default function ManageVenue() {
                 className="w-32 p-2 border border-gray-300 rounded-md"
                 required
               />
-              {/* <span>Per</span>
-              <select
-                onChange={handleInputChange}
-                className="p-2 border border-gray-300 rounded-md"
-              > */}
-              {/* <option value="">Select</option>
-                <option value="hour">Hour</option>
-                <option value="day">Day</option>
-                <option value="month">Month</option> */}
-              {/* </select> */}
             </div>
           </div>
 
@@ -303,7 +409,6 @@ export default function ManageVenue() {
             </div>
           </div>
 
-          {/* Additional fields */}
           <div className="flex items-center gap-4">
             <span className="w-32 font-medium">Rooms :</span>
             <input
@@ -348,12 +453,7 @@ export default function ManageVenue() {
             <textarea
               name="additional_information"
               value={venueData.additional_information}
-              onChange={(e) =>
-                setVenueData((prev) => ({
-                  ...prev,
-                  additional_information: e.target.value,
-                }))
-              }
+              onChange={handleInputChange}
               className="flex-1 p-2 border border-gray-300 rounded-md"
               rows={3}
               required
@@ -365,15 +465,19 @@ export default function ManageVenue() {
             <input
               type="file"
               name="venue_certification"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  // Handle file upload logic here
-                }
-              }}
-              className="flex-1"
+              onChange={(e) => handleFileChange(e, "venue_certification")}
+              className="hidden"
+              id="certification-upload"
               required
             />
+            <label
+              htmlFor="certification-upload"
+              className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md cursor-pointer"
+            >
+              {files.venue_certification
+                ? files.venue_certification.name
+                : "Attach File"}
+            </label>
           </div>
 
           <div className="flex items-center gap-4">
@@ -381,12 +485,19 @@ export default function ManageVenue() {
             <input
               type="file"
               name="personal_identification"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-              }}
-              className="flex-1"
+              onChange={(e) => handleFileChange(e, "personal_identification")}
+              className="hidden"
+              id="id-upload"
               required
             />
+            <label
+              htmlFor="id-upload"
+              className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md cursor-pointer"
+            >
+              {files.personal_identification
+                ? files.personal_identification.name
+                : "Attach File"}
+            </label>
           </div>
         </div>
 

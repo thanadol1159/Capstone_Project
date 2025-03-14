@@ -37,6 +37,8 @@ from .models import (
     Review,
     Notifications,
     FavoriteVenue,
+    VenueImage,
+    VenueRequestImage,
 )
 from .serializers import (
     RoleSerializer,
