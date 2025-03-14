@@ -290,7 +290,11 @@ const AddVenuePage = () => {
               {/* Venue Image */}
               <div className="relative w-32 h-32 rounded-lg overflow-hidden">
                 <img
-                  src={venue.image ? venue.image : "/placeholder-image.jpg"}
+                  src={
+                    venue.venue_images && venue.venue_images.length > 0
+                      ? venue.venue_images[0].image_url
+                      : "/placeholder-image.jpg"
+                  }
                   alt={venue.venue_name}
                   className="object-cover w-full h-full rounded-lg border-4 border-[#3F6B96]"
                 />

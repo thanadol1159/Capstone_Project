@@ -47,7 +47,7 @@ class Venue(models.Model):
     status = models.ForeignKey(StatusBooking, on_delete=models.CASCADE,null=True, blank=True)
 
 class VenueImage(models.Model):
-    venue = models.ForeignKey(Venue, on_delete=models.CASCADE, related_name="images")
+    venue = models.ForeignKey(Venue, on_delete=models.CASCADE, related_name="venue_images")
     image = models.ImageField(upload_to="images/venues/")
 
 class VenueFile(models.Model):

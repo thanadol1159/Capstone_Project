@@ -37,6 +37,8 @@ from .models import (
     Review,
     Notifications,
     FavoriteVenue,
+    VenueImage,
+    VenueRequestImage
 )
 from .serializers import (
     RoleSerializer,
@@ -55,6 +57,7 @@ from .serializers import (
     NotificationSerializer,
     CustomTokenObtainPairSerializer,
     FavoriteVenueSerializer
+    
 )
 
 # ViewSets define the view behavior.

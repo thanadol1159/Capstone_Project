@@ -85,10 +85,21 @@ class UserDetailSerializer(serializers.ModelSerializer):
         model = UserDetail
         fields = '__all__'
 
+class VenueImageSerializer(serializers.ModelSerializer):
+    image_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = VenueImage
+        fields = ['id', 'image_url']
+
+    def get_image_url(self, obj):
+        request = self.context.get('request')
+        if obj.image:
+            return request.build_absolute_uri(obj.image.url)
+        return None
+
 class VenueSerializer(serializers.ModelSerializer):
-    venue_images = serializers.ListField(
-        child=Base64ImageField(), write_only=True, required=False, allow_null=True
-    )
+    venue_images = VenueImageSerializer(many=True, read_only=True)
 
     venue_certification_url = serializers.SerializerMethodField()
     personal_identification_url = serializers.SerializerMethodField()
@@ -108,6 +119,7 @@ class VenueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Venue
         fields = '__all__'
+        extra_fields = ['venue_images_read_only']
 
     def create(self, validated_data):
         images_data = validated_data.pop("venue_images", [])  
