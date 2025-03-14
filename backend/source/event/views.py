@@ -139,7 +139,24 @@ class UserDetailViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action == 'create':
             return [AllowAny()]
-        return [IsAuthenticated()]
+        elif self.action in ['update_interests']:
+            return [IsAuthenticated()]
+        return super().get_permissions()
+
+    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
+    def update_interests(self, request):
+        interests = request.data.get('interests', [])
+
+        if not isinstance(interests, list):
+            return Response({"error": "Interests must be a list."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user_detail = UserDetail.objects.get(user=request.user)
+            user_detail.interests = interests
+            user_detail.save()
+            return Response({"message": "Interests updated successfully!", "interests": user_detail.interests}, status=status.HTTP_200_OK)
+        except UserDetail.DoesNotExist:
+            return Response({"error": "User detail not found."}, status=status.HTTP_404_NOT_FOUND)
 
 class VenueViewSet(viewsets.ModelViewSet):
     queryset = Venue.objects.all()

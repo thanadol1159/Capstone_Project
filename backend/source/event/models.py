@@ -19,6 +19,7 @@ class UserDetail(models.Model):
     address = models.CharField(max_length=255,null=True, blank=True)
     dob = models.DateField(null=True, blank=True)
     role = models.ForeignKey(Role, on_delete=models.CASCADE,null=True, blank=True)
+    interests = models.JSONField(default=list, blank=True)
 
 class TypeOfVenue(models.Model):
     type_name = models.CharField(max_length=45,null=True)
@@ -118,3 +119,5 @@ class FavoriteVenue(models.Model):
 
     class Meta:
         unique_together = ("user", "venue")
+
+

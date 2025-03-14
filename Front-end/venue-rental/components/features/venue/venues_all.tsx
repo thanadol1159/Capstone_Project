@@ -41,7 +41,7 @@ export default function VenueRental() {
   };
 
   const handleFilterClick = () => {
-    setIsFilterOpen(!isFilterOpen); // Toggle filter modal
+    setIsFilterOpen(!isFilterOpen); 
   };
 
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
