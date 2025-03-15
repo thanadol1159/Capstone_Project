@@ -18,8 +18,6 @@ from datetime import datetime,date
 from django.db.models import Q
 import pytz
 import base64
-from django.http import FileResponse
-from django.shortcuts import get_object_or_404
 from django.core.files.base import ContentFile
 
 from .models import (
@@ -37,8 +35,6 @@ from .models import (
     Review,
     Notifications,
     FavoriteVenue,
-    VenueImage,
-    VenueRequestImage
 )
 from .serializers import (
     RoleSerializer,
@@ -57,7 +53,6 @@ from .serializers import (
     NotificationSerializer,
     CustomTokenObtainPairSerializer,
     FavoriteVenueSerializer
-    
 )
 
 # ViewSets define the view behavior.
@@ -169,6 +164,7 @@ class VenueViewSet(viewsets.ModelViewSet):
                 {"error": "user not found"}, 
                 status=status.HTTP_404_NOT_FOUND
             )
+<<<<<<< HEAD
         
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -208,6 +204,8 @@ class VenueViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+=======
+>>>>>>> parent of cfae462 (Merge branch 'release2')
 
 class TypeOfvanueViewSet(viewsets.ModelViewSet):
     queryset = TypeOfVenue.objects.all()
@@ -241,41 +239,10 @@ class VenueRequestViewSet(viewsets.ModelViewSet):
                 {"error": "user not found"}, 
                 status=status.HTTP_404_NOT_FOUND
             )
-    def create(self, request, *args, **kwargs):
-        try:
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            
-            venue_request = serializer.save()
 
-            venueRequest_images = request.data.get("venueRequest_images", [])
 
-            for index, image_base64 in enumerate(venueRequest_images):
-                try:
-                    if ';base64,' in image_base64:
-                        format, imgstr = image_base64.split(';base64,')
-                        ext = format.split('/')[-1]
-                    else:
-                        raise ValueError("Invalid Base64 format")
 
-                    missing_padding = len(imgstr) % 4
-                    if missing_padding:
-                        imgstr += '=' * (4 - missing_padding)
 
-                    file_name = f"venueRequest_{venue_request.id}_{index}.{ext}"
-                    image_file = ContentFile(base64.b64decode(imgstr, validate=True), name=file_name)
-
-                    VenueRequestImage.objects.create(venue_request=venue_request, image=image_file)
-
-                except Exception as e:
-                    print(f"Error processing image {index}: {e}")
-                    return Response({"error": f"Invalid Base64 encoding for image {index}"}, status=status.HTTP_400_BAD_REQUEST)
-
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
@@ -328,72 +295,126 @@ class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
 
-def create(self, request):
-    try:
-        user = request.user
-        venue_id = int(request.data.get("venue", 0))
-        booking_id = int(request.data.get("booking", 0))
-        create_at = request.data.get("createAt", "")
-        review_detail = request.data.get("reviewDetail", "")
-        clean = request.data.get("clean", 1)
-        service = request.data.get("service", 1)
-        value_for_money = request.data.get("value_for_money", 1)
-        facilities = request.data.get("facilities", 1)
-        matches_expectations = request.data.get("matches_expectations", 1) 
-        environment = request.data.get("environment", 1)
-        review_images = request.data.get("review_images", [])
+    def create(self, request):
+        try:
+            user = request.user
+            venue_id = int(request.data.get("venue", 0))
+            booking_id = int(request.data.get("booking", 0))
+            creat_at = request.data.get("createAt", "")
+            review_detail = request.data.get("reviewDetail", "")
+            point = request.data.get("point", 0)
+            review_images = request.data.get("review_images", [])
+            if not venue_id or not booking_id:
+                return Response(
+                    {"error": "Venue ID and Booking ID are required."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-        if not venue_id or not booking_id:
-            return Response({"error": "Venue ID and Booking ID are required."}, status=status.HTTP_400_BAD_REQUEST)
+            approved_status = StatusBooking.objects.filter(status="approved").first()
+            if not approved_status:
+                return Response(
+                    {"error": "Approved status not found."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            print(f"Booking ID: {booking_id}")
+            print(f"User: {user.id}")
+            print(f"Venue ID: {venue_id}")
+            print(f"Approved Status: {approved_status.id}")
 
-        approved_status = StatusBooking.objects.filter(status="approved").first()
-        if not approved_status:
-            return Response({"error": "Approved status not found."}, status=status.HTTP_400_BAD_REQUEST)
+            booking = Booking.objects.filter(
+                id=booking_id,
+                user=user,
+                venue_id=venue_id,
+                status_booking=approved_status,  
+            ).first()
 
-        booking = Booking.objects.filter(
-            id=booking_id, user=user, venue_id=venue_id, status_booking=approved_status
-        ).first()
+            if not booking:
+                return Response(
+                    {"error": "No completed booking found for this venue."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-        if not booking:
-            return Response({"error": "No completed booking found for this venue."}, status=status.HTTP_400_BAD_REQUEST)
+            zones = pytz.timezone("Asia/Jakarta")
+            current_time = datetime.now(zones)
 
-        zones = pytz.timezone("Asia/Jakarta")
-        current_time = datetime.now(zones)
+            if not booking.check_out:
+                return Response({"error": "Booking check-out time is missing."}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not booking.check_out:
-            return Response({"error": "Booking check-out time is missing."}, status=status.HTTP_400_BAD_REQUEST)
+            if booking.check_out >= current_time:
+                return Response(
+                    {"error": "Cannot proceed, checkout time has not passed yet."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-        if booking.check_out >= current_time:
-            return Response({"error": "Cannot proceed, checkout time has not passed yet."}, status=status.HTTP_400_BAD_REQUEST)
+            if booking.isReview:
+                return Response(
+                    {"error": "This booking has already been reviewed."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-        if booking.isReview:
-            return Response({"error": "This booking has already been reviewed."}, status=status.HTTP_400_BAD_REQUEST)
+            serializer = self.get_serializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save(user=user, venue_id=venue_id, booking=booking) 
+                
+            #     review = Review.objects.create(
+            #     user=user,
+            #     venue_id=venue_id,
+            #     booking=booking,
+            #     createAt=creat_at,
+            #     reviewDetail=review_detail,
+            #     point=point
+            # )
 
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            review = serializer.save(user=user, venue_id=venue_id, booking=booking)
+                # บันทึกไฟล์ภาพจาก Base64
+                for index, image_base64 in enumerate(review_images):
+                    format, imgstr = image_base64.split(';base64,')  # แยกข้อมูล Base64
+                    ext = format.split('/')[-1]  # ดึงนามสกุลไฟล์ (เช่น jpg, png)
 
-            for index, image_base64 in enumerate(review_images):
-                try:
-                    format, imgstr = image_base64.split(';base64,')
-                    ext = format.split('/')[-1]
+                    # ตั้งชื่อไฟล์ให้ไม่ซ้ำกัน
                     file_name = f"review_{review.id}_{index}.{ext}"
-
+                    
+                    # แปลง Base64 เป็นไฟล์
                     review_image = ContentFile(base64.b64decode(imgstr), name=file_name)
+                    
+                    # บันทึกลงใน review_image (FileField)
                     review.review_image.save(file_name, review_image)
-                except Exception as e:
-                    print(f"Error processing image {index}: {e}")
 
-            booking.isReview = True
-            booking.save()
+                # อัปเดตว่า Booking นี้ถูก Review แล้ว
+                booking.isReview = True
+                booking.save()
 
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                booking.isReview = True
+                booking.save()
 
-    except Exception as e:
-        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        # if bookings.exists():
+        #     expired_bookings = bookings.filter(checkout__lt=now)
+
+        #     if expired_bookings.exists():
+        #         return Response(
+        #             {"error": "Cannot proceed, checkout time has already passed"},
+        #             status=status.HTTP_400_BAD_REQUEST,
+        #         )
+        #     return Response(
+        #         {"message": "User has an active booking"},
+        #         status=status.HTTP_200_OK,
+        #     )
+        # else:
+        #     return Response(
+        #         {"error": "No booking found for this user"},
+        #         status=status.HTTP_404_NOT_FOUND,
+        #     )
+
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from .models import Notifications
+from .serializers import NotificationSerializer
 
 class NotificationViewset(viewsets.ModelViewSet):
     queryset = Notifications.objects.all()

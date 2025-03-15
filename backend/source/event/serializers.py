@@ -3,8 +3,6 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-import base64
-from django.core.files.base import ContentFile
 from .models import (
     Role,
     # Account,
@@ -21,10 +19,6 @@ from .models import (
     Notifications,
     FavoriteVenue,
     ReviewImage,
-    VenueImage,
-    VenueFile,
-    VenueRequestFile,
-    VenueRequestImage,
 )
 
 class CustomAccessToken(AccessToken):
@@ -72,33 +66,13 @@ class UserSerializer(serializers.ModelSerializer):
         )
         return user
 
-class Base64ImageField(serializers.ImageField):
-    def to_internal_value(self, data):
-        if isinstance(data, str) and data.startswith("data:image"):
-            format, imgstr = data.split(";base64,")  
-            ext = format.split("/")[-1]  
-            return ContentFile(base64.b64decode(imgstr), name=f"temp.{ext}")  
-        return super().to_internal_value(data)
-    
 class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserDetail
         fields = '__all__'
 
-class VenueImageSerializer(serializers.ModelSerializer):
-    image_url = serializers.SerializerMethodField()
-
-    class Meta:
-        model = VenueImage
-        fields = ['id', 'image_url']
-
-    def get_image_url(self, obj):
-        request = self.context.get('request')
-        if obj.image:
-            return request.build_absolute_uri(obj.image.url)
-        return None
-
 class VenueSerializer(serializers.ModelSerializer):
+<<<<<<< HEAD
     venue_images = VenueImageSerializer(many=True, read_only=True)
     venue_certification_url = serializers.SerializerMethodField()
     personal_identification_url = serializers.SerializerMethodField()
@@ -134,27 +108,21 @@ class VenueSerializer(serializers.ModelSerializer):
         return venue
 
     
+=======
+    class Meta:
+        model = Venue
+        fields = '__all__'
+
+>>>>>>> parent of cfae462 (Merge branch 'release2')
 class TypeOfvanueSerializer(serializers.ModelSerializer):
     class Meta:
         model = TypeOfVenue
         fields = '__all__'
 
 class VenueRequestSerializer(serializers.ModelSerializer):
-    venueRequest_images = serializers.ListField(
-        child=Base64ImageField(), write_only=True, required=False, allow_null=True
-    )
-
     class Meta:
         model = VenueRequest
         fields = '__all__'
-
-    def create(self, validated_data):
-        images_data = validated_data.pop("venueRequest_images", [])  
-        venue_request = VenueRequest.objects.create(**validated_data) 
-        for image_data in images_data:
-            VenueRequestImage.objects.create(venue_request=venue_request, image=image_data)
-
-        return venue_request
 
 class StatusBookingSerializer(serializers.ModelSerializer):
     class Meta:
@@ -184,6 +152,13 @@ class EventOfVenueSerializer(serializers.ModelSerializer):
         model = EventOfVenue
         fields = '__all__'
 
+class Base64ImageField(serializers.ImageField):
+    def to_internal_value(self, data):
+        if isinstance(data, str) and data.startswith("data:image"):
+            format, imgstr = data.split(";base64,")  
+            ext = format.split("/")[-1]  
+            return ContentFile(base64.b64decode(imgstr), name=f"temp.{ext}")  
+        return super().to_internal_value(data)
 
 class ReviewSerializer(serializers.ModelSerializer):
     review_images = serializers.ListField(
