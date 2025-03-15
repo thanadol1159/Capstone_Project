@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import MaxValueValidator, MinValueValidator 
 # Create your models here.
 
 
@@ -31,7 +32,6 @@ class StatusBooking(models.Model):
 class Venue(models.Model):
     venue_type = models.ForeignKey(TypeOfVenue,on_delete=models.CASCADE,null=True, blank=True) 
     venue_name = models.CharField(max_length=50,null=True, blank=True)  
-    image = models.ImageField(upload_to='images/venue/', null=True, blank=True)
     location = models.CharField(max_length=100, null=True, blank=True)
     category_event = models.CharField(max_length=50, null=True, blank=True)
     price = models.IntegerField(null=True, blank=True)
@@ -46,10 +46,17 @@ class Venue(models.Model):
     venue_owner = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)
     status = models.ForeignKey(StatusBooking, on_delete=models.CASCADE,null=True, blank=True)
 
+class VenueImage(models.Model):
+    venue = models.ForeignKey(Venue, on_delete=models.CASCADE, related_name="venue_images")
+    image = models.ImageField(upload_to="images/venues/")
+
+class VenueFile(models.Model):
+    venue = models.ForeignKey(Venue, on_delete=models.CASCADE, related_name="files")
+    file = models.FileField(upload_to="pdfs/venues/")
+
 class VenueRequest(models.Model):
     venue_type = models.ForeignKey(TypeOfVenue,on_delete=models.CASCADE,null=True, blank=True) 
     venue_name = models.CharField(max_length=50,null=True, blank=True)
-    image = models.ImageField(upload_to='images/venue/', null=True, blank=True)
     location = models.CharField(max_length=100, null=True, blank=True)
     category_event = models.CharField(max_length=50, null=True, blank=True)
     price = models.IntegerField(null=True, blank=True)
@@ -64,6 +71,14 @@ class VenueRequest(models.Model):
     venue_owner = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)
     status = models.ForeignKey(StatusBooking, on_delete=models.CASCADE,null=True, blank=True)
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE,null=True, blank=True)
+
+class VenueRequestImage(models.Model):
+    venue_request = models.ForeignKey(VenueRequest, on_delete=models.CASCADE, related_name="images")
+    image = models.ImageField(upload_to="images/venues/")
+
+class VenueRequestFile(models.Model):
+    venue_request = models.ForeignKey(VenueRequest, on_delete=models.CASCADE, related_name="files")
+    file = models.FileField(upload_to="pdfs/venues/")
 
 class Booking(models.Model):
     check_in = models.DateTimeField(null=True,blank=True)
@@ -97,12 +112,18 @@ class Review(models.Model):
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE, null=True, blank=True)
     reviewDetail = models.TextField()
     createAt = models.DateTimeField()
-    point = models.IntegerField()
+    clean = models.IntegerField(default=1, validators=[MinValueValidator(1), MaxValueValidator(5)], null=True, blank=True)
+    service = models.IntegerField(default=1, validators=[MinValueValidator(1), MaxValueValidator(5)], null=True, blank=True)
+    value_for_money = models.IntegerField(default=1, validators=[MinValueValidator(1), MaxValueValidator(5)], null=True, blank=True)
+    facilities = models.IntegerField(default=1, validators=[MinValueValidator(1), MaxValueValidator(5)], null=True, blank=True)
+    matches_expectations = models.IntegerField(default=1, validators=[MinValueValidator(1), MaxValueValidator(5)], null=True, blank=True)
+    environment = models.IntegerField(default=1, validators=[MinValueValidator(1), MaxValueValidator(5)], null=True, blank=True)
+    location = models.IntegerField(default=1, validators=[MinValueValidator(1), MaxValueValidator(5)], null=True, blank=True)
     booking = models.ForeignKey(Booking, on_delete=models.CASCADE, null=True, blank=True)
 
 class ReviewImage(models.Model):
     review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name="images")
-    image = models.ImageField(upload_to="images/reviews/")
+    image = models.ImageField(upload_to="images/reviews/", null=True, blank=True)
     
 class Notifications(models.Model):
     notifications_type =  models.CharField(max_length=45,)

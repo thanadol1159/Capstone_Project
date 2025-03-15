@@ -83,7 +83,7 @@ class StatusBookingAdmin(admin.ModelAdmin):
 
 @admin.register(Review)
 class Review(admin.ModelAdmin):
-    list_display = ('id','user','venue','reviewDetail','createAt','point')
+    list_display = ('id','user','venue','reviewDetail','createAt')
 
 @admin.register(Notifications)
 class Notifications(admin.ModelAdmin):
