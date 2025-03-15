@@ -74,8 +74,11 @@ class UserDetailSerializer(serializers.ModelSerializer):
 class VenueSerializer(serializers.ModelSerializer):
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     venue_images = VenueImageSerializer(many=True, read_only=True)
 =======
+=======
+>>>>>>> parent of d2bc089 (make images appear)
     venue_images = serializers.ListField(
         child=Base64ImageField(), write_only=True, required=False, allow_null=True
     )
@@ -105,6 +108,9 @@ class VenueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Venue
         fields = '__all__'
+<<<<<<< HEAD
+>>>>>>> parent of d2bc089 (make images appear)
+=======
 >>>>>>> parent of d2bc089 (make images appear)
 
     def create(self, validated_data):

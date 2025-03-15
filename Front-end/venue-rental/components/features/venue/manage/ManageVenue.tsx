@@ -101,6 +101,7 @@ export default function ManageVenue() {
     try {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
       // Create venue first
       const venueFormData = new FormData();
 
@@ -111,11 +112,15 @@ export default function ManageVenue() {
 =======
       const formData = new FormData();
 >>>>>>> parent of d2bc089 (make images appear)
+=======
+      const formData = new FormData();
+>>>>>>> parent of d2bc089 (make images appear)
       Object.entries(venueData).forEach(([key, value]) => {
         if (value !== null && value !== "") {
           formData.append(key, value.toString());
         }
       });
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 
@@ -140,6 +145,8 @@ export default function ManageVenue() {
 =======
 =======
 >>>>>>> parent of d2bc089 (make images appear)
+=======
+>>>>>>> parent of d2bc089 (make images appear)
       Object.entries(files).forEach(([key, file]) => {
         if (file) {
           formData.append(key, file);
@@ -155,6 +162,7 @@ export default function ManageVenue() {
       if (venueResponse.status === 201 || venueResponse.status === 200) {
         const venueId = venueResponse.data.id;
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
         // Create venue request without sending images again
@@ -189,6 +197,8 @@ export default function ManageVenue() {
 
 >>>>>>> parent of cfae462 (Merge branch 'release2')
 =======
+=======
+>>>>>>> parent of d2bc089 (make images appear)
         formData.append("venue", venueId);
 
 >>>>>>> parent of d2bc089 (make images appear)
