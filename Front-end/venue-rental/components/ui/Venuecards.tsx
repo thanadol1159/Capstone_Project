@@ -11,7 +11,7 @@ import { MapPin } from "lucide-react";
 export default function VenueCard({
   id,
   venue_name,
-  image,
+  venue_images,
   location,
   category_event,
   onDetailClick,
@@ -79,7 +79,11 @@ export default function VenueCard({
       <div className="p-4 relative">
         <div className="relative">
           <img
-            src={image || "/placeholder-image.jpg"}
+            src={
+              venue_images && venue_images.length > 0
+                ? venue_images[0].image_url
+                : "/placeholder-image.jpg"
+            }
             alt={venue_name}
             className="w-full h-36 object-cover rounded-t-lg"
           />
