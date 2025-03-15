@@ -291,6 +291,7 @@ const AddVenuePage = () => {
               <div className="relative w-32 h-32 rounded-lg overflow-hidden">
                 <img
 <<<<<<< HEAD
+<<<<<<< HEAD
                   src={
                     venue.venue_images && venue.venue_images.length > 0
                       ? venue.venue_images[0].image_url // ใช้ image_url จาก API
@@ -298,6 +299,8 @@ const AddVenuePage = () => {
                   }
                   alt={venue.venue_name || "Venue Image"} // ใช้ venue.name หรือข้อความ fallback
 =======
+=======
+>>>>>>> parent of d2bc089 (make images appear)
                   src={venue.image ? venue.image : "/placeholder-image.jpg"}
                   alt={venue.venue_name}
 >>>>>>> parent of cfae462 (Merge branch 'release2')

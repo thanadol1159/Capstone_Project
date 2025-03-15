@@ -73,7 +73,14 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
 class VenueSerializer(serializers.ModelSerializer):
 <<<<<<< HEAD
+<<<<<<< HEAD
     venue_images = VenueImageSerializer(many=True, read_only=True)
+=======
+    venue_images = serializers.ListField(
+        child=Base64ImageField(), write_only=True, required=False, allow_null=True
+    )
+
+>>>>>>> parent of d2bc089 (make images appear)
     venue_certification_url = serializers.SerializerMethodField()
     personal_identification_url = serializers.SerializerMethodField()
 
@@ -92,6 +99,13 @@ class VenueSerializer(serializers.ModelSerializer):
         if obj.personal_identification:
             return request.build_absolute_uri(obj.personal_identification.url)
         return None
+<<<<<<< HEAD
+=======
+    
+    class Meta:
+        model = Venue
+        fields = '__all__'
+>>>>>>> parent of d2bc089 (make images appear)
 
     def create(self, validated_data):
         # สร้าง Venue object

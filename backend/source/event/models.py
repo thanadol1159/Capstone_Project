@@ -46,6 +46,17 @@ class Venue(models.Model):
     venue_owner = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)
     status = models.ForeignKey(StatusBooking, on_delete=models.CASCADE,null=True, blank=True)
 
+<<<<<<< HEAD
+=======
+class VenueImage(models.Model):
+    venue = models.ForeignKey(Venue, on_delete=models.CASCADE, related_name="images")
+    image = models.ImageField(upload_to="images/venues/")
+
+class VenueFile(models.Model):
+    venue = models.ForeignKey(Venue, on_delete=models.CASCADE, related_name="files")
+    file = models.FileField(upload_to="pdfs/venues/")
+
+>>>>>>> parent of d2bc089 (make images appear)
 class VenueRequest(models.Model):
     venue_type = models.ForeignKey(TypeOfVenue,on_delete=models.CASCADE,null=True, blank=True) 
     venue_name = models.CharField(max_length=50,null=True, blank=True)
