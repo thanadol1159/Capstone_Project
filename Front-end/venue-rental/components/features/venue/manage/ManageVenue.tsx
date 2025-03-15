@@ -148,9 +148,6 @@ export default function ManageVenue() {
     e.preventDefault();
 
     try {
-      // Convert images to base64
-      const base64Images = await convertImagesToBase64(files.images);
-
       // Create venue first
       const venueFormData = new FormData();
 
@@ -174,18 +171,21 @@ export default function ManageVenue() {
       }
 
       // Add images
-      base64Images.forEach((base64Image, index) => {
-        venueFormData.append(`venue_images[${index}]`, base64Image);
-      });
+      if (files.images) {
+        Array.from(files.images).forEach((image) => {
+          venueFormData.append("venue_images", image);
+        });
+      }
 
       console.log("Venue Data before submit:", venueData);
+      console.log("Sending files:", files.images);
 
       const venueResponse = await apiFormData.post("/venues/", venueFormData);
 
       if (venueResponse.status === 201 || venueResponse.status === 200) {
         const venueId = venueResponse.data.id;
 
-        // Create venue request with the same data
+        // Create venue request without sending images again
         const requestFormData = new FormData();
 
         // Add venue data
@@ -212,19 +212,13 @@ export default function ManageVenue() {
             files.personal_identification
           );
         }
-
-        // Add images
-        base64Images.forEach((base64Image, index) => {
-          requestFormData.append(`venueRequest_images[${index}]`, base64Image);
-        });
-
         const requestResponse = await apiFormData.post(
           "/venue-requests/",
           requestFormData
         );
 
         if (requestResponse.status === 201 || requestResponse.status === 200) {
-          router.push("/nk1/venue/manage");
+          // router.push("/nk1/venue/manage");
         } else {
           console.error("Error creating venue request:", requestResponse);
         }

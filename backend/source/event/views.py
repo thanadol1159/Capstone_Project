@@ -188,22 +188,19 @@ class VenueViewSet(viewsets.ModelViewSet):
 
         return FileResponse(open(file_path, 'rb'), as_attachment=True)
 
-
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             venue = serializer.save()
 
-            # บันทึกภาพ
-            venue_images = request.data.get("venue_images", [])
-            for index, image_base64 in enumerate(venue_images):
-                try:
-                    format, imgstr = image_base64.split(';base64,')
-                    ext = format.split('/')[-1]
-                    file_name = f"venue_{venue.id}_{index}.{ext}"
+            venue_images = request.FILES.getlist("venue_images")
 
-                    venue_image = ContentFile(base64.b64decode(imgstr), name=file_name)
-                    VenueImage.objects.create(venue=venue, image=venue_image)
+            print("Received venue_images:", venue_images)
+            for index, image_file in enumerate(venue_images):
+                try:
+                    file_name = f"venue_{venue.id}_{index}.{image_file.name.split('.')[-1]}"
+                    
+                    VenueImage.objects.create(venue=venue, image=image_file)
 
                 except Exception as e:
                     print(f"Error processing image {index}: {e}")

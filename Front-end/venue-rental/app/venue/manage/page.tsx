@@ -292,10 +292,10 @@ const AddVenuePage = () => {
                 <img
                   src={
                     venue.venue_images && venue.venue_images.length > 0
-                      ? venue.venue_images[0].image_url
-                      : "/placeholder-image.jpg"
+                      ? venue.venue_images[0].image_url // ใช้ image_url จาก API
+                      : "/placeholder-image.jpg" // ภาพ placeholder หากไม่มีภาพ
                   }
-                  alt={venue.venue_name}
+                  alt={venue.venue_name || "Venue Image"} // ใช้ venue.name หรือข้อความ fallback
                   className="object-cover w-full h-full rounded-lg border-4 border-[#3F6B96]"
                 />
               </div>

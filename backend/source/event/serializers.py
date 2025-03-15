@@ -100,9 +100,12 @@ class VenueImageSerializer(serializers.ModelSerializer):
 
 class VenueSerializer(serializers.ModelSerializer):
     venue_images = VenueImageSerializer(many=True, read_only=True)
-
     venue_certification_url = serializers.SerializerMethodField()
     personal_identification_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Venue
+        fields = '__all__'
 
     def get_venue_certification_url(self, obj):
         request = self.context.get('request')
@@ -115,18 +118,18 @@ class VenueSerializer(serializers.ModelSerializer):
         if obj.personal_identification:
             return request.build_absolute_uri(obj.personal_identification.url)
         return None
-    
-    class Meta:
-        model = Venue
-        fields = '__all__'
-        extra_fields = ['venue_images_read_only']
 
     def create(self, validated_data):
-        images_data = validated_data.pop("venue_images", [])  
+        # สร้าง Venue object
         venue = Venue.objects.create(**validated_data)
 
-        for image_data in images_data:
-            VenueImage.objects.create(venue=venue, image=image_data)
+        # ดึงไฟล์ภาพจาก request.FILES
+        request = self.context.get('request')
+        venue_images = request.FILES.getlist('venue_images')
+
+        # สร้าง VenueImage objects
+        for image in venue_images:
+            VenueImage.objects.create(venue=venue, image=image)
 
         return venue
 
