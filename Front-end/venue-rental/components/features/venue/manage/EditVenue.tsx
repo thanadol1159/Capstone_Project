@@ -116,7 +116,11 @@ export default function VenueEditPage() {
         <div className="overflow-hidden mt-6">
           <div className="p-0">
             <img
-              src={venue.image ? venue.image : "/placeholder-image.jpg"}
+              src={
+                venue.venue_images && venue.venue_images.length > 0
+                  ? venue.venue_images[0].image_url
+                  : "/placeholder-image.jpg"
+              }
               alt="Venue Preview"
               className="w-full h-48 object-scale-down"
             />
