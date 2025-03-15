@@ -119,7 +119,10 @@ export default function VenuePage() {
     return <div>Venue not found</div>;
   }
 
-  const imageUrl = venue.image ? venue.image : "/placeholder-image.jpg";
+  const imageUrl =
+    venue.venue_images && venue.venue_images.length > 0
+      ? venue.venue_images[0].image_url
+      : "/placeholder-image.jpg";
   const venueType = typeVenue?.type_name || "Unknown Type";
 
   return (
