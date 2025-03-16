@@ -14,6 +14,24 @@
   }
 }
 
+/* :root {
+  --swiper-pagination-color: #000000;
+} */
+
+.custom-swiper .swiper-pagination-bullet {
+  border: 2px solid white;
+  /* background-color: transparent;  */
+  width: 12px; 
+  height: 12px;
+}
+
+.custom-swiper .swiper-pagination-bullet-active {
+  background-color: #304B84; 
+  border-color: white;
+}
+
+
+
 body {
   color: var(--foreground);
   background: var(--background);

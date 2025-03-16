@@ -11,6 +11,11 @@ import { RootState } from "@/hook/store";
 import Reviews from "@/components/ui/ReviewsBox";
 import { Review } from "@/types/Review";
 import { Star, StarHalf } from "lucide-react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/pagination";
+import { Pagination } from "swiper/modules";
+import "swiper/css/navigation";
 
 // const addNk1ToUrl = (url: string): string => {
 //   return url ? url.replace(/(\/images\/)/, "$1/nk1$2") : "";
@@ -119,7 +124,7 @@ export default function VenuePage() {
     return <div>Venue not found</div>;
   }
 
-  const imageUrl = venue.image ? venue.image : "/placeholder-image.jpg";
+  // const imageUrl = venue.image ? venue.image : "/placeholder-image.jpg";
   const venueType = typeVenue?.type_name || "Unknown Type";
 
   return (
@@ -127,12 +132,31 @@ export default function VenuePage() {
       <h1 className="text-2xl font-semibold text-center mb-4 mt-2">
         {venue.venue_name}
       </h1>
-      <div className="relative w-full aspect-[20/10]">
-        <img
-          src={imageUrl}
-          alt={venue.venue_name}
-          className="rounded-lg object-cover w-[80%] mx-auto"
-        />
+      <div className="relative w-full aspect-[30/10]">
+        {venue.venue_images.length > 1 ? (
+          <Swiper
+            pagination={{ clickable: true }}
+            modules={[Pagination]}
+            className="w-[80%] mx-auto rounded-lg overflow-hidden custom-swiper"
+            // style={{ "--swiper-pagination-color": "#304B84" }}
+          >
+            {venue.venue_images.map((img) => (
+              <SwiperSlide key={img.id}>
+                <img
+                  src={img.image}
+                  alt={venue.venue_name}
+                  className="rounded-lg object-cover w-full h-96"
+                />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        ) : (
+          <img
+            src={venue.venue_images[0]?.image || "/placeholder-image.jpg"}
+            alt={venue.venue_name}
+            className="rounded-lg object-cover w-[80%] mx-auto h-96"
+          />
+        )}
       </div>
       <div className="mt-8 bg-[#E6F3FF] relative rounded-md p-2">
         {/* Details header */}
