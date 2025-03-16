@@ -144,13 +144,101 @@ export default function ManageVenue() {
     return Promise.all(promises);
   };
 
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+
+  //   try {
+  //     // Convert images to base64
+  //     const base64Images = await convertImagesToBase64(files.images);
+
+  //     // Create venue first
+  //     const venueFormData = new FormData();
+
+  //     // Add venue data
+  //     Object.entries(venueData).forEach(([key, value]) => {
+  //       if (value !== null && value !== "") {
+  //         venueFormData.append(key, value.toString());
+  //       }
+  //     });
+
+  //     // Add certification and ID
+  //     if (files.venue_certification) {
+  //       venueFormData.append("venue_certification", files.venue_certification);
+  //     }
+
+  //     if (files.personal_identification) {
+  //       venueFormData.append(
+  //         "personal_identification",
+  //         files.personal_identification
+  //       );
+  //     }
+
+  //     // Add images
+  //     base64Images.forEach((base64Image, index) => {
+  //       venueFormData.append(`venue_images[${index}]`, base64Image);
+  //     });
+
+  //     console.log("Venue Data before submit:", venueData);
+
+  //     const venueResponse = await apiFormData.post("/venues/", venueFormData);
+
+  //     if (venueResponse.status === 201 || venueResponse.status === 200) {
+  //       const venueId = venueResponse.data.id;
+
+  //       // Create venue request with the same data
+  //       const requestFormData = new FormData();
+
+  //       // Add venue data
+  //       Object.entries(venueData).forEach(([key, value]) => {
+  //         if (value !== null && value !== "") {
+  //           requestFormData.append(key, value.toString());
+  //         }
+  //       });
+
+  //       // Link to the venue
+  //       requestFormData.append("venue", venueId);
+
+  //       // Add certification and ID
+  //       if (files.venue_certification) {
+  //         requestFormData.append(
+  //           "venue_certification",
+  //           files.venue_certification
+  //         );
+  //       }
+
+  //       if (files.personal_identification) {
+  //         requestFormData.append(
+  //           "personal_identification",
+  //           files.personal_identification
+  //         );
+  //       }
+
+  //       // Add images
+  //       base64Images.forEach((base64Image, index) => {
+  //         requestFormData.append(`venueRequest_images[${index}]`, base64Image);
+  //       });
+
+  //       const requestResponse = await apiFormData.post(
+  //         "/venue-requests/",
+  //         requestFormData
+  //       );
+
+  //       if (requestResponse.status === 201 || requestResponse.status === 200) {
+  //         router.push("/nk1/venue/manage");
+  //       } else {
+  //         console.error("Error creating venue request:", requestResponse);
+  //       }
+  //     } else {
+  //       console.error("Error creating venue:", venueResponse);
+  //     }
+  //   } catch (err) {
+  //     console.error("Error:", err);
+  //   }
+  // };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      // Convert images to base64
-      const base64Images = await convertImagesToBase64(files.images);
-
       // Create venue first
       const venueFormData = new FormData();
 
@@ -174,11 +262,14 @@ export default function ManageVenue() {
       }
 
       // Add images
-      base64Images.forEach((base64Image, index) => {
-        venueFormData.append(`venue_images[${index}]`, base64Image);
-      });
+      if (files.images) {
+        Array.from(files.images).forEach((image) => {
+          venueFormData.append("venue_images", image);
+        });
+      }
 
       console.log("Venue Data before submit:", venueData);
+      console.log("Sending files:", files.images);
 
       const venueResponse = await apiFormData.post("/venues/", venueFormData);
 
@@ -214,9 +305,11 @@ export default function ManageVenue() {
         }
 
         // Add images
-        base64Images.forEach((base64Image, index) => {
-          requestFormData.append(`venueRequest_images[${index}]`, base64Image);
-        });
+        if (files.images) {
+          Array.from(files.images).forEach((image, index) => {
+            requestFormData.append(`venueRequest_images[${index}]`, image);
+          });
+        }
 
         const requestResponse = await apiFormData.post(
           "/venue-requests/",
@@ -224,7 +317,7 @@ export default function ManageVenue() {
         );
 
         if (requestResponse.status === 201 || requestResponse.status === 200) {
-          router.push("/nk1/venue/manage");
+          // router.push("/nk1/venue/manage");
         } else {
           console.error("Error creating venue request:", requestResponse);
         }
@@ -235,7 +328,7 @@ export default function ManageVenue() {
       console.error("Error:", err);
     }
   };
-
+  
   return (
     <div className="max-w-full mx-auto p-6 text-black">
       <form onSubmit={handleSubmit} className="space-y-6">

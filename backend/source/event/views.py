@@ -21,6 +21,7 @@ import base64
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django.core.files.base import ContentFile
+from rest_framework.parsers import MultiPartParser, FormParser
 
 from .models import (
     Role,
@@ -149,6 +150,9 @@ class UserDetailViewSet(viewsets.ModelViewSet):
 class VenueViewSet(viewsets.ModelViewSet):
     queryset = Venue.objects.all()
     serializer_class = VenueSerializer
+    print("checkpoint 1")
+    parser_classes = [MultiPartParser, FormParser]
+    print("checkpoint 2")
 
     def get_permissions(self):
         if self.action == 'list' or self.action == 'retrieve':
@@ -190,27 +194,43 @@ class VenueViewSet(viewsets.ModelViewSet):
 
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        print("checkpoint 3")
+        data = self.request.data
+        print("checkpoint 4")
+        venue_images = request.FILES.getlist("venue_images") 
+        print("checkpoint 5")
+        serializer = self.get_serializer(data=data)
         if serializer.is_valid():
+            print("checkpoint 6")
             venue = serializer.save()
 
-            # บันทึกภาพ
-            venue_images = request.data.get("venue_images", [])
-            for index, image_base64 in enumerate(venue_images):
-                try:
-                    format, imgstr = image_base64.split(';base64,')
-                    ext = format.split('/')[-1]
-                    file_name = f"venue_{venue.id}_{index}.{ext}"
-
-                    venue_image = ContentFile(base64.b64decode(imgstr), name=file_name)
-                    VenueImage.objects.create(venue=venue, image=venue_image)
-
-                except Exception as e:
-                    print(f"Error processing image {index}: {e}")
+            # บันทึกรูปภาพที่แนบมา
+            for image in venue_images:
+                VenueImage.objects.create(venue=venue, image=image)
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # serializer = self.get_serializer(data=request.data)
+        # if serializer.is_valid():
+        #     venue = serializer.save()
+
+        #     # บันทึกภาพ
+        #     venue_images = request.data.get("venue_images", [])
+        #     for index, image_base64 in enumerate(venue_images):
+        #         try:
+        #             format, imgstr = image_base64.split(';base64,')
+        #             ext = format.split('/')[-1]
+        #             file_name = f"venue_{venue.id}_{index}.{ext}"
+
+        #             venue_image = ContentFile(base64.b64decode(imgstr), name=file_name)
+        #             VenueImage.objects.create(venue=venue, image=venue_image)
+
+        #         except Exception as e:
+        #             print(f"Error processing image {index}: {e}")
+
+        #     return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 class TypeOfvanueViewSet(viewsets.ModelViewSet):
     queryset = TypeOfVenue.objects.all()
