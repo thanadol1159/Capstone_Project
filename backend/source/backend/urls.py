@@ -43,6 +43,8 @@ from event.views import (
     FavoriteVenueViewSet,
 )
 
+from event.views import export_venues_to_csv
+
 # Create a router and register our viewsets with it.
 router = DefaultRouter()
 router.register(r'roles', RoleViewSet)
@@ -78,6 +80,7 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),   
     re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     re_path(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    path('export-venues/', export_venues_to_csv, name='export_venues'),
     # path('api/tokens/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     # path('api/tokens/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
