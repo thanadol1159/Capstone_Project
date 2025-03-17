@@ -150,9 +150,8 @@ class UserDetailViewSet(viewsets.ModelViewSet):
 class VenueViewSet(viewsets.ModelViewSet):
     queryset = Venue.objects.all()
     serializer_class = VenueSerializer
-    print("checkpoint 1")
+
     parser_classes = [MultiPartParser, FormParser]
-    print("checkpoint 2")
 
     def get_permissions(self):
         if self.action == 'list' or self.action == 'retrieve':
@@ -192,45 +191,20 @@ class VenueViewSet(viewsets.ModelViewSet):
 
         return FileResponse(open(file_path, 'rb'), as_attachment=True)
 
-
     def create(self, request, *args, **kwargs):
-        print("checkpoint 3")
         data = self.request.data
-        print("checkpoint 4")
         venue_images = request.FILES.getlist("venue_images") 
-        print("checkpoint 5")
+        print(data.getlist("venue_images"))
         serializer = self.get_serializer(data=data)
         if serializer.is_valid():
-            print("checkpoint 6")
             venue = serializer.save()
 
-            # บันทึกรูปภาพที่แนบมา
             for image in venue_images:
                 VenueImage.objects.create(venue=venue, image=image)
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        # serializer = self.get_serializer(data=request.data)
-        # if serializer.is_valid():
-        #     venue = serializer.save()
-
-        #     # บันทึกภาพ
-        #     venue_images = request.data.get("venue_images", [])
-        #     for index, image_base64 in enumerate(venue_images):
-        #         try:
-        #             format, imgstr = image_base64.split(';base64,')
-        #             ext = format.split('/')[-1]
-        #             file_name = f"venue_{venue.id}_{index}.{ext}"
-
-        #             venue_image = ContentFile(base64.b64decode(imgstr), name=file_name)
-        #             VenueImage.objects.create(venue=venue, image=venue_image)
-
-        #         except Exception as e:
-        #             print(f"Error processing image {index}: {e}")
-
-        #     return Response(serializer.data, status=status.HTTP_201_CREATED)
-
 
 class TypeOfvanueViewSet(viewsets.ModelViewSet):
     queryset = TypeOfVenue.objects.all()
@@ -244,6 +218,7 @@ class TypeOfvanueViewSet(viewsets.ModelViewSet):
 class VenueRequestViewSet(viewsets.ModelViewSet):
     queryset = VenueRequest.objects.all()
     serializer_class = VenueRequestSerializer
+    parser_classes = [MultiPartParser, FormParser]
 
     def get_permissions(self):
         if self.action == 'list' or self.action == 'retrieve':
@@ -264,40 +239,54 @@ class VenueRequestViewSet(viewsets.ModelViewSet):
                 {"error": "user not found"}, 
                 status=status.HTTP_404_NOT_FOUND
             )
+        
     def create(self, request, *args, **kwargs):
-        try:
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            
+        data = self.request.data
+        venueRequest_images = [
+            file for key, file in request.FILES.items() if key.startswith("venueRequest_images")
+        ]
+        
+        print("🔹 Payload Data:", data)
+        print("🔹 Received Images:", venueRequest_images)
+        print(request.FILES.getlist("venueRequest_images[1]"))
+
+        if not venueRequest_images:
+            print("❌ No images received!")
+        
+        serializer = self.get_serializer(data=data)
+        
+        if serializer.is_valid():
             venue_request = serializer.save()
+            print("✅ VenueRequest Created:", venue_request)
 
-            venueRequest_images = request.data.get("venueRequest_images", [])
-
-            for index, image_base64 in enumerate(venueRequest_images):
-                try:
-                    if ';base64,' in image_base64:
-                        format, imgstr = image_base64.split(';base64,')
-                        ext = format.split('/')[-1]
-                    else:
-                        raise ValueError("Invalid Base64 format")
-
-                    missing_padding = len(imgstr) % 4
-                    if missing_padding:
-                        imgstr += '=' * (4 - missing_padding)
-
-                    file_name = f"venueRequest_{venue_request.id}_{index}.{ext}"
-                    image_file = ContentFile(base64.b64decode(imgstr, validate=True), name=file_name)
-
-                    VenueRequestImage.objects.create(venue_request=venue_request, image=image_file)
-
-                except Exception as e:
-                    print(f"Error processing image {index}: {e}")
-                    return Response({"error": f"Invalid Base64 encoding for image {index}"}, status=status.HTTP_400_BAD_REQUEST)
+            for image in venueRequest_images:
+                print("📷 Saving Image:", image.name)
+                VenueRequestImage.objects.create(venue_request=venue_request, image=image) 
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        print("❌ Serializer Errors:", serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    # def create(self, request, *args, **kwargs):
+    #     data = self.request.data
+    #     print(data)
+    #     venueRequest_images = request.FILES.getlist("venueRequest_images") 
+    #     print(venueRequest_images)
+
+    #     serializer = self.get_serializer(data=data)
+    #     if serializer.is_valid():
+    #         venue_request = serializer.save()
+    #         print("checkpoint 3")
+
+    #         print(venueRequest_images)
+    #         for image in venueRequest_images:
+    #             print("createe image")
+    #             VenueRequestImage.objects.create(venue_request=venue_request, image=image)
+
+    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()

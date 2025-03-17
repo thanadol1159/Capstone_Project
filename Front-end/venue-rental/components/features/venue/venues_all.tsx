@@ -59,7 +59,7 @@ export default function VenueRental() {
   const filteredVenues = venues.filter((venue: any) => {
     const matchesCategory =
       selectedCategory === "All" || venue.category_event === selectedCategory;
-    const matchesSearch = venue.venue_name.toLowerCase().includes(searchQuery);
+    // const matchesSearch = venue.venue_name.toLowerCase().includes(searchQuery);
     const matchesStatus = venue.status === 3;
 
     const matchesAreaSize =
@@ -87,7 +87,7 @@ export default function VenueRental() {
 
     return (
       matchesCategory &&
-      matchesSearch &&
+      // matchesSearch &&
       matchesStatus &&
       matchesAreaSize &&
       matchesCapacity &&

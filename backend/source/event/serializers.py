@@ -85,18 +85,6 @@ class UserDetailSerializer(serializers.ModelSerializer):
         model = UserDetail
         fields = '__all__'
 
-# class VenueImageSerializer(serializers.ModelSerializer):
-#     image_url = serializers.SerializerMethodField()
-
-#     class Meta:
-#         model = VenueImage
-#         fields = ['id', 'image_url']
-
-#     def get_image_url(self, obj):
-#         request = self.context.get('request')
-#         if obj.image:
-#             return request.build_absolute_uri(obj.image.url)
-#         return None
 class VenueImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = VenueImage
@@ -123,16 +111,7 @@ class VenueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Venue
         fields = '__all__'
-    #     extra_fields = ['venue_images_read_only']
 
-    # def create(self, validated_data):
-    #     images_data = validated_data.pop("venue_images", [])  
-    #     venue = Venue.objects.create(**validated_data)
-
-    #     for image_data in images_data:
-    #         VenueImage.objects.create(venue=venue, image=image_data)
-
-    #     return venue
 
     
 class TypeOfvanueSerializer(serializers.ModelSerializer):
@@ -140,22 +119,17 @@ class TypeOfvanueSerializer(serializers.ModelSerializer):
         model = TypeOfVenue
         fields = '__all__'
 
+class VenueRequestImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VenueRequestImage
+        fields = ['id', 'image']
+
 class VenueRequestSerializer(serializers.ModelSerializer):
-    venueRequest_images = serializers.ListField(
-        child=Base64ImageField(), write_only=True, required=False, allow_null=True
-    )
+    venueRequest_images = VenueRequestImageSerializer(many=True, read_only=True)
 
     class Meta:
         model = VenueRequest
         fields = '__all__'
-
-    def create(self, validated_data):
-        images_data = validated_data.pop("venueRequest_images", [])  
-        venue_request = VenueRequest.objects.create(**validated_data) 
-        for image_data in images_data:
-            VenueRequestImage.objects.create(venue_request=venue_request, image=image_data)
-
-        return venue_request
 
 class StatusBookingSerializer(serializers.ModelSerializer):
     class Meta:
