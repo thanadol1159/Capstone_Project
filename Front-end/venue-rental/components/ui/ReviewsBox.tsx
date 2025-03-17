@@ -9,6 +9,7 @@ interface ReviewProps {
   user: number;
   checkIn: string;
   checkOut: string;
+  reviewImages: { id: number; image: string }[];
 }
 
 const formatDate = (dateString: string): string => {
@@ -27,6 +28,7 @@ const Review: React.FC<ReviewProps> = ({
   user,
   checkIn,
   checkOut,
+  reviewImages,
 }) => {
   const [userName, setUserName] = useState<string | null>(null);
 
@@ -50,7 +52,7 @@ const Review: React.FC<ReviewProps> = ({
         <div>
           <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
         </div>
-        <div className="space-y-2 ">
+        <div className="space-y-2">
           <div className="flex-col">
             <div className="flex items-center space-x-2">
               <span className="font-medium">{userName}</span>
@@ -74,6 +76,23 @@ const Review: React.FC<ReviewProps> = ({
           <div>
             <p className="text-[#304B84]">{review}</p>
           </div>
+
+          {/* Display Review Images */}
+          {reviewImages.length > 0 && (
+            <div className="flex gap-2 mt-2">
+              {reviewImages.map((image) => {
+                console.log(image); // Log the image object to inspect its structure
+                return (
+                  <img
+                    key={image.id}
+                    src={image.image} // Ensure this is the correct URL string
+                    alt={`Review Image ${image.id}`}
+                    className="w-20 h-20 object-cover rounded-lg"
+                  />
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
       <span className="text-gray-500 ml-4 shrink-0">{formatDate(date)}</span>

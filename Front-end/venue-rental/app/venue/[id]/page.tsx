@@ -310,23 +310,32 @@ export default function VenuePage() {
               reviews
                 .sort(
                   (a, b) =>
-                    new Date(a.createAt).getTime() -
-                    new Date(b.createAt).getTime()
+                    new Date(b.createAt).getTime() -
+                    new Date(a.createAt).getTime() // Sort by newest first
                 )
                 .map((review) => {
                   const booking = bookings.find(
                     (booking) => booking.id === review.booking
                   );
 
+                  // Transform `review.review_images` (string[]) into `{ id: number; image: string }[]`
+                  const reviewImages = review.review_images.map(
+                    (image, index) => ({
+                      id: index, // Use the array index as the ID (or generate a unique ID if needed)
+                      image, // Use the image URL
+                    })
+                  );
+
                   return (
                     <Reviews
                       key={review.id}
                       date={review.createAt}
-                      rating={review.point}
+                      rating={review.point} // Assuming `point` is the correct field for rating
                       review={review.reviewDetail}
                       user={review.user}
                       checkIn={booking?.check_in || "N/A"}
                       checkOut={booking?.check_out || "N/A"}
+                      reviewImages={reviewImages} // Pass the transformed array
                     />
                   );
                 })

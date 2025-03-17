@@ -6,5 +6,12 @@ export interface Review {
   reviewDetail: string;
   point: number;
   createAt: string;
-  review_images: string[];
+  clean: number;
+  service: number;
+  value_for_money: number;
+  matches_expectations: number;
+  facilities: number;
+  environment: number;
+  location: number;
+  review_images: string[]; 
 }
