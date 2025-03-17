@@ -39,7 +39,8 @@ from .models import (
     Notifications,
     FavoriteVenue,
     VenueImage,
-    VenueRequestImage
+    VenueRequestImage,
+    ReviewImage
 )
 from .serializers import (
     RoleSerializer,
@@ -57,8 +58,8 @@ from .serializers import (
     ReviewSerializer,
     NotificationSerializer,
     CustomTokenObtainPairSerializer,
-    FavoriteVenueSerializer
-    
+    FavoriteVenueSerializer,
+    ReviewImageSerializer
 )
 
 # ViewSets define the view behavior.
@@ -246,26 +247,26 @@ class VenueRequestViewSet(viewsets.ModelViewSet):
             file for key, file in request.FILES.items() if key.startswith("venueRequest_images")
         ]
         
-        print("🔹 Payload Data:", data)
-        print("🔹 Received Images:", venueRequest_images)
+        print("Payload Data:", data)
+        print("Received Images:", venueRequest_images)
         print(request.FILES.getlist("venueRequest_images[1]"))
 
         if not venueRequest_images:
-            print("❌ No images received!")
+            print("No images received!")
         
         serializer = self.get_serializer(data=data)
         
         if serializer.is_valid():
             venue_request = serializer.save()
-            print("✅ VenueRequest Created:", venue_request)
+            print("VenueRequest Created:", venue_request)
 
             for image in venueRequest_images:
-                print("📷 Saving Image:", image.name)
+                print("Saving Image:", image.name)
                 VenueRequestImage.objects.create(venue_request=venue_request, image=image) 
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        print("❌ Serializer Errors:", serializer.errors)
+        print("Serializer Errors:", serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
     # def create(self, request, *args, **kwargs):
@@ -340,73 +341,58 @@ class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
 
-def create(self, request):
-    try:
-        user = request.user
-        venue_id = int(request.data.get("venue", 0))
-        booking_id = int(request.data.get("booking", 0))
-        create_at = request.data.get("createAt", "")
-        review_detail = request.data.get("reviewDetail", "")
-        clean = request.data.get("clean", 1)
-        service = request.data.get("service", 1)
-        value_for_money = request.data.get("value_for_money", 1)
-        facilities = request.data.get("facilities", 1)
-        matches_expectations = request.data.get("matches_expectations", 1) 
-        environment = request.data.get("environment", 1)
-        review_images = request.data.get("review_images", [])
+    parser_classes = [MultiPartParser, FormParser]
 
-        if not venue_id or not booking_id:
-            return Response({"error": "Venue ID and Booking ID are required."}, status=status.HTTP_400_BAD_REQUEST)
+    def create(self, request):
+        try:
+            user = request.user
+            venue_id = int(request.data.get("venue", 0))
+            booking_id = int(request.data.get("booking", 0))
+            review_images = request.FILES.getlist("review_images")
 
-        approved_status = StatusBooking.objects.filter(status="approved").first()
-        if not approved_status:
-            return Response({"error": "Approved status not found."}, status=status.HTTP_400_BAD_REQUEST)
+            if not venue_id or not booking_id:
+                return Response({"error": "Venue ID and Booking ID are required."}, status=status.HTTP_400_BAD_REQUEST)
 
-        booking = Booking.objects.filter(
-            id=booking_id, user=user, venue_id=venue_id, status_booking=approved_status
-        ).first()
+            approved_status = StatusBooking.objects.filter(status="approved").first()
+            if not approved_status:
+                return Response({"error": "Approved status not found."}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not booking:
-            return Response({"error": "No completed booking found for this venue."}, status=status.HTTP_400_BAD_REQUEST)
+            booking = Booking.objects.filter(
+                id=booking_id, user=user, venue_id=venue_id, status_booking=approved_status
+            ).first()
 
-        zones = pytz.timezone("Asia/Jakarta")
-        current_time = datetime.now(zones)
+            if not booking:
+                return Response({"error": "No completed booking found for this venue."}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not booking.check_out:
-            return Response({"error": "Booking check-out time is missing."}, status=status.HTTP_400_BAD_REQUEST)
+            zones = pytz.timezone("Asia/Jakarta")
+            current_time = datetime.now(zones)
 
-        if booking.check_out >= current_time:
-            return Response({"error": "Cannot proceed, checkout time has not passed yet."}, status=status.HTTP_400_BAD_REQUEST)
+            if not booking.check_out:
+                return Response({"error": "Booking check-out time is missing."}, status=status.HTTP_400_BAD_REQUEST)
 
-        if booking.isReview:
-            return Response({"error": "This booking has already been reviewed."}, status=status.HTTP_400_BAD_REQUEST)
+            if booking.check_out >= current_time:
+                return Response({"error": "Cannot proceed, checkout time has not passed yet."}, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            review = serializer.save(user=user, venue_id=venue_id, booking=booking)
+            if booking.isReview:
+                return Response({"error": "This booking has already been reviewed."}, status=status.HTTP_400_BAD_REQUEST)
 
-            for index, image_base64 in enumerate(review_images):
-                try:
-                    format, imgstr = image_base64.split(';base64,')
-                    ext = format.split('/')[-1]
-                    file_name = f"review_{review.id}_{index}.{ext}"
+            serializer = self.get_serializer(data=request.data)
+            if serializer.is_valid():
+                review = serializer.save(user=user, venue_id=venue_id, booking=booking)
+                
+                for image in review_images:
+                    ReviewImage.objects.create(review=review, image=image)
 
-                    review_image = ContentFile(base64.b64decode(imgstr), name=file_name)
-                    review.review_image.save(file_name, review_image)
-                except Exception as e:
-                    print(f"Error processing image {index}: {e}")
+                booking.isReview = True
+                booking.save()
 
-            booking.isReview = True
-            booking.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    except Exception as e:
-        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
 class NotificationViewset(viewsets.ModelViewSet):
     queryset = Notifications.objects.all()
     serializer_class = NotificationSerializer

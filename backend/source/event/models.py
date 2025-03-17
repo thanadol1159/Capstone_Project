@@ -122,7 +122,7 @@ class Review(models.Model):
     booking = models.ForeignKey(Booking, on_delete=models.CASCADE, null=True, blank=True)
 
 class ReviewImage(models.Model):
-    review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name="images")
+    review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name="review_images")
     image = models.ImageField(upload_to="images/reviews/", null=True, blank=True)
     
 class Notifications(models.Model):
