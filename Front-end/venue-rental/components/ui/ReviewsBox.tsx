@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Star } from "lucide-react";
 import { apiJson } from "@/hook/api";
-// import Modal from "react-modal";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
+import * as Dialog from "@radix-ui/react-dialog";
+import { X } from "lucide-react";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -50,8 +51,8 @@ const Review: React.FC<ReviewProps> = ({
   location,
 }) => {
   const [userName, setUserName] = useState<string | null>(null);
-  const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const fetchUserName = async () => {
@@ -68,7 +69,7 @@ const Review: React.FC<ReviewProps> = ({
   }, [user]);
 
   return (
-    <div className="bg-white shadow-md rounded-r-xl rounded-l-full p-5 border-[#335473] border flex justify-between">
+    <div className="bg-white shadow-md rounded-r-xl rounded-l-full p-8 border-[#335473] border flex justify-between">
       <div className="flex gap-5">
         <div>
           <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
@@ -105,7 +106,7 @@ const Review: React.FC<ReviewProps> = ({
                   className="w-20 h-20 object-cover rounded-lg border border-gray-300 cursor-pointer"
                   onClick={() => {
                     setSelectedImageIndex(index);
-                    setModalIsOpen(true);
+                    setIsOpen(true);
                   }}
                 />
               ))}
@@ -114,6 +115,42 @@ const Review: React.FC<ReviewProps> = ({
         </div>
       </div>
       <span className="text-gray-500 ml-4 shrink-0">{formatDate(date)}</span>
+
+      {/* Radix UI Modal */}
+      <Dialog.Root open={isOpen} onOpenChange={setIsOpen}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-50" />
+          <Dialog.Content className="fixed inset-0 flex items-center justify-center">
+            <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-2xl relative">
+              <Dialog.Title className="sr-only">Review Images</Dialog.Title>
+              <Dialog.Close asChild>
+                <button className="absolute top-3 right-3 text-gray-500">
+                  <X />
+                </button>
+              </Dialog.Close>
+
+              {/* Swiper Carousel */}
+              <Swiper
+                modules={[Navigation, Pagination]}
+                navigation
+                pagination={{ clickable: true }}
+                initialSlide={selectedImageIndex}
+                className="w-full"
+              >
+                {reviewImages.map((img, index) => (
+                  <SwiperSlide key={index}>
+                    <img
+                      src={img}
+                      alt={`Slide ${index + 1}`}
+                      className="w-full h-[400px] object-contain rounded-lg"
+                    />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            </div>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
     </div>
   );
 };

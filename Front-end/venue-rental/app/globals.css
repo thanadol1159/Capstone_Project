@@ -20,17 +20,17 @@
 
 .custom-swiper .swiper-pagination-bullet {
   border: 2px solid white;
-  /* background-color: transparent;  */
-  width: 12px; 
+  width: 12px;
   height: 12px;
 }
 
 .custom-swiper .swiper-pagination-bullet-active {
-  background-color: #304B84; 
+  background-color: #304b84;
   border-color: white;
 }
-
-
+:root {
+  --swiper-navigation-color: #304b84;
+}
 
 body {
   color: var(--foreground);
