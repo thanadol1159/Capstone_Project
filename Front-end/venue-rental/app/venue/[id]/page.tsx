@@ -249,7 +249,16 @@ export default function VenuePage() {
                     {reviews.length > 0
                       ? (
                           reviews.reduce(
-                            (sum, review) => sum + review.point,
+                            (sum, review) =>
+                              sum +
+                              (review.clean +
+                                review.service +
+                                review.value_for_money +
+                                review.matches_expectations +
+                                review.facilities +
+                                review.environment +
+                                review.location) /
+                                7,
                             0
                           ) / reviews.length
                         ).toFixed(1)
@@ -272,9 +281,19 @@ export default function VenuePage() {
               {/* Right side */}
               <div className="space-y-2 right-side flex-1">
                 {[5, 4, 3, 2, 1].map((star) => {
-                  const count = reviews.filter(
-                    (review) => review.point === star
-                  ).length;
+                  const count = reviews.filter((review) => {
+                    const avgRating =
+                      (review.clean +
+                        review.service +
+                        review.value_for_money +
+                        review.matches_expectations +
+                        review.facilities +
+                        review.environment +
+                        review.location) /
+                      7;
+                    return Math.round(avgRating) === star;
+                  }).length;
+
                   const percentage =
                     reviews.length === 0 ? 0 : (count / reviews.length) * 100;
                   return (
@@ -311,31 +330,32 @@ export default function VenuePage() {
                 .sort(
                   (a, b) =>
                     new Date(b.createAt).getTime() -
-                    new Date(a.createAt).getTime() // Sort by newest first
+                    new Date(a.createAt).getTime()
                 )
                 .map((review) => {
                   const booking = bookings.find(
                     (booking) => booking.id === review.booking
                   );
 
-                  // Transform `review.review_images` (string[]) into `{ id: number; image: string }[]`
-                  const reviewImages = review.review_images.map(
-                    (image, index) => ({
-                      id: index, // Use the array index as the ID (or generate a unique ID if needed)
-                      image, // Use the image URL
-                    })
-                  );
-
                   return (
                     <Reviews
                       key={review.id}
                       date={review.createAt}
-                      rating={review.point} // Assuming `point` is the correct field for rating
+                      rating={review.point}
                       review={review.reviewDetail}
                       user={review.user}
                       checkIn={booking?.check_in || "N/A"}
                       checkOut={booking?.check_out || "N/A"}
-                      reviewImages={reviewImages} // Pass the transformed array
+                      reviewImages={review.review_images.map(
+                        (img) => img.image
+                      )}
+                      clean={review.clean}
+                      service={review.service}
+                      valueForMoney={review.value_for_money}
+                      matchesExpectations={review.matches_expectations}
+                      facilities={review.facilities}
+                      environment={review.environment}
+                      location={review.location}
                     />
                   );
                 })

@@ -13,5 +13,5 @@ export interface Review {
   facilities: number;
   environment: number;
   location: number;
-  review_images: string[]; 
+  review_images: { id: number; image: string }[];
 }

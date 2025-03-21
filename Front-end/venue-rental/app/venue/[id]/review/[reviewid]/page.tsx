@@ -76,7 +76,7 @@ export default function ReviewCreate() {
     formData.append("venue", String(venueId));
     formData.append("booking", String(selectedBookingId));
     formData.append("reviewDetail", reviewText);
-    formData.append("createAt", new Date().toISOString()); 
+    formData.append("createAt", new Date().toISOString());
 
     Object.entries(rating).forEach(([key, value]) => {
       formData.append(key, String(value));
@@ -147,26 +147,31 @@ export default function ReviewCreate() {
           </div>
           <div className="mb-6">
             <label className="block text-lg mb-2">Your Ratings:</label>
-            {(Object.keys(rating) as Array<keyof typeof rating>).map(
-              (category) => (
-                <div key={category} className="mb-4">
-                  <p className="capitalize">{category.replace("_", " ")}</p>
-                  <div className="flex space-x-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star
-                        key={star}
-                        size={30}
-                        fill={rating[category] >= star ? "gold" : "none"}
-                        color="gold"
-                        onClick={() => handleRating(category, star)}
-                        className="cursor-pointer"
-                      />
-                    ))}
+            <div className="grid grid-cols-2 gap-4">
+              {(Object.keys(rating) as Array<keyof typeof rating>).map(
+                (category) => (
+                  <div key={category} className="flex flex-col items-center">
+                    <p className="capitalize font-medium">
+                      {category.replace(/_/g, " ")}
+                    </p>
+                    <div className="flex space-x-1 mt-2">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star
+                          key={star}
+                          size={30}
+                          fill={rating[category] >= star ? "gold" : "none"}
+                          color="gold"
+                          onClick={() => handleRating(category, star)}
+                          className="cursor-pointer transition-transform transform hover:scale-110"
+                        />
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )
-            )}
+                )
+              )}
+            </div>
           </div>
+
           <div className="mb-6">
             <label htmlFor="review" className="block text-lg mb-2">
               Your Review:

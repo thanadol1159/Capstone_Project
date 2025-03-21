@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Star } from "lucide-react";
 import { apiJson } from "@/hook/api";
+// import Modal from "react-modal";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 
 interface ReviewProps {
   date: string;
@@ -9,12 +15,18 @@ interface ReviewProps {
   user: number;
   checkIn: string;
   checkOut: string;
-  reviewImages: { id: number; image: string }[];
+  reviewImages: string[];
+  clean: number;
+  service: number;
+  valueForMoney: number;
+  matchesExpectations: number;
+  facilities: number;
+  environment: number;
+  location: number;
 }
 
 const formatDate = (dateString: string): string => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString("en-US", {
+  return new Date(dateString).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -29,8 +41,17 @@ const Review: React.FC<ReviewProps> = ({
   checkIn,
   checkOut,
   reviewImages,
+  clean,
+  service,
+  valueForMoney,
+  matchesExpectations,
+  facilities,
+  environment,
+  location,
 }) => {
   const [userName, setUserName] = useState<string | null>(null);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   useEffect(() => {
     const fetchUserName = async () => {
@@ -66,31 +87,28 @@ const Review: React.FC<ReviewProps> = ({
                 ))}
               </div>
             </div>
-            <div>
-              <p className="text-gray-300">
-                {formatDate(checkIn)} - {formatDate(checkOut)}
-              </p>
-            </div>
+            <p className="text-gray-300">
+              {formatDate(checkIn)} - {formatDate(checkOut)}
+            </p>
           </div>
 
-          <div>
-            <p className="text-[#304B84]">{review}</p>
-          </div>
+          <p className="text-[#304B84]">{review}</p>
 
           {/* Display Review Images */}
           {reviewImages.length > 0 && (
             <div className="flex gap-2 mt-2">
-              {reviewImages.map((image) => {
-                console.log(image); // Log the image object to inspect its structure
-                return (
-                  <img
-                    key={image.id}
-                    src={image.image} // Ensure this is the correct URL string
-                    alt={`Review Image ${image.id}`}
-                    className="w-20 h-20 object-cover rounded-lg"
-                  />
-                );
-              })}
+              {reviewImages.map((img, index) => (
+                <img
+                  key={index}
+                  src={img}
+                  alt={`Review ${index + 1}`}
+                  className="w-20 h-20 object-cover rounded-lg border border-gray-300 cursor-pointer"
+                  onClick={() => {
+                    setSelectedImageIndex(index);
+                    setModalIsOpen(true);
+                  }}
+                />
+              ))}
             </div>
           )}
         </div>
