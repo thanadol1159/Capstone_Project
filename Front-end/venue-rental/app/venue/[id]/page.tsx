@@ -16,7 +16,7 @@ import "swiper/css";
 import "swiper/css/pagination";
 import { Pagination } from "swiper/modules";
 import "swiper/css/navigation";
-
+import MapComponent  from '../../../components/common/Map';
 // const addNk1ToUrl = (url: string): string => {
 //   return url ? url.replace(/(\/images\/)/, "$1/nk1$2") : "";
 // };
@@ -126,9 +126,9 @@ export default function VenuePage() {
 
   // const imageUrl = venue.image ? venue.image : "/placeholder-image.jpg";
   const venueType = typeVenue?.type_name || "Unknown Type";
-
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 text-black ">
+      <MapComponent />
       <h1 className="text-2xl font-semibold text-center mb-4 mt-2">
         {venue.venue_name}
       </h1>
@@ -348,6 +348,7 @@ export default function VenuePage() {
         </div>
       </div>
 
+                      {/* <MapComponent /> */}
       {showLoginModal && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
@@ -380,4 +381,4 @@ export default function VenuePage() {
       )}
     </div>
   );
-}
+  }
