@@ -1,13 +1,41 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from "react";
 
-const MapComponent: React.FC = () => {
+interface MapComponentProps {
+  latitude: number;
+  longitude: number;
+}
+
+const MapComponent: React.FC<MapComponentProps> = ({ latitude, longitude }) => {
+  const mapRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [userLocation, setUserLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
 
   useEffect(() => {
-    // Load Longdo Map script
-    const script = document.createElement('script');
-    script.src = 'https://api.longdo.com/map/?key=5fc04d23896fc489e4e60e6ff5b6cb37';
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+        },
+        (error) => {
+          setError("Failed to get user location: " + error.message);
+        }
+      );
+    } else {
+      setError("Geolocation is not supported by this browser.");
+    }
+  }, []);
+
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src =
+      "https://api.longdo.com/map/?key=5fc04d23896fc489e4e60e6ff5b6cb37";
     script.async = true;
     script.onload = initializeMap;
     script.onerror = () => setError("Failed to load map script");
@@ -16,87 +44,81 @@ const MapComponent: React.FC = () => {
     return () => {
       document.head.removeChild(script);
     };
-  }, []);
+  }, [userLocation]);
 
   const initializeMap = () => {
+    if (!mapRef.current) return;
+
     const mapInstance = new (window as any).longdo.Map({
-      placeholder: document.getElementById('map'),
-      zoom: 10
+      placeholder: mapRef.current,
+      zoom: 14,
     });
     setMap(mapInstance);
 
-    // Configure UI
     mapInstance.Layers.setBase((window as any).longdo.Layers.NORMAL_EN);
     mapInstance.Ui.DPad.visible(false);
     mapInstance.Ui.Zoombar.visible(true);
     mapInstance.Ui.Geolocation.visible(true);
+    mapInstance.Ui.Toolbar.visible(false);
+    mapInstance.Ui.LayerSelector.visible(true);
+    mapInstance.Ui.Fullscreen.visible(true);
+    mapInstance.Ui.Crosshair.visible(false);
+    mapInstance.Ui.Scale.visible(true);
 
-    // Get current position
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude: lat, longitude: lon } = position.coords;
-          addUserLocation(mapInstance, lon, lat);
-        },
-        (err) => {
-          setError(`Geolocation error: ${err.message}`);
-          // Fallback to Bangkok coordinates if denied
-        }
+    if (userLocation) {
+      addRoute(
+        mapInstance,
+        userLocation.longitude,
+        userLocation.latitude,
+        longitude,
+        latitude
       );
-    } else {
-      setError("Geolocation not supported");
-      // Fallback to Bangkok coordinates
     }
   };
 
-  const addUserLocation = (mapInstance: any, lon: number, lat: number) => {
-    // Add user marker
+  const addRoute = (
+    mapInstance: any,
+    userLon: number,
+    userLat: number,
+    venueLon: number,
+    venueLat: number
+  ) => {
     const userMarker = new (window as any).longdo.Marker(
-      { lon, lat },
-      { title: "Your Current Location", detail: "Detected automatically" }
+      { lon: userLon, lat: userLat },
+      { title: "Your Location", detail: "You are here" }
     );
+
+    const venueMarker = new (window as any).longdo.Marker(
+      { lon: venueLon, lat: venueLat },
+      { title: "Venue Location", detail: "This is the venue's location" }
+    );
+
     mapInstance.Overlays.add(userMarker);
-
-    // Add destination (Victory Monument)
-    const destinationMarker = new (window as any).longdo.Marker(
-      { lon: 100.749502, lat: 13.688381, },
-      { title: "Victory Monument", detail: "Destination" }
-    );
-    mapInstance.Overlays.add(destinationMarker);
-
-    // Set up route
-    mapInstance.Route.placeholder(document.getElementById('result'));
-    mapInstance.Route.add({ lon, lat });
-    mapInstance.Route.add({ lon: 100.749502, lat: 13.688381 });
+    mapInstance.Overlays.add(venueMarker);
+    mapInstance.Route.add(userMarker);
+    mapInstance.Route.add(venueMarker);
     mapInstance.Route.search();
-    mapInstance.location({ lon, lat }, true);
+    mapInstance.location({ lon: userLon, lat: userLat }, true);
   };
 
   return (
-    <div style={{ height: '50vh', margin: 0 }}>
+    <div style={{ height: "50vh", margin: 0 }}>
       {error && (
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          background: 'rgba(255,0,0,0.3)',
-          padding: '10px',
-          zIndex: 1000
-        }}>
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            background: "rgba(255,0,0,0.3)",
+            padding: "10px",
+            zIndex: 1000,
+          }}
+        >
           {error}
         </div>
       )}
-      <div id="map" style={{ height: '100%' }}></div>
-      <div id="result" style={{ 
-        position: 'relative',
-        bottom: 0,
-        left: 0,
-        right: 20,
-        height: '30%',
-        background: 'white',
-        overflow: 'auto'
-      }}></div>
+      <div ref={mapRef} style={{ height: "100%" }}></div>
     </div>
   );
 };
