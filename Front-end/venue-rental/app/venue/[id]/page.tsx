@@ -128,7 +128,7 @@ export default function VenuePage() {
   const venueType = typeVenue?.type_name || "Unknown Type";
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 text-black ">
-      <MapComponent />
+      {/* <MapComponent /> */}
       <h1 className="text-2xl font-semibold text-center mb-4 mt-2">
         {venue.venue_name}
       </h1>
@@ -379,6 +379,7 @@ export default function VenuePage() {
           </div>
         </div>
       )}
+      <MapComponent/>
     </div>
   );
   }
