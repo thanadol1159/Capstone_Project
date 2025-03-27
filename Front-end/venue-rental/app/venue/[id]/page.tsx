@@ -380,7 +380,7 @@ export default function VenuePage() {
         </div>
       )}
       {venue.latitude && venue.longitude ? (
-        <MapComponent latitude={venue.latitude} longitude={venue.longitude} />
+        <MapComponent latitude={venue.latitude} longitude={venue.longitude}/>
       ) : (
         <p className="text-center text-gray-500">No location data available</p>
       )}
