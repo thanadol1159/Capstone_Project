@@ -45,6 +45,8 @@ class Venue(models.Model):
     personal_identification = models.FileField(upload_to='pdfs/personal/',null=True, blank=True)
     venue_owner = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)
     status = models.ForeignKey(StatusBooking, on_delete=models.CASCADE,null=True, blank=True)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
 
 class VenueImage(models.Model):
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE, related_name="venue_images")
@@ -71,6 +73,8 @@ class VenueRequest(models.Model):
     venue_owner = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)
     status = models.ForeignKey(StatusBooking, on_delete=models.CASCADE,null=True, blank=True)
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE,null=True, blank=True)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
 
 class VenueRequestImage(models.Model):
     venue_request = models.ForeignKey(VenueRequest, on_delete=models.CASCADE, related_name="venueRequest_images")
