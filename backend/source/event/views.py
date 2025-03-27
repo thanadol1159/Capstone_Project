@@ -192,6 +192,21 @@ class VenueViewSet(viewsets.ModelViewSet):
 
         return FileResponse(open(file_path, 'rb'), as_attachment=True)
 
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        data = request.data
+        venue_images = request.FILES.getlist("venue_images")
+        serializer = self.get_serializer(instance, data=data, partial=True)
+        if serializer.is_valid():
+            venue = serializer.save()
+
+            for image in venue_images:
+                VenueImage.objects.create(venue=venue, image=image)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
     def create(self, request, *args, **kwargs):
         data = self.request.data
         venue_images = request.FILES.getlist("venue_images") 
@@ -240,6 +255,21 @@ class VenueRequestViewSet(viewsets.ModelViewSet):
                 {"error": "user not found"}, 
                 status=status.HTTP_404_NOT_FOUND
             )
+        
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        data = request.data
+        venueRequest_images = request.FILES.getlist("venueRequest_images")
+        serializer = self.get_serializer(instance, data=data, partial=True)
+        if serializer.is_valid():
+            venue_request = serializer.save()
+
+            for image in venueRequest_images:
+                VenueRequestImage.objects.create(venue_request=venue_request, image=image)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
     def create(self, request, *args, **kwargs):
         data = self.request.data
