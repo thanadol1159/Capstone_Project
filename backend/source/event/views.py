@@ -197,6 +197,7 @@ class VenueViewSet(viewsets.ModelViewSet):
         data = request.data
         venue_images = request.FILES.getlist("venue_images")
         serializer = self.get_serializer(instance, data=data, partial=True)
+        instance.venue_images.all().delete()
         if serializer.is_valid():
             venue = serializer.save()
 
@@ -261,6 +262,7 @@ class VenueRequestViewSet(viewsets.ModelViewSet):
         data = request.data
         venueRequest_images = request.FILES.getlist("venueRequest_images")
         serializer = self.get_serializer(instance, data=data, partial=True)
+        instance.venueRequest_images.all().delete()
         if serializer.is_valid():
             venue_request = serializer.save()
 
