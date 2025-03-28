@@ -10,4 +10,6 @@ export interface VenueRequest {
   venue_owner: number;
   status: number;
   venue: number;
+  personal_identification: string;
+  venue_certification: string;
 }

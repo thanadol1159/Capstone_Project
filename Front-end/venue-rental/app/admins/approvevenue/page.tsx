@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { apiJson } from "@/hook/api";
+import { apiFormData } from "@/hook/api";
 import { VenueRequest } from "@/types/venuerequest";
 
 const ApproveVenue = () => {
@@ -57,8 +58,8 @@ const ApproveVenue = () => {
     venueOwner: number
   ) => {
     try {
-      await apiJson.put(`/venues/${venueId}/`, { status: 3 });
-      await apiJson.put(`/venue-requests/${requestId}/`, { status: 3 });
+      await apiFormData.patch(`/venues/${venueId}/`, { status: 3 });
+      await apiFormData.patch(`/venue-requests/${requestId}/`, { status: 3 });
 
       setVenues((prevVenues) =>
         prevVenues.map((venue) =>
@@ -73,14 +74,18 @@ const ApproveVenue = () => {
     }
   };
 
-  const rejectVenue = async (venueId: number, requestId: number,venueOwner: number) => {
+  const rejectVenue = async (
+    venueId: number,
+    requestId: number,
+    venueOwner: number
+  ) => {
     try {
-      await apiJson.put(`/venues/${venueId}/`, { status: 1 });
-      await apiJson.put(`/venue-requests/${requestId}/`, { status: 1 });
+      await apiFormData.put(`/venues/${venueId}/`, { status: 1 });
+      await apiFormData.put(`/venue-requests/${requestId}/`, { status: 1 });
 
       setVenues((prevVenues) =>
         prevVenues.map((venue) =>
-          venue.id === requestId ? { ...venue, status: 3 } : venue
+          venue.id === requestId ? { ...venue, status: 1 } : venue
         )
       );
       setExpanded(null);
@@ -136,10 +141,33 @@ const ApproveVenue = () => {
                 <p>
                   <strong>Info:</strong> {venue.additional_information}
                 </p>
+                <p>
+                  <strong>Documents:</strong>
+                </p>
+                <div className="flex gap-3 mt-2">
+                  <a
+                    href={venue.personal_identification}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1 bg-blue-500 text-white rounded"
+                  >
+                    View ID
+                  </a>
+                  <a
+                    href={venue.venue_certification}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1 bg-green-500 text-white rounded"
+                  >
+                    View Certification
+                  </a>
+                </div>
                 <div className="flex justify-end mt-3">
                   <button
                     className="px-4 py-2 border rounded text-gray-700 mr-2 border-[#3F6B96]"
-                    onClick={() => rejectVenue(venue.venue, venue.id,venue.venue_owner)}
+                    onClick={() =>
+                      rejectVenue(venue.venue, venue.id, venue.venue_owner)
+                    }
                   >
                     Deny
                   </button>
