@@ -80,8 +80,8 @@ const ApproveVenue = () => {
     venueOwner: number
   ) => {
     try {
-      await apiFormData.put(`/venues/${venueId}/`, { status: 1 });
-      await apiFormData.put(`/venue-requests/${requestId}/`, { status: 1 });
+      await apiFormData.patch(`/venues/${venueId}/`, { status: 1 });
+      await apiFormData.patch(`/venue-requests/${requestId}/`, { status: 1 });
 
       setVenues((prevVenues) =>
         prevVenues.map((venue) =>

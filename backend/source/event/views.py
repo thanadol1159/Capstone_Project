@@ -191,38 +191,25 @@ class VenueViewSet(viewsets.ModelViewSet):
             return Response({"error": "File not found"}, status=status.HTTP_404_NOT_FOUND)
 
         return FileResponse(open(file_path, 'rb'), as_attachment=True)
-
-    def update(self, request, *args, **kwargs):
-        instance = self.get_object()
-        data = request.data
-        venue_images = request.FILES.getlist("venue_images")
-        serializer = self.get_serializer(instance, data=data, partial=True)
-        instance.venue_images.all().delete()
-        if serializer.is_valid():
-            venue = serializer.save()
-
-            for image in venue_images:
-                VenueImage.objects.create(venue=venue, image=image)
-
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
         data = request.data
-        venue_images = request.FILES.getlist("venue_images") 
-        received_image_ids = request.data.getlist("venue_images_ids") 
+        venue_images = request.FILES.getlist("venue_images")
+        received_image_ids = request.data.getlist("venue_images_ids")
 
-        serializer = self.get_serializer(instance, data=data, partial=True)
+        # Determine if it's a full update (PUT) or a partial update (PATCH)
+        is_put_request = request.method == "PUT"
+        serializer = self.get_serializer(instance, data=data, partial=not is_put_request)
 
         if serializer.is_valid():
             venue = serializer.save()
 
-            existing_image_ids = set(instance.venue_images.values_list("id", flat=True))
-
-            images_to_delete = existing_image_ids - set(map(int, received_image_ids))  
-            VenueImage.objects.filter(id__in=images_to_delete).delete()
+            if is_put_request:
+                # Only delete images if it's a full update (PUT)
+                existing_image_ids = set(instance.venue_images.values_list("id", flat=True))
+                images_to_delete = existing_image_ids - set(map(int, received_image_ids))
+                VenueImage.objects.filter(id__in=images_to_delete).delete()
 
             for image in venue_images:
                 VenueImage.objects.create(venue=venue, image=image)
@@ -230,6 +217,7 @@ class VenueViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     
     def create(self, request, *args, **kwargs):
         data = self.request.data
@@ -279,30 +267,34 @@ class VenueRequestViewSet(viewsets.ModelViewSet):
                 {"error": "user not found"}, 
                 status=status.HTTP_404_NOT_FOUND
             )
-        
+    
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
-        data = request.data 
-        venueRequest_images = request.FILES.getlist("venueRequest_images")  
-        received_image_ids = request.data.getlist("venue_images")  
+        data = request.data
+        venueRequest_images = request.FILES.getlist("venueRequest_images")
+        received_image_ids = request.data.getlist("venue_images_ids")
 
-        serializer = self.get_serializer(instance, data=data, partial=True)
+        # Use partial=True for PATCH, partial=False for PUT
+        is_put_request = request.method == "PUT"
+        serializer = self.get_serializer(instance, data=data, partial=not is_put_request)
 
         if serializer.is_valid():
             venue_request = serializer.save()
 
-            existing_image_ids = set(instance.venueRequest_images.values_list("id", flat=True))
+            if is_put_request:  
+                # Only delete images if it's a full update (PUT)
+                existing_image_ids = set(instance.venueRequest_images.values_list("id", flat=True))
+                images_to_delete = existing_image_ids - set(map(int, received_image_ids))
+                VenueRequestImage.objects.filter(id__in=images_to_delete).delete()
 
-            images_to_delete = existing_image_ids - set(map(int, received_image_ids))  
-            VenueRequestImage.objects.filter(id__in=images_to_delete).delete()
-
-        if venueRequest_images:
-            for image in venueRequest_images:
-                VenueRequestImage.objects.create(venue_request=venue_request, image=image)
+            if venueRequest_images:
+                for image in venueRequest_images:
+                    VenueRequestImage.objects.create(venue_request=venue_request, image=image)
 
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
         
     def create(self, request, *args, **kwargs):
         data = self.request.data
