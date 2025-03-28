@@ -1,29 +1,41 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-// import { VenueCardProps } from "@/types/venue";
 import { Venue } from "@/types/venue";
 import { apiFormData } from "@/hook/api";
 import { apiJson } from "@/hook/api";
 import { useSelector } from "react-redux";
 import { RootState } from "@/hook/store";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/pagination";
+import { Pagination } from "swiper/modules";
+import "swiper/css/navigation";
+import { X } from "lucide-react";
 
 export default function VenueEditPage() {
   const params = useParams();
   const router = useRouter();
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
   const [venue, setVenue] = useState<Venue | null>(null);
+
+  // Updated files state to match ManageVenue component
   const [files, setFiles] = useState({
-    image: null as File | null,
-    venue_certification: null as File | null,
-    personal_identification: null as File | null,
+    images: [] as File[],
   });
+
+  // For image preview
+  const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
+  const [existingImages, setExistingImages] = useState<
+    { id: number; image: string }[]
+  >([]);
 
   useEffect(() => {
     const fetchVenueDetail = async () => {
       try {
         const { data } = await apiJson.get(`/venues/${params.id}/`);
         setVenue(data);
+        setExistingImages(data.venue_images || []);
       } catch (error) {
         console.error("Error fetching venue:", error);
       }
@@ -34,17 +46,38 @@ export default function VenueEditPage() {
     }
   }, [params.id]);
 
-  const handleFileChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    fieldName: keyof typeof files
-  ) => {
-    const file = e.target.files?.[0];
-    if (file) {
+  // Handle multiple image uploads
+  const handleImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = e.target.files;
+    if (selectedFiles && selectedFiles.length > 0) {
+      // Convert FileList to Array and add to existing files
+      const newImages = Array.from(selectedFiles);
       setFiles((prev) => ({
         ...prev,
-        [fieldName]: file,
+        images: [...prev.images, ...newImages],
       }));
+
+      // Create preview URLs for the images
+      const newPreviewUrls = newImages.map((file) => URL.createObjectURL(file));
+      setImagePreviewUrls((prev) => [...prev, ...newPreviewUrls]);
     }
+  };
+
+  // Remove image from selection
+  const removeImage = (index: number) => {
+    setFiles((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+    }));
+
+    // Revoke the URL to free memory
+    URL.revokeObjectURL(imagePreviewUrls[index]);
+    setImagePreviewUrls((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // Remove existing image
+  const removeExistingImage = (id: number) => {
+    setExistingImages((prev) => prev.filter((img) => img.id !== id));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -54,33 +87,43 @@ export default function VenueEditPage() {
     try {
       const formData = new FormData();
 
-      // Append venue data as JSON string
-      Object.keys(venue).forEach((key) => {
-        if (key !== "image") {
-          formData.append(key, String(venue[key as keyof Venue]));
+      // Append text fields
+      const fieldsToUpdate = [
+        "venue_name",
+        "venue_type",
+        "price",
+        "capacity",
+        "parking_space",
+        "additional_information",
+        "area_size",
+        "category_event",
+        "location",
+        "number_of_rooms",
+        "outdoor_spaces",
+        "status",
+        "latitude",
+        "longitude",
+      ];
+
+      fieldsToUpdate.forEach((field) => {
+        if (venue[field as keyof Venue] !== undefined) {
+          formData.append(field, String(venue[field as keyof Venue]));
         }
       });
 
-      // Append new image file if it exists
-      if (files.image) {
-        formData.append("image", files.image);
-      }
+      // Append existing images
+      existingImages.forEach((img) => {
+        formData.append("venue_images_ids", String(img.id));
+      });
 
-      // Append other files if they exist
-      if (files.venue_certification) {
-        formData.append("venue_certification", files.venue_certification);
-      }
-      if (files.personal_identification) {
-        formData.append(
-          "personal_identification",
-          files.personal_identification
-        );
-      }
+      // Append new images
+      files.images.forEach((image) => {
+        formData.append("venue_images", image);
+      });
 
       await apiFormData.put(`/venues/${params.id}/`, formData);
 
       router.push(`/nk1/venue/${params.id}`);
-      // router.push(`/venue/manage`);
       router.refresh();
     } catch (error) {
       console.error("Error updating venue:", error);
@@ -99,28 +142,68 @@ export default function VenueEditPage() {
 
   useEffect(() => {
     handleNoAuth();
-  });
+
+    return () => {
+      imagePreviewUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, []);
 
   if (!venue) {
     return <div>Loading...</div>;
   }
 
-  // const addNk1ToUrl = (url: string): string => {
-  //   return url.replace(/(\/images\/)/, "$1/nk1$2");
-  // };
-
   return (
     <div className="w-full max-w-lg mx-auto p-2 text-black">
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Preview Image */}
-        <div className="overflow-hidden mt-6">
-          <div className="p-0">
-            <img
-              src={venue.image ? venue.image : "/placeholder-image.jpg"}
-              alt="Venue Preview"
-              className="w-full h-48 object-scale-down"
-            />
-          </div>
+        {/* Image Preview and Upload */}
+        <div className="grid grid-cols-3 gap-4">
+          {existingImages.map((img) => (
+            <div key={img.id} className="relative group">
+              <img
+                src={img.image}
+                alt="Venue"
+                className="w-full h-24 object-cover rounded-md"
+              />
+              <button
+                type="button"
+                onClick={() => removeExistingImage(img.id)}
+                className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
+        <div>
+          <label className="block font-medium">Upload Images</label>
+          <input
+            type="file"
+            name="images"
+            onChange={handleImagesChange}
+            accept="image/*"
+            multiple
+            className="mt-2 block w-full border border-gray-300 p-2 rounded-md"
+          />
+          {imagePreviewUrls.length > 0 && (
+            <div className="grid grid-cols-3 gap-3 mt-2">
+              {imagePreviewUrls.map((url, index) => (
+                <div key={index} className="relative group">
+                  <img
+                    src={url}
+                    alt={`preview ${index}`}
+                    className="h-24 w-24 object-cover rounded-md"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(index)}
+                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Venue Type */}
@@ -164,23 +247,79 @@ export default function VenueEditPage() {
           />
         </div>
 
-        {/* Image */}
-        <div className="flex items-center">
-          <span className="w-16 font-medium">Image :</span>
+        {/* Latitude and Longitude */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <div className="text-sm font-bold">Latitude:</div>
+            <input
+              type="number"
+              step="0.000001"
+              value={venue.latitude || ""}
+              onChange={(e) =>
+                setVenue({ ...venue, latitude: Number(e.target.value) })
+              }
+              className="w-full p-2 border rounded-md"
+              placeholder="Enter latitude"
+            />
+          </div>
+          <div className="space-y-2">
+            <div className="text-sm font-bold">Longitude:</div>
+            <input
+              type="number"
+              step="0.000001"
+              value={venue.longitude || ""}
+              onChange={(e) =>
+                setVenue({ ...venue, longitude: Number(e.target.value) })
+              }
+              className="w-full p-2 border rounded-md"
+              placeholder="Enter longitude"
+            />
+          </div>
+        </div>
+
+        {/* Area Size */}
+        <div className="flex items-center gap-2">
+          <div className="font-medium w-[30%]">Area Size:</div>
           <input
-            type="file"
-            name="image"
-            onChange={(e) => handleFileChange(e, "image")}
-            accept="image/*"
-            className="hidden"
-            id="image-upload"
+            type="number"
+            value={venue.area_size || ""}
+            onChange={(e) =>
+              setVenue({ ...venue, area_size: Number(e.target.value) })
+            }
+            className="w-full p-2 border rounded-md"
+            min={0}
+            placeholder="Enter area size"
           />
-          <label
-            htmlFor="image-upload"
-            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md cursor-pointer"
-          >
-            {files.image ? files.image.name : "Attach File"}
-          </label>
+          <p>sq.m</p>
+        </div>
+
+        {/* Number of Rooms */}
+        <div className="flex items-center gap-2">
+          <div className="font-medium w-[50%]">Number of Rooms:</div>
+          <input
+            type="number"
+            value={venue.number_of_rooms || ""}
+            onChange={(e) =>
+              setVenue({ ...venue, number_of_rooms: Number(e.target.value) })
+            }
+            className="w-full p-2 border rounded-md"
+            min={0}
+            placeholder="Enter number of rooms"
+          />
+        </div>
+
+        {/* Outdoor Spaces */}
+        <div className="space-y-2">
+          <div className="font-medium">Outdoor Spaces:</div>
+          <input
+            type="number"
+            value={venue.outdoor_spaces || ""}
+            onChange={(e) =>
+              setVenue({ ...venue, outdoor_spaces: e.target.value })
+            }
+            className="w-full p-2 border rounded-md"
+            placeholder="Describe outdoor spaces available"
+          />
         </div>
 
         {/* Price */}

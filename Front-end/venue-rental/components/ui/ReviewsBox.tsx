@@ -68,6 +68,17 @@ const Review: React.FC<ReviewProps> = ({
     fetchUserName();
   }, [user]);
 
+  // Calculate the average rating
+  const averageRating =
+    (clean +
+      service +
+      valueForMoney +
+      matchesExpectations +
+      facilities +
+      environment +
+      location) /
+    7;
+
   return (
     <div className="bg-white shadow-md rounded-r-xl rounded-l-full p-8 border-[#335473] border flex justify-between">
       <div className="flex gap-5">
@@ -83,7 +94,9 @@ const Review: React.FC<ReviewProps> = ({
                   <Star
                     key={i}
                     className="w-5 h-5"
-                    fill={i < rating ? "currentColor" : "none"}
+                    fill={
+                      i < Math.round(averageRating) ? "currentColor" : "none"
+                    }
                   />
                 ))}
               </div>
