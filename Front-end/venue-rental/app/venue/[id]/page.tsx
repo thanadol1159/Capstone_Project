@@ -145,7 +145,7 @@ export default function VenuePage() {
                 <img
                   src={img.image}
                   alt={venue.venue_name}
-                  className="rounded-lg object-cover w-full h-96"
+                  className="rounded-lg object-contain w-full h-96"
                 />
               </SwiperSlide>
             ))}
