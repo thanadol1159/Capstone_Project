@@ -22,6 +22,8 @@ from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django.core.files.base import ContentFile
 from rest_framework.parsers import MultiPartParser, FormParser
+import requests
+from django.http import JsonResponse
 
 from .models import (
     Role,
@@ -442,3 +444,17 @@ class FavoriteVenueViewSet(viewsets.ModelViewSet):
 
         favorite.delete()
         return Response({"message": "Venue removed from favorites"}, status=status.HTTP_204_NO_CONTENT)
+    
+
+FLASK_API_URL = "http://ml:5000/predict"
+
+def get_ml_prediction(request):
+    try:
+        response = requests.get(FLASK_API_URL)
+        if response.status_code == 200:
+            data = response.json()
+            return JsonResponse(data, safe=False)
+        else:
+            return JsonResponse({"error": "Failed to get prediction"}, status=response.status_code)
+    except requests.exceptions.RequestException as e:
+        return JsonResponse({"error": str(e)}, status=500)
