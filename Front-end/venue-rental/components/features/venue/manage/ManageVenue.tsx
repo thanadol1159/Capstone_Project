@@ -213,7 +213,7 @@ export default function ManageVenue() {
         console.log(requestFormData)
 
         if (requestResponse.status === 201 || requestResponse.status === 200) {
-          // router.push("/nk1/venue/manage");
+          router.push("/nk1/venue/manage");
         } else {
           console.error("Error creating venue request:", requestResponse);
         }
