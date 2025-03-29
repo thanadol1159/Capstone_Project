@@ -4,10 +4,20 @@ import { useEffect, useState } from "react";
 import { apiJson } from "@/hook/api";
 import { apiFormData } from "@/hook/api";
 import { VenueRequest } from "@/types/venuerequest";
+import * as Dialog from "@radix-ui/react-dialog";
+import { X } from "lucide-react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 
 const ApproveVenue = () => {
   const [venues, setVenues] = useState<VenueRequest[]>([]);
   const [expanded, setExpanded] = useState<number | null>(null);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [reviewImages, setReviewImages] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchVenuesRequest = async () => {
@@ -24,6 +34,15 @@ const ApproveVenue = () => {
 
   const toggleExpand = (id: number) => {
     setExpanded(expanded === id ? null : id);
+  };
+
+  const openImageModal = (
+    images: { id: number; image: string }[],
+    index: number = 0
+  ) => {
+    setReviewImages(images.map((img) => img.image));
+    setSelectedImageIndex(index);
+    setIsImageModalOpen(true);
   };
 
   const sendNotification = async (userId: number) => {
@@ -141,6 +160,30 @@ const ApproveVenue = () => {
                 <p>
                   <strong>Info:</strong> {venue.additional_information}
                 </p>
+
+                {/* Venue Images */}
+                {venue.venueRequest_images &&
+                  venue.venueRequest_images.length > 0 && (
+                    <>
+                      <p>
+                        <strong>Venue Images:</strong>
+                      </p>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {venue.venueRequest_images.map((img, index) => (
+                          <img
+                            key={img.id}
+                            src={img.image}
+                            alt={`Venue image ${index + 1}`}
+                            className="w-24 h-24 object-cover rounded cursor-pointer"
+                            onClick={() =>
+                              openImageModal(venue.venueRequest_images, index)
+                            }
+                          />
+                        ))}
+                      </div>
+                    </>
+                  )}
+
                 <p>
                   <strong>Documents:</strong>
                 </p>
@@ -185,6 +228,42 @@ const ApproveVenue = () => {
           </div>
         ))}
       </div>
+
+      {/* Image Viewer Modal */}
+      <Dialog.Root open={isImageModalOpen} onOpenChange={setIsImageModalOpen}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-50" />
+          <Dialog.Content className="fixed inset-0 flex items-center justify-center">
+            <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-2xl relative">
+              <Dialog.Title className="sr-only">Review Images</Dialog.Title>
+              <Dialog.Close asChild>
+                <button className="absolute top-3 right-3 text-gray-500">
+                  <X />
+                </button>
+              </Dialog.Close>
+
+              {/* Swiper Carousel */}
+              <Swiper
+                modules={[Navigation, Pagination]}
+                navigation
+                pagination={{ clickable: true }}
+                initialSlide={selectedImageIndex}
+                className="w-full"
+              >
+                {reviewImages.map((img, index) => (
+                  <SwiperSlide key={index}>
+                    <img
+                      src={img}
+                      alt={`Slide ${index + 1}`}
+                      className="w-full h-[400px] object-contain rounded-lg"
+                    />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            </div>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
     </div>
   );
 };
