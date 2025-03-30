@@ -48,6 +48,9 @@ def load_models():
 # โหลดโมเดลและ LabelEncoders ตอนเริ่มต้น
 model, label_encoders = load_models()
 
+UPLOAD_FOLDER = "/app/data"  # กำหนดตำแหน่งเก็บไฟล์
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)  # สร้างโฟลเดอร์ถ้ายังไม่มี
+
 @app.route("/predict_category", methods=["GET"])
 def predict_category():
     """ทำนายหมวดหมู่จากข้อมูลผู้ใช้"""
@@ -93,6 +96,20 @@ def predict_category():
     
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+@app.route("/upload_csv", methods=["POST"])
+def upload_csv():
+    if "file" not in request.files:
+        return jsonify({"error": "No file uploaded"}), 400
+
+    file = request.files["file"]
+    
+    if file.filename == "":
+        return jsonify({"error": "No selected file"}), 400
+
+    file_path = os.path.join(UPLOAD_FOLDER, "test_precategory.csv")
+    file.save(file_path)
+
+    return jsonify({"message": "CSV uploaded successfully", "file_path": file_path})
 
 if __name__ == "__main__":
     print("\n🚀 กำลังเริ่มต้น API server สำหรับทำนายหมวดหมู่...")

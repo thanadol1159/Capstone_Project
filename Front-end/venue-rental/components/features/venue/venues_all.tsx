@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { Filter } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useUserId } from "@/hook/userid";
+import axios from "axios";
 
 export default function VenueRental() {
   const router = useRouter();
@@ -18,6 +19,7 @@ export default function VenueRental() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [showInterestModal, setShowInterestModal] = useState(false);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [recommendedVenues, setRecommendedVenues] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const filters = {
@@ -106,6 +108,20 @@ export default function VenueRental() {
       console.error("Error submitting interests:", error);
     }
   };
+
+  useEffect(() => {
+    const fetchRecommendedVenues = async () => {
+      try {
+        if (!userId) return;
+        const response = await axios.get(`http://localhost:8080/ml-predict/`);
+        setRecommendedVenues(response.data.results || []);
+      } catch (error) {
+        console.error("Error fetching recommended venues:", error);
+      }
+    };
+
+    fetchRecommendedVenues();
+  }, []);
 
   const handleDetailClick = (id: string) => {
     router.push(`/nk1/venue/${id}`);
@@ -224,6 +240,23 @@ export default function VenueRental() {
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
+
+      {recommendedVenues.length > 0 && (
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4 text-black">
+            Recommended for You
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {recommendedVenues.map((venue: any) => (
+              <VenueCard
+                key={venue.id}
+                {...venue}
+                onDetailClick={handleDetailClick}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Category Section */}
       <div className="mb-8">

@@ -1,4 +1,3 @@
 user_id,age,gender,interested
-66,,,[]
-65,,,[]
-81,22,female,"['Sports', 'Arts & Culture']"
+13,23,male,Arts & Culture
+12,23,male,Technology & Innovation

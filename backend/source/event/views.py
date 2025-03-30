@@ -530,7 +530,10 @@ def get_ml_prediction(request):
         if response.status_code == 200:
             data = response.json()
             results = data.get("results", [])
+            print("Results:", results)
             user_id = request.user.id
+            print(request.user)
+            print("User ID:", user_id)
 
             # ค้นหา predicted_category ของ user นี้
             predict_category = next((item["predicted_category"] for item in results if item["user_id"] == user_id), None)
@@ -574,6 +577,9 @@ import csv
 from django.http import HttpResponse
 from .models import Venue  # Ensure Venue is correctly imported
 
+
+FLASK_UPLOAD_URL = "http://ml:5000/upload_csv"  # ใช้ชื่อ container ของ ML
+
 def export_venues_to_csv(request):
     file_name = "test_precategory.csv"
     file_path = os.path.join(settings.MEDIA_ROOT, file_name)
@@ -585,14 +591,22 @@ def export_venues_to_csv(request):
         writer = csv.writer(file)
         writer.writerow(["user_id", "age", "gender", "interested"])
 
-        user_details = UserDetail.objects.all()  # เปลี่ยนชื่อตัวแปรเป็นพหูพจน์เพื่อความชัดเจน
-        for user in user_details:
-            writer.writerow([
-                user.user.id if hasattr(user, 'user') else '',  # ตรวจสอบก่อนว่ามีฟิลด์ user หรือไม่
-                user.age,
-                user.gender,
-                user.interested
-            ])
+        users = UserDetail.objects.all()
+        for user in users:
+            user_id = getattr(user.user, "id", "")  # ป้องกัน AttributeError
+            age = user.age if user.age is not None else ""
+            gender = user.gender if user.gender else ""
+            interested = ", ".join(user.interested) if user.interested else ""
 
-    file_url = f"{settings.MEDIA_URL}{file_name}"
-    return JsonResponse({"message": "CSV file created successfully", "file_url": file_url})
+            writer.writerow([user_id, age, gender, interested])
+    try:
+        with open(file_path, "rb") as file:
+            response = requests.post(FLASK_UPLOAD_URL, files={"file": file})
+
+        if response.status_code == 200:
+            return JsonResponse({"message": "CSV uploaded successfully", "response": response.json()})
+        else:
+            return JsonResponse({"error": "Failed to upload CSV", "details": response.text}, status=500)
+    
+    except requests.exceptions.RequestException as e:
+        return JsonResponse({"error": str(e)}, status=500)
