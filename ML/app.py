@@ -1,192 +1,99 @@
-# from flask import Flask, request, jsonify
-# import pandas as pd
-# import joblib
-# import os
-# import subprocess
-
-# app = Flask(__name__)
-
-# # เรียกใช้งาน test.py ก่อนโหลดโมเดล
-# # TEST_SCRIPT_PATH = "test.py"
-
-# # print("🔄 กำลังรัน test.py เพื่อเตรียมไฟล์ .pkl ...")
-# # try:
-# #     subprocess.run(["python", TEST_SCRIPT_PATH], check=True)
-# #     print("✅ test.py รันสำเร็จ!")
-# # except subprocess.CalledProcessError as e:
-# #     print(f"❌ เกิดข้อผิดพลาดในการรัน test.py: {e}")
-# #     exit(1) 
-
-# # ตรวจสอบไฟล์โมเดล
-# MODEL_PATH = "models/popular_venue_model.pkl"
-# VECTORIZER_PATH = "models/vectorizer.pkl"
-# COSINE_SIM_PATH = "models/cosine_sim.pkl"
-# DATA_PATH = "models/data.pkl"
-# USER_CSV_PATH = "data/user.csv"
-# VENUE_CSV_PATH = "data/venue_data.csv"
-
-# for path in [MODEL_PATH, VECTORIZER_PATH, COSINE_SIM_PATH, DATA_PATH, USER_CSV_PATH, VENUE_CSV_PATH]:
-#     if not os.path.exists(path):
-#         raise FileNotFoundError(f"ไม่พบไฟล์ {path}")
-
-# # โหลดโมเดลหลัก (โหลดแค่ครั้งเดียว)
-# model = joblib.load(MODEL_PATH)
-# vectorizer = joblib.load(VECTORIZER_PATH)
-# cosine_sim = joblib.load(COSINE_SIM_PATH)
-
-# @app.route("/predict", methods=["GET"])
-# def predict():
-#     TEST_SCRIPT_PATH = "test.py"
-
-#     print("🔄 กำลังรัน test.py เพื่อเตรียมไฟล์ .pkl ...")
-#     try:
-#         subprocess.run(["python", TEST_SCRIPT_PATH], check=True)
-#         print("✅ test.py รันสำเร็จ!")
-#     except subprocess.CalledProcessError as e:
-#         print(f"❌ เกิดข้อผิดพลาดในการรัน test.py: {e}")
-
-#     """โหลด data.pkl ใหม่ทุกครั้งที่มีการเรียก API เพื่อให้แน่ใจว่าข้อมูลล่าสุดถูกนำมาใช้"""
-#     df = joblib.load(DATA_PATH)
-#     model = joblib.load(MODEL_PATH)
-#     vectorizer = joblib.load(VECTORIZER_PATH)
-#     cosine_sim = joblib.load(COSINE_SIM_PATH)
-#     venues_df = pd.read_csv(VENUE_CSV_PATH)
-#     users_df = pd.read_csv(USER_CSV_PATH)
-
-#     categories = ['staycation', 'wedding', 'party', 'workshop', 'co-working space', 'film', 'private party']
-#     results = []
-
-#     for category_name in categories:
-#         if category_name not in df["category"].values:
-#             results.append({"category": category_name, "error": f"หมวดหมู่ '{category_name}' ไม่มีในข้อมูล"})
-#             continue
-
-#         category_encoded = df[df['category'] == category_name].index[0]
-#         bookings = df[df['category'] == category_name]['bookings'].values[0]
-
-#         test_data = pd.DataFrame({"category_encoded": [category_encoded], "bookings": [bookings]})
-#         prediction = model.predict(test_data)[0]
-
-#         results.append({
-#             "category": category_name,
-#             "popular": bool(prediction)
-#         })
-
-#     return jsonify({"results" : results})
-
-
-# if __name__ == "__main__":
-#     app.run(host="0.0.0.0", port=5000, debug=True)
 from flask import Flask, request, jsonify
 import pandas as pd
 import joblib
-import tensorflow as tf
 import os
 from sklearn.preprocessing import LabelEncoder
 
 app = Flask(__name__)
 
 # กำหนดพาธไฟล์
-CSV_PATH = "/app/data/newvenue.csv"
-MODEL_PATH = "models/popular_venue_model.pkl"
-DATA_PATH = "models/data.pkl"
-TF_MODEL_PATH = "models/tf_model.h5"
+MODEL_PATH = "/app/models/predict_category_model.pkl"
+DATA_PATH = "/app/data/test_precategory.csv"
+LABEL_ENCODER_PATHS = {
+    'age': "/app/models/label_encoder_age.pkl",
+    'interested': "/app/models/label_encoder_interested.pkl",
+    'category': "/app/models/label_encoder_category.pkl",
+    'gender': "/app/models/label_encoder_gender.pkl"
+}
 
-# ฟังก์ชันโหลดข้อมูลใหม่จาก CSV ทุกครั้งที่มีการเรียก API
+# ฟังก์ชันโหลดข้อมูล
 def load_data():
-    if not os.path.exists(CSV_PATH):
-        raise FileNotFoundError(f"❌ ไม่พบไฟล์ {CSV_PATH}")
-
-    df = pd.read_csv(CSV_PATH)
-
-    required_columns = {'category', 'bookings'}
+    if not os.path.exists(DATA_PATH):
+        raise FileNotFoundError(f"❌ ไม่พบไฟล์ {DATA_PATH}")
+    
+    df = pd.read_csv(DATA_PATH)
+    
+    required_columns = {'age', 'interested', 'gender', 'user_id'}
     if not required_columns.issubset(df.columns):
         raise ValueError(f"CSV ต้องมีคอลัมน์ {required_columns} แต่พบ {set(df.columns)}")
-
-    # บันทึกข้อมูลเป็นไฟล์ pickle
-    os.makedirs("models", exist_ok=True)
-    joblib.dump(df, DATA_PATH)
-
+    
     return df
 
-# ฟังก์ชันโหลดโมเดล
+# ฟังก์ชันโหลดโมเดลและ LabelEncoders
 def load_models():
     if not os.path.exists(MODEL_PATH):
         raise FileNotFoundError(f"❌ ไม่พบไฟล์โมเดล {MODEL_PATH}")
-
+    
     model = joblib.load(MODEL_PATH)
+    
+    # โหลด LabelEncoders
+    label_encoders = {}
+    for name, path in LABEL_ENCODER_PATHS.items():
+        if not os.path.exists(path):
+            raise FileNotFoundError(f"❌ ไม่พบไฟล์ LabelEncoder {path}")
+        label_encoders[name] = joblib.load(path)
+    
+    return model, label_encoders
 
-    # โหลด TensorFlow Model ถ้ามี
-    tf_model = None
-    if os.path.exists(TF_MODEL_PATH):
-        tf_model = tf.keras.models.load_model(TF_MODEL_PATH)
+# โหลดโมเดลและ LabelEncoders ตอนเริ่มต้น
+model, label_encoders = load_models()
 
-    return model, tf_model
-
-# โหลดโมเดลตอนเริ่มต้น
-model, tf_model = load_models()
-
-@app.route("/predict", methods=["GET"])
-def predict():
-    """โหลด CSV ใหม่และทำนายข้อมูล"""
-    df = load_data()
-
-    # โหลด LabelEncoder ใหม่
-    encoder = LabelEncoder()
-    encoder.fit(df["category"])
-
-    categories = request.args.get("categories", "").split(",")
-
-    # ถ้าไม่ได้กำหนดหมวดหมู่ ให้ใช้ทุกหมวดหมู่
-    if not categories or categories[0] == "":
-        categories = df["category"].unique().tolist()
-
-    results = []
-    for category_name in categories:
-        if category_name not in df["category"].values:
-            results.append({"category": category_name, "error": f"หมวดหมู่ '{category_name}' ไม่มีในข้อมูล"})
-            continue
-
-        avg_bookings = df[df["category"] == category_name]["bookings"].mean()
-        category_encoded = encoder.transform([category_name])[0]
-
-        # สร้าง DataFrame สำหรับทำนาย
-        test_data = pd.DataFrame({"category_encoded": [category_encoded], "bookings": [avg_bookings]})
-
-        # ทำนาย
-        prediction = model.predict(test_data)[0]
-
-        results.append({
-            "category": category_name,
-            "popular": bool(prediction)
-        })
-
-    return jsonify({"results": results})
-
-@app.route("/recommend_all", methods=["GET"])
-def recommend_all():
-    """โหลดข้อมูลใหม่และแนะนำสถานที่ทั้งหมด"""
-    df = load_data()
-
-    encoder = LabelEncoder()
-    encoder.fit(df["category"])
-
-    results = []
-    for category_name in df["category"].unique():
-        avg_bookings = df[df["category"] == category_name]["bookings"].mean()
-        category_encoded = encoder.transform([category_name])[0]
-
-        test_data = pd.DataFrame({"category_encoded": [category_encoded], "bookings": [avg_bookings]})
-
-        prediction = model.predict(test_data)
-
-        results.append({
-            "category": category_name,
-            "is_popular": bool(prediction[0] == 1)
-        })
-
-    return jsonify({"results": results})
+@app.route("/predict_category", methods=["GET"])
+def predict_category():
+    """ทำนายหมวดหมู่จากข้อมูลผู้ใช้"""
+    try:
+        df = load_data()
+        
+        # ตรวจสอบว่ามีคอลัมน์ที่จำเป็น
+        if 'age' not in df.columns or 'interested' not in df.columns or 'gender' not in df.columns:
+            raise ValueError("DataFrame must contain 'age', 'interested', and 'gender' columns")
+        
+        # จัดการข้อมูลที่ขาดหายไป
+        df.dropna(subset=['age', 'interested', 'gender'], inplace=True)
+        
+        # จัดกลุ่มช่วงอายุ
+        age_bins = [18, 29, 39, float('inf')]
+        age_labels = ['18-29', '30-39', '40+']
+        df['age_group'] = pd.cut(df['age'], bins=age_bins, labels=age_labels, right=True)
+        
+        # แปลงข้อมูลด้วย LabelEncoders
+        df['interested_encoded'] = label_encoders['interested'].transform(df['interested'])
+        df['age_group_encoded'] = label_encoders['age'].transform(df['age_group'])
+        df['gender_encoded'] = label_encoders['gender'].transform(df['gender'])
+        
+        # สร้าง DataFrame สำหรับการทำนาย
+        X_test = df[['age_group_encoded', 'interested_encoded', 'gender_encoded']]
+        
+        # ทำนาย category
+        predicted_category_encoded = model.predict(X_test)
+        predicted_category = label_encoders['category'].inverse_transform(predicted_category_encoded)
+        
+        # สร้างผลลัพธ์
+        results = []
+        for _, row in df.iterrows():
+            results.append({
+                "user_id": row['user_id'],
+                "age": row['age'],
+                "gender": row['gender'],
+                "interested": row['interested'],
+                "predicted_category": predicted_category[_]
+            })
+        
+        return jsonify({"results": results})
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
 if __name__ == "__main__":
-    print("\n🚀 กำลังเริ่มต้น API server...")
+    print("\n🚀 กำลังเริ่มต้น API server สำหรับทำนายหมวดหมู่...")
     app.run(host="0.0.0.0", port=5000, debug=True)

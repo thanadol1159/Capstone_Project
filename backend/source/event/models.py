@@ -42,7 +42,7 @@ class Venue(models.Model):
     venue_type = models.ForeignKey(TypeOfVenue,on_delete=models.CASCADE,null=True, blank=True) 
     venue_name = models.CharField(max_length=50,null=True, blank=True)  
     location = models.CharField(max_length=100, null=True, blank=True)
-    category_event = models.CharField(max_length=50, null=True, blank=True)
+    # category_event = models.CharField(max_length=50, null=True, blank=True)
     price = models.IntegerField(null=True, blank=True)
     area_size = models.CharField(max_length=50, null=True, blank=True)  
     capacity = models.IntegerField(null=True, blank=True)

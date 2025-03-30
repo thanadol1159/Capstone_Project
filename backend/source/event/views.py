@@ -520,7 +520,7 @@ class VenueRequestCategoryViewSet(viewsets.ModelViewSet):
 #             return [AllowAny()]
 #         return [IsAuthenticated()]
 
-FLASK_API_URL = "http://ml:5000/recommend_all"
+FLASK_API_URL = "http://ml:5000/predict_category"
 # FLASK_API_RELOAD = "http://ml:5000/reload"
 
 
@@ -528,29 +528,39 @@ def get_ml_prediction(request):
     try:
         response = requests.get(FLASK_API_URL)
         if response.status_code == 200:
-            data = response.json()  
-            print(data)  
+            data = response.json()
+            results = data.get("results", [])
+            user_id = request.user.id
 
-            category_list = data.get("category_event", [])  
-            
-            venue = Venue.objects.filter(category_event__in=category_list)
+            # ค้นหา predicted_category ของ user นี้
+            predict_category = next((item["predicted_category"] for item in results if item["user_id"] == user_id), None)
 
-            venue_list = [
-                {
-                    "id": v.id,
-                    "venue_name": v.venue_name,
-                    "location": v.location,
-                    "category_event": v.category_event,
-                    "price": v.price,
-                    "area_size": v.area_size,
-                    "capacity": v.capacity,
-                    "number_of_rooms": v.number_of_rooms,
-                    "parking_space": v.parking_space,
-                    "outdoor_spaces": v.outdoor_spaces,
-                    "additional_information": v.additional_information,
-                }
-                for v in venue
-            ]
+            if not predict_category:
+                return JsonResponse({"error": "No predicted category found for this user"}, status=404)
+
+            # ค้นหา Venue ที่มี category_event ตรงกับ predicted_category
+            venue_ids = VenueCategory.objects.filter(category_event=predict_category).values_list('venue_id', flat=True)
+            venues = Venue.objects.filter(id__in=venue_ids).select_related('venue_type', 'venue_owner', 'status').prefetch_related('venue_category')
+
+            # แปลงข้อมูล Venue เป็น JSON response
+            venue_list = []
+            for venue in venues:
+                venue_list.append({
+                    "id": venue.id,
+                    "venue_name": venue.venue_name,
+                    "location": venue.location,
+                    "price": venue.price,
+                    "area_size": venue.area_size,
+                    "capacity": venue.capacity,
+                    "number_of_rooms": venue.number_of_rooms,
+                    "parking_space": venue.parking_space,
+                    "outdoor_spaces": venue.outdoor_spaces,
+                    "additional_information": venue.additional_information,
+                    "venue_type": venue.venue_type.type_name if venue.venue_type else None,
+                    "venue_owner": venue.venue_owner.username if venue.venue_owner else None,
+                    "status": venue.status.status if venue.status else None,
+                    "categories": [cat.category_event for cat in venue.venue_category.all()]  # ดึง category ทั้งหมดของ Venue นี้
+                })
 
             return JsonResponse(venue_list, safe=False)
 
@@ -559,8 +569,6 @@ def get_ml_prediction(request):
 
     except requests.exceptions.RequestException as e:
         return JsonResponse({"error": str(e)}, status=500)
-        
-    
 
 import csv
 from django.http import HttpResponse
@@ -568,7 +576,7 @@ from .models import Venue  # Ensure Venue is correctly imported
 
 def export_venues_to_csv(request):
     # กำหนดชื่อไฟล์ที่ต้องการบันทึก
-    file_name = "venues_data.csv"
+    file_name = "test_precategory.csv"
     file_path = os.path.join(settings.MEDIA_ROOT, file_name)
 
     # ตรวจสอบและลบไฟล์เก่า ถ้ามี
@@ -578,37 +586,17 @@ def export_venues_to_csv(request):
     # สร้างและบันทึกไฟล์ CSV ใหม่
     with open(file_path, mode="w", newline="", encoding="utf-8") as file:
         writer = csv.writer(file)
-        headers = [
-            'ID', 'Venue Name', 'Location', 'Category Event', 'Price', 
-            'Area Size', 'Capacity', 'Number of Rooms', 'Parking Space',
-            'Outdoor Spaces', 'Additional Information', 'Venue Type',
-            'Venue Owner', 'Status'
-        ]
-        writer.writerow(headers)
+        
+        writer.writerow(["user_id", "age", "gender", "interested"])
 
-        venues = Venue.objects.all()
-        for venue in venues:
-            venue_type_name = getattr(venue.venue_type, "type_name", "")
-            venue_owner_name = getattr(venue.venue_owner, "username", "")
-            status_name = getattr(venue.status, "status", "")
-
-            row = [
-                venue.id,
-                venue.venue_name,
-                venue.location,
-                venue.category_event,
-                venue.price,
-                venue.area_size,
-                venue.capacity,
-                venue.number_of_rooms,
-                venue.parking_space,
-                venue.outdoor_spaces,
-                venue.additional_information,
-                venue_type_name,
-                venue_owner_name,
-                status_name
-            ]
-            writer.writerow(row)
+        user_detail = UserDetail.objects.all()
+        for user in user_detail:
+            writer.writerow([
+                user["user"],
+                user["age"],
+                user["gender"],
+                user["interested"]
+            ])
 
 
     # สร้าง URL สำหรับดาวน์โหลดไฟล์
