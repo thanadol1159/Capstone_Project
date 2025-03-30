@@ -207,11 +207,11 @@ CSRF_COOKIE_SECURE =  True
 
 USE_X_FORWARDED_HOST = True
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
-# if os.getenv("DJANGO_ENV") == "production":
-#     MEDIA_URL = "https://capstone24.sit.kmutt.ac.th/nk1/media/"
+if os.getenv("DJANGO_ENV") == "production":
+    MEDIA_URL = "https://capstone24.sit.kmutt.ac.th/nk1/media/"
     # MEDIA_URL = "https://capstone24.sit.kmutt.ac.th/media/"
 
 # MINIO_STORAGE_MEDIA_BUCKET_NAME = 'media'
