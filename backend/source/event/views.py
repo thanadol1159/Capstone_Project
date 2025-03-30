@@ -523,15 +523,40 @@ class VenueRequestCategoryViewSet(viewsets.ModelViewSet):
 FLASK_API_URL = "http://ml:5000/recommend_all"
 # FLASK_API_RELOAD = "http://ml:5000/reload"
 
+
 def get_ml_prediction(request):
     try:
         response = requests.get(FLASK_API_URL)
-        print(response.json())
         if response.status_code == 200:
-            data = response.json()
-            return JsonResponse(data, safe=False)
+            data = response.json()  
+            print(data)  
+
+            category_list = data.get("category_event", [])  
+            
+            venue = Venue.objects.filter(category_event__in=category_list)
+
+            venue_list = [
+                {
+                    "id": v.id,
+                    "venue_name": v.venue_name,
+                    "location": v.location,
+                    "category_event": v.category_event,
+                    "price": v.price,
+                    "area_size": v.area_size,
+                    "capacity": v.capacity,
+                    "number_of_rooms": v.number_of_rooms,
+                    "parking_space": v.parking_space,
+                    "outdoor_spaces": v.outdoor_spaces,
+                    "additional_information": v.additional_information,
+                }
+                for v in venue
+            ]
+
+            return JsonResponse(venue_list, safe=False)
+
         else:
             return JsonResponse({"error": "Failed to get prediction"}, status=response.status_code)
+
     except requests.exceptions.RequestException as e:
         return JsonResponse({"error": str(e)}, status=500)
         
