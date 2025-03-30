@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { Venue } from "@/types/venue";
-import axios from "axios";
 import { apiFormData, apiJson } from "@/hook/api";
 import { useRouter } from "next/navigation";
 import { useUserId } from "@/hook/userid";
@@ -13,12 +12,13 @@ export default function ManageVenue() {
   const router = useRouter();
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
   const userId = useUserId();
-  const [statusId, setStatusId] = useState<number | null>(null);
 
   const [venueData, setVenueData] = useState<Partial<Venue>>({
     venue_type: 0,
     venue_name: "",
     location: "",
+    latitude: 0,
+    longitude: 0,
     category_event: "",
     price: 0,
     area_size: null,
@@ -129,28 +129,10 @@ export default function ManageVenue() {
     };
   }, []);
 
-  const convertImagesToBase64 = async (files: File[]): Promise<string[]> => {
-    const promises = files.map((file) => {
-      return new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          resolve(reader.result as string);
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-    });
-
-    return Promise.all(promises);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      // Convert images to base64
-      const base64Images = await convertImagesToBase64(files.images);
-
       // Create venue first
       const venueFormData = new FormData();
 
@@ -174,11 +156,14 @@ export default function ManageVenue() {
       }
 
       // Add images
-      base64Images.forEach((base64Image, index) => {
-        venueFormData.append(`venue_images[${index}]`, base64Image);
-      });
+      if (files.images) {
+        Array.from(files.images).forEach((image) => {
+          venueFormData.append("venue_images", image);
+        });
+      }
 
       console.log("Venue Data before submit:", venueData);
+      console.log("Sending files:", files.images);
 
       const venueResponse = await apiFormData.post("/venues/", venueFormData);
 
@@ -214,14 +199,18 @@ export default function ManageVenue() {
         }
 
         // Add images
-        base64Images.forEach((base64Image, index) => {
-          requestFormData.append(`venueRequest_images[${index}]`, base64Image);
-        });
+        if (files.images) {
+          Array.from(files.images).forEach((image, index) => {
+            requestFormData.append(`venueRequest_images[${index}]`, image);
+          });
+        }
 
         const requestResponse = await apiFormData.post(
           "/venue-requests/",
           requestFormData
         );
+
+        console.log(requestFormData)
 
         if (requestResponse.status === 201 || requestResponse.status === 200) {
           router.push("/nk1/venue/manage");
@@ -341,7 +330,35 @@ export default function ManageVenue() {
               name="location"
               value={venueData.location || ""}
               onChange={handleInputChange}
-              placeholder="Paste URL"
+              placeholder="Address or description"
+              className="flex-1 p-2 border border-gray-300 rounded-md"
+              required
+            />
+          </div>
+
+          <div className="flex items-center gap-4">
+            <span className="w-32 font-medium">Latitude :</span>
+            <input
+              type="number"
+              name="latitude"
+              step="any"
+              value={venueData.latitude || ""}
+              onChange={handleInputChange}
+              placeholder="e.g., -6.2088"
+              className="flex-1 p-2 border border-gray-300 rounded-md"
+              required
+            />
+          </div>
+
+          <div className="flex items-center gap-4">
+            <span className="w-32 font-medium">Longitude :</span>
+            <input
+              type="number"
+              name="longitude"
+              step="any"
+              value={venueData.longitude || ""}
+              onChange={handleInputChange}
+              placeholder="e.g., 106.8456"
               className="flex-1 p-2 border border-gray-300 rounded-md"
               required
             />

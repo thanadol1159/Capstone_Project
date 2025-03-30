@@ -21,8 +21,10 @@ export interface Venue {
   id: number;
   venue_type: number;
   venue_name: string;
-  venue_images: { id: number; image_url: string }[];
+  venue_images: { id: number; image: string }[];
+  latitude: number;
   location: string | null;
+  longitude: number;
   category_event: string | null;
   price: number;
   area_size: number | null;

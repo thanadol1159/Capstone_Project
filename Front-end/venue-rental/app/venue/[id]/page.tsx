@@ -10,8 +10,13 @@ import { apiJson } from "@/hook/api";
 import { RootState } from "@/hook/store";
 import Reviews from "@/components/ui/ReviewsBox";
 import { Review } from "@/types/Review";
-import { Star, StarHalf } from "lucide-react";
-
+import { Star } from "lucide-react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/pagination";
+import { Pagination } from "swiper/modules";
+import "swiper/css/navigation";
+import MapComponent from "../../../components/common/Map";
 // const addNk1ToUrl = (url: string): string => {
 //   return url ? url.replace(/(\/images\/)/, "$1/nk1$2") : "";
 // };
@@ -119,23 +124,39 @@ export default function VenuePage() {
     return <div>Venue not found</div>;
   }
 
-  const imageUrl =
-    venue.venue_images && venue.venue_images.length > 0
-      ? venue.venue_images[0].image_url
-      : "/placeholder-image.jpg";
+  // const imageUrl = venue.image ? venue.image : "/placeholder-image.jpg";
   const venueType = typeVenue?.type_name || "Unknown Type";
-
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 text-black ">
+      {/* <MapComponent /> */}
       <h1 className="text-2xl font-semibold text-center mb-4 mt-2">
         {venue.venue_name}
       </h1>
-      <div className="relative w-full aspect-[20/10]">
-        <img
-          src={imageUrl}
-          alt={venue.venue_name}
-          className="rounded-lg object-cover w-[80%] mx-auto"
-        />
+      <div className="relative w-full aspect-[30/10]">
+        {venue.venue_images.length > 1 ? (
+          <Swiper
+            pagination={{ clickable: true }}
+            modules={[Pagination]}
+            className="w-[80%] mx-auto rounded-lg overflow-hidden custom-swiper"
+            // style={{ "--swiper-pagination-color": "#304B84" }}
+          >
+            {venue.venue_images.map((img) => (
+              <SwiperSlide key={img.id}>
+                <img
+                  src={img.image}
+                  alt={venue.venue_name}
+                  className="rounded-lg object-contain w-full h-96"
+                />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        ) : (
+          <img
+            src={venue.venue_images[0]?.image || "/placeholder-image.jpg"}
+            alt={venue.venue_name}
+            className="rounded-lg object-cover w-[80%] mx-auto h-96"
+          />
+        )}
       </div>
       <div className="mt-8 bg-[#E6F3FF] relative rounded-md p-2">
         {/* Details header */}
@@ -228,7 +249,16 @@ export default function VenuePage() {
                     {reviews.length > 0
                       ? (
                           reviews.reduce(
-                            (sum, review) => sum + review.point,
+                            (sum, review) =>
+                              sum +
+                              (review.clean +
+                                review.service +
+                                review.value_for_money +
+                                review.matches_expectations +
+                                review.facilities +
+                                review.environment +
+                                review.location) /
+                                7,
                             0
                           ) / reviews.length
                         ).toFixed(1)
@@ -251,9 +281,19 @@ export default function VenuePage() {
               {/* Right side */}
               <div className="space-y-2 right-side flex-1">
                 {[5, 4, 3, 2, 1].map((star) => {
-                  const count = reviews.filter(
-                    (review) => review.point === star
-                  ).length;
+                  const count = reviews.filter((review) => {
+                    const avgRating =
+                      (review.clean +
+                        review.service +
+                        review.value_for_money +
+                        review.matches_expectations +
+                        review.facilities +
+                        review.environment +
+                        review.location) /
+                      7;
+                    return Math.round(avgRating) === star;
+                  }).length;
+
                   const percentage =
                     reviews.length === 0 ? 0 : (count / reviews.length) * 100;
                   return (
@@ -289,8 +329,8 @@ export default function VenuePage() {
               reviews
                 .sort(
                   (a, b) =>
-                    new Date(a.createAt).getTime() -
-                    new Date(b.createAt).getTime()
+                    new Date(b.createAt).getTime() -
+                    new Date(a.createAt).getTime()
                 )
                 .map((review) => {
                   const booking = bookings.find(
@@ -306,6 +346,16 @@ export default function VenuePage() {
                       user={review.user}
                       checkIn={booking?.check_in || "N/A"}
                       checkOut={booking?.check_out || "N/A"}
+                      reviewImages={review.review_images.map(
+                        (img) => img.image
+                      )}
+                      clean={review.clean}
+                      service={review.service}
+                      valueForMoney={review.value_for_money}
+                      matchesExpectations={review.matches_expectations}
+                      facilities={review.facilities}
+                      environment={review.environment}
+                      location={review.location}
                     />
                   );
                 })
@@ -318,6 +368,7 @@ export default function VenuePage() {
         </div>
       </div>
 
+      {/* <MapComponent /> */}
       {showLoginModal && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
@@ -347,6 +398,11 @@ export default function VenuePage() {
             </div>
           </div>
         </div>
+      )}
+      {venue.latitude && venue.longitude ? (
+        <MapComponent latitude={venue.latitude} longitude={venue.longitude}/>
+      ) : (
+        <p className="text-center text-gray-500">No location data available</p>
       )}
     </div>
   );

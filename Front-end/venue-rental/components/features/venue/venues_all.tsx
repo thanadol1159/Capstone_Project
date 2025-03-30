@@ -2,18 +2,27 @@
 import { useState, useEffect } from "react";
 import useFetchVenues from "@/hook/Venue";
 import VenueCard from "@/components/ui/Venuecards";
+import { apiJson, apiML } from "@/hook/api";
 import { useRouter } from "next/navigation";
-import { apiJson } from "@/hook/api";
 import { Filter } from "lucide-react";
+import * as Dialog from "@radix-ui/react-dialog";
+import { useUserId } from "@/hook/userid";
+import axios from "axios";
 
 export default function VenueRental() {
   const router = useRouter();
   const { venues } = useFetchVenues();
+  const userId = useUserId();
   const categories = ["All", "Meeting", "Studio", "Party"];
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filters, setFilters] = useState({
+  const [showInterestModal, setShowInterestModal] = useState(false);
+  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [recommendedVenues, setRecommendedVenues] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const filters = {
     minAreaSize: "",
     maxAreaSize: "",
     minCapacity: "",
@@ -26,7 +35,94 @@ export default function VenueRental() {
     maxOutdoorSpaces: "",
     minParkingSpace: "",
     maxParkingSpace: "",
-  });
+  };
+  const [filterState, setFilters] = useState(filters);
+
+  const interests = [
+    "Sports",
+    "Arts & Culture",
+    "Technology & Innovation",
+    "Food & Lifestyle",
+  ];
+
+  useEffect(() => {
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
+
+    const checkUserDetails = async () => {
+      try {
+        const response = await apiJson.get(`/user-details/`);
+
+        // Find the user detail where user matches userId
+        const userDetail = response.data.find(
+          (detail: any) => detail.user === userId
+        );
+
+        if (userDetail && !userDetail.interested_check) {
+          setShowInterestModal(true);
+        }
+      } catch (error) {
+        console.error("Error checking user details:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkUserDetails();
+  }, [userId]);
+
+  const handleInterestToggle = (interest: string) => {
+    setSelectedInterests((prev) =>
+      prev.includes(interest)
+        ? prev.filter((i) => i !== interest)
+        : [...prev, interest]
+    );
+  };
+
+  const submitInterests = async () => {
+    if (!userId || selectedInterests.length === 0) return;
+
+    try {
+      const getResponse = await apiJson.get(`/user-details/`);
+      const userDetail = getResponse.data.find(
+        (detail: any) => detail.user === userId
+      );
+
+      if (!userDetail) {
+        console.error("User detail not found");
+        return;
+      }
+
+      const response = await apiJson.put(`/user-details/${userDetail.id}/`, {
+        ...userDetail,
+        interested: selectedInterests,
+        interested_check: true,
+      });
+
+      if (response.data) {
+        setShowInterestModal(false);
+      }
+    } catch (error) {
+      console.error("Error submitting interests:", error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchRecommendedVenues = async () => {
+      console.log(userId);
+      try {
+        if (!userId) return;
+        const response = await apiML.get(`/ml-predict/?user_id=${userId}`);
+        setRecommendedVenues(response.data);
+      } catch (error) {
+        console.error("Error fetching recommended venues:", error);
+      }
+    };
+
+    fetchRecommendedVenues();
+  }, []);
 
   const handleDetailClick = (id: string) => {
     router.push(`/nk1/venue/${id}`);
@@ -41,7 +137,7 @@ export default function VenueRental() {
   };
 
   const handleFilterClick = () => {
-    setIsFilterOpen(!isFilterOpen); // Toggle filter modal
+    setIsFilterOpen(!isFilterOpen);
   };
 
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,6 +196,52 @@ export default function VenueRental() {
 
   return (
     <div className="max-w-6xl mx-auto p-6">
+      {/* Radix UI Interest Selection Modal */}
+      <Dialog.Root open={showInterestModal} onOpenChange={setShowInterestModal}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-50" />
+          <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white text-black p-6 rounded-lg w-full max-w-md">
+            <Dialog.Title className="text-xl font-semibold mb-4">
+              Select Your Interests
+            </Dialog.Title>
+            <Dialog.Description className="mb-4">
+              Please select at least one interest to help us personalize your
+              experience.
+            </Dialog.Description>
+
+            <div className="space-y-2 mb-6">
+              {interests.map((interest) => (
+                <label
+                  key={interest}
+                  className="flex items-center space-x-2 cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedInterests.includes(interest)}
+                    onChange={() => handleInterestToggle(interest)}
+                    className="h-5 w-5 text-[#335473] rounded"
+                  />
+                  <span>{interest}</span>
+                </label>
+              ))}
+            </div>
+
+            <div className="flex justify-end gap-2">
+              {/* <Dialog.Close asChild>
+                <button className="px-4 py-2 bg-gray-300 rounded">Skip</button>
+              </Dialog.Close> */}
+              <button
+                onClick={submitInterests}
+                className="px-4 py-2 bg-[#335473] text-white rounded"
+                disabled={selectedInterests.length === 0}
+              >
+                Submit
+              </button>
+            </div>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+
       {/* Category Section */}
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-4 text-black">Category</h2>
@@ -303,6 +445,23 @@ export default function VenueRental() {
         </div>
       )}
 
+      {recommendedVenues.length > 0 && (
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4 text-black">
+            Recommended for You
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {recommendedVenues.map((venue: any) => (
+              <VenueCard
+                key={venue.id}
+                {...venue}
+                onDetailClick={handleDetailClick}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Venue Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {filteredVenues.length > 0 ? (
@@ -310,6 +469,7 @@ export default function VenueRental() {
             <VenueCard
               key={venue.id}
               {...venue}
+              id={venue.id}
               onDetailClick={handleDetailClick}
             />
           ))

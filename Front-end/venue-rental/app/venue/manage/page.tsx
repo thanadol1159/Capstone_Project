@@ -292,7 +292,7 @@ const AddVenuePage = () => {
                 <img
                   src={
                     venue.venue_images && venue.venue_images.length > 0
-                      ? venue.venue_images[0].image_url
+                      ? venue.venue_images[0].image
                       : "/placeholder-image.jpg"
                   }
                   alt={venue.venue_name}
