@@ -3,18 +3,13 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-import base64
-from django.core.files.base import ContentFile
 from .models import (
     Role,
-    # Account,
     UserDetail,
     Venue,
     TypeOfVenue,
     VenueRequest,
     Booking,
-    # VenueApproval,
-    CategoryOfEvent,
     EventOfVenue,
     StatusBooking,
     Review,
@@ -22,10 +17,11 @@ from .models import (
     FavoriteVenue,
     ReviewImage,
     VenueImage,
-    VenueFile,
-    VenueRequestFile,
     VenueRequestImage,
+    VenueRequestCategory,
     ReviewImage,
+    VenueCategory,
+    # Interested,
 )
 
 class CustomAccessToken(AccessToken):
@@ -73,14 +69,6 @@ class UserSerializer(serializers.ModelSerializer):
         )
         return user
 
-class Base64ImageField(serializers.ImageField):
-    def to_internal_value(self, data):
-        if isinstance(data, str) and data.startswith("data:image"):
-            format, imgstr = data.split(";base64,")  
-            ext = format.split("/")[-1]  
-            return ContentFile(base64.b64decode(imgstr), name=f"temp.{ext}")  
-        return super().to_internal_value(data)
-    
 class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserDetail
@@ -91,11 +79,14 @@ class VenueImageSerializer(serializers.ModelSerializer):
         model = VenueImage
         fields = ['id', 'image']
 
+class VenueCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VenueCategory
+        fields = ['id', 'category_event']
+
 class VenueSerializer(serializers.ModelSerializer):
     venue_images = VenueImageSerializer(many=True, read_only=True)
-
-    # venue_certification_url = serializers.SerializerMethodField()
-    # personal_identification_url = serializers.SerializerMethodField()
+    venue_category = VenueCategorySerializer(many=True, read_only=True)
 
     def get_venue_certification_url(self, obj):
         request = self.context.get('request')
@@ -125,8 +116,14 @@ class VenueRequestImageSerializer(serializers.ModelSerializer):
         model = VenueRequestImage
         fields = ['id', 'image']
 
+class VenueRequestCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VenueRequestCategory
+        fields = '__all__'
+
 class VenueRequestSerializer(serializers.ModelSerializer):
     venueRequest_images = VenueRequestImageSerializer(many=True, read_only=True)
+    venueRequest_category = VenueRequestCategorySerializer(many=True, read_only=True)
 
     class Meta:
         model = VenueRequest
@@ -146,15 +143,15 @@ class BookingSerializer(serializers.ModelSerializer):
         model = Booking
         fields = '__all__'
 
-class CategoryOfEventSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CategoryOfEvent
-        fields = '__all__'
+# class CategoryOfEventSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = CategoryOfEvent
+#         fields = '__all__'
 
 class EventOfVenueSerializer(serializers.ModelSerializer):
     venue = VenueSerializer()
     venue_request = VenueRequestSerializer()
-    category_of_event = CategoryOfEventSerializer()
+    # category_of_event = CategoryOfEventSerializer()
 
     class Meta:
         model = EventOfVenue
@@ -184,3 +181,10 @@ class FavoriteVenueSerializer(serializers.ModelSerializer):
     class Meta:
         model = FavoriteVenue
         fields = '__all__'
+
+# class InterestedSerializer(serializers.ModelSerializer):
+#     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    
+#     class Meta:
+#         model = Interested
+#         fields = '__all__'

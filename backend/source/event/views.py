@@ -1,7 +1,10 @@
 from django.shortcuts import render
+import csv
+from django.http import HttpResponse
 
 # Create your views here.
-from rest_framework import viewsets, status
+from rest_framework import viewsets
+from rest_framework import status as drf_status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -22,17 +25,19 @@ from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django.core.files.base import ContentFile
 from rest_framework.parsers import MultiPartParser, FormParser
+import requests
+from django.http import JsonResponse
+import os
+from django.conf import settings
+from django.db import transaction
 
 from .models import (
     Role,
-    # Account,
     UserDetail,
     Venue,
     TypeOfVenue,
     VenueRequest,
     Booking,
-    # VenueApproval,
-    CategoryOfEvent,
     EventOfVenue,
     StatusBooking,
     Review,
@@ -40,26 +45,28 @@ from .models import (
     FavoriteVenue,
     VenueImage,
     VenueRequestImage,
-    ReviewImage
+    ReviewImage,
+    VenueCategory,
+    VenueRequestCategory,
+    # Interested,
 )
 from .serializers import (
     RoleSerializer,
-    # AccountSerializer,
     UserSerializer,
     UserDetailSerializer,
     VenueSerializer,
     TypeOfvanueSerializer,
     VenueRequestSerializer,
     BookingSerializer,
-    # VenueApprovalSerializer,
-    CategoryOfEventSerializer,
     EventOfVenueSerializer,
     StatusBookingSerializer,
     ReviewSerializer,
     NotificationSerializer,
     CustomTokenObtainPairSerializer,
     FavoriteVenueSerializer,
-    ReviewImageSerializer
+    VenueCategorySerializer,
+    VenueRequestCategorySerializer,
+    # InterestedSerializer,
 )
 
 # ViewSets define the view behavior.
@@ -83,61 +90,71 @@ class UserViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         username = request.data.get('username')  
         password = request.data.get('password')
-        email = request.data.get('email') 
+        email = request.data.get('email')
+        age = request.data.get('age')
+        gender = request.data.get('gender')
         
         if User.objects.filter(username=username).exists():
             return Response(
                 {"error": "Username already exists"},
-                status=status.HTTP_400_BAD_REQUEST
+                status=drf_status.HTTP_400_BAD_REQUEST
             )
         
         if len(password) < 8:
             return Response(
                 {"error": "Password must be at least 8 characters long"},
-                status=status.HTTP_400_BAD_REQUEST
+                status=drf_status.HTTP_400_BAD_REQUEST
+            )
+    
+        if User.objects.filter(email=email).exists():
+            return Response(
+                {"error": "Email already exists"},
+                status=drf_status.HTTP_400_BAD_REQUEST
             )
         
        
-        user = User.objects.create_user(username=username, password=password, email=email)
-        role, _ = Role.objects.get_or_create(role_name="User")
+        try:
+            with transaction.atomic():
+                user_serializer = UserSerializer(data={"username": username, "password": password, "email": email})
+                if user_serializer.is_valid():
+                    user = user_serializer.save()
+                else:
+                    return Response(user_serializer.errors, status=drf_status.HTTP_400_BAD_REQUEST)
 
-        user_detail = UserDetail.objects.create(
-        user=user,
-        email=email,  
-        role=role  
-        )
+                role, _ = Role.objects.get_or_create(role_name="User")
 
-        return Response(
-        {
-            "message": "User created successfully!",
-            "user_id": user.id,  
-            "user_detail_id": user_detail.id,  
-            "username": user.username,
-            "email": user.email,
-            "role": role.role_name
-        },
-        status=status.HTTP_201_CREATED,
-        )
+                user_detail = UserDetail.objects.create(
+                    user=user,
+                    email=email,  
+                    role=role,
+                    age=age,
+                    gender=gender
+                )
 
-        # serializer = UserSerializer(data=request.data)
-        # if serializer.is_valid():
-        #     serializer.save()
+                return Response(
+                    {
+                        "message": "User created successfully!",
+                        "user_id": user.id,
+                        "user_detail_id": user_detail.id,
+                        "username": user.username,
+                        "email": user.email,
+                        "role": role.role_name,
+                        "age": user_detail.age,
+                        "gender": user_detail.gender,
+                    },
+                    status=drf_status.HTTP_201_CREATED,
+                )
 
-        #     UserDetail.objects.create(
-        #         user=User.objects.get(username=username),
-        #         role=Role.objects.get(role_name='user')
-        #     )
-
-        #     return Response(
-        #         {"message": "User created successfully!", "data": serializer.data},
-        #         status=status.HTTP_201_CREATED,
-        #     )
-        # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response(
+                {"error": f"An error occurred: {str(e)}"},
+                status=drf_status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     def list(self, request, *args, **kwargs):
         users = User.objects.all()  
         serializer = UserSerializer(users, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=drf_status.HTTP_200_OK)
 
 class UserDetailViewSet(viewsets.ModelViewSet):
     queryset = UserDetail.objects.all()
@@ -171,7 +188,7 @@ class VenueViewSet(viewsets.ModelViewSet):
         except User.DoesNotExist:
             return Response(
                 {"error": "user not found"}, 
-                status=status.HTTP_404_NOT_FOUND
+                status=drf_status.HTTP_404_NOT_FOUND
             )
         
     def retrieve(self, request, *args, **kwargs):
@@ -188,7 +205,7 @@ class VenueViewSet(viewsets.ModelViewSet):
         elif file_type == "identification" and venue_request.personal_identification:
             file_path = venue_request.personal_identification.path
         else:
-            return Response({"error": "File not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "File not found"}, status=drf_status.HTTP_404_NOT_FOUND)
 
         return FileResponse(open(file_path, 'rb'), as_attachment=True)
     
@@ -222,7 +239,7 @@ class VenueViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         data = self.request.data
         venue_images = request.FILES.getlist("venue_images") 
-        print(data.getlist("venue_images"))
+        venue_category = request.data.getlist("venue_category")
         serializer = self.get_serializer(data=data)
         if serializer.is_valid():
             venue = serializer.save()
@@ -230,9 +247,12 @@ class VenueViewSet(viewsets.ModelViewSet):
             for image in venue_images:
                 VenueImage.objects.create(venue=venue, image=image)
 
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            for category in venue_category:
+                VenueCategory.objects.create(venue=venue, category_event=category)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.data, status=drf_status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=drf_status.HTTP_400_BAD_REQUEST)
 
 class TypeOfvanueViewSet(viewsets.ModelViewSet):
     queryset = TypeOfVenue.objects.all()
@@ -265,7 +285,7 @@ class VenueRequestViewSet(viewsets.ModelViewSet):
         except User.DoesNotExist:
             return Response(
                 {"error": "user not found"}, 
-                status=status.HTTP_404_NOT_FOUND
+                status=drf_status.HTTP_404_NOT_FOUND
             )
     
     def update(self, request, *args, **kwargs):
@@ -301,48 +321,24 @@ class VenueRequestViewSet(viewsets.ModelViewSet):
         venueRequest_images = [
             file for key, file in request.FILES.items() if key.startswith("venueRequest_images")
         ]
-        
-        print("Payload Data:", data)
-        print("Received Images:", venueRequest_images)
-        print(request.FILES.getlist("venueRequest_images[1]"))
 
-        if not venueRequest_images:
-            print("No images received!")
+        venueRequest_category = request.data.getlist("venueRequest_category")
         
         serializer = self.get_serializer(data=data)
         
         if serializer.is_valid():
             venue_request = serializer.save()
-            print("VenueRequest Created:", venue_request)
 
             for image in venueRequest_images:
-                print("Saving Image:", image.name)
                 VenueRequestImage.objects.create(venue_request=venue_request, image=image) 
 
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            for category in venueRequest_category:
+                VenueRequestCategory.objects.create(venue_request=venue_request, category_event=category)
+
+            return Response(serializer.data, status=drf_status.HTTP_201_CREATED)
 
         print("Serializer Errors:", serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
-    # def create(self, request, *args, **kwargs):
-    #     data = self.request.data
-    #     print(data)
-    #     venueRequest_images = request.FILES.getlist("venueRequest_images") 
-    #     print(venueRequest_images)
-
-    #     serializer = self.get_serializer(data=data)
-    #     if serializer.is_valid():
-    #         venue_request = serializer.save()
-    #         print("checkpoint 3")
-
-    #         print(venueRequest_images)
-    #         for image in venueRequest_images:
-    #             print("createe image")
-    #             VenueRequestImage.objects.create(venue_request=venue_request, image=image)
-
-    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
@@ -365,7 +361,7 @@ class BookingViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
         return Response(
             {"error": "Venue ID is required"},
-            status=status.HTTP_400_BAD_REQUEST
+            status=drf_status.HTTP_400_BAD_REQUEST
         )
 
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
@@ -377,12 +373,8 @@ class BookingViewSet(viewsets.ModelViewSet):
         except User.DoesNotExist:
             return Response(
                 {"error": "User not found"},
-                status=status.HTTP_404_NOT_FOUND
+                status=drf_status.HTTP_404_NOT_FOUND
             )
-
-class CategoryOfEventViewSet(viewsets.ModelViewSet):
-    queryset = CategoryOfEvent.objects.all()
-    serializer_class = CategoryOfEventSerializer
 
 class EventOfVenueViewSet(viewsets.ModelViewSet):
     queryset = EventOfVenue.objects.all()
@@ -471,14 +463,14 @@ class NotificationViewset(viewsets.ModelViewSet):
         if not user_id:
             return Response(
                 {"error": "User ID is required"},
-                status=status.HTTP_400_BAD_REQUEST
+                status=drf_status.HTTP_400_BAD_REQUEST
             )
 
 
         Notifications.objects.filter(user_id=user_id, isRead=True).delete()
         return Response(
             {"message": "Read notifications deleted"},
-            status=status.HTTP_200_OK
+            status=drf_status.HTTP_200_OK
         )
     
 class FavoriteVenueViewSet(viewsets.ModelViewSet):
@@ -491,22 +483,110 @@ class FavoriteVenueViewSet(viewsets.ModelViewSet):
     def create(self, request):
         venue_id = request.data.get("venue_id")
         if not venue_id:
-            return Response({"error": "Venue ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Venue ID is required"}, status=drf_status.HTTP_400_BAD_REQUEST)
 
         venue = Venue.objects.filter(id=venue_id).first()
         if not venue:
-            return Response({"error": "Venue not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Venue not found"}, status=drf_status.HTTP_404_NOT_FOUND)
 
         favorite, created = FavoriteVenue.objects.get_or_create(user=request.user, venue=venue)
         if not created:
-            return Response({"message": "Venue is already in favorites"}, status=status.HTTP_200_OK)
+            return Response({"message": "Venue is already in favorites"}, status=drf_status.HTTP_200_OK)
 
-        return Response(FavoriteVenueSerializer(favorite).data, status=status.HTTP_201_CREATED)
+        return Response(FavoriteVenueSerializer(favorite).data, status=drf_status.HTTP_201_CREATED)
 
     def destroy(self, request, pk=None):
         favorite = FavoriteVenue.objects.filter(user=request.user, venue_id=pk).first()
         if not favorite:
-            return Response({"error": "Favorite venue not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Favorite venue not found"}, status=drf_status.HTTP_404_NOT_FOUND)
 
         favorite.delete()
-        return Response({"message": "Venue removed from favorites"}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"message": "Venue removed from favorites"}, status=drf_status.HTTP_204_NO_CONTENT)
+    
+class VenueCategoryViewSet(viewsets.ModelViewSet):
+    queryset = VenueCategory.objects.all()
+    serializer_class = VenueCategorySerializer
+
+class VenueRequestCategoryViewSet(viewsets.ModelViewSet):
+    queryset = VenueRequestCategory.objects.all()
+    serializer_class = VenueRequestCategorySerializer
+
+# class InterestedViewSet(viewsets.ModelViewSet):
+#     queryset = Interested.objects.all()
+#     serializer_class = InterestedSerializer
+
+#     def get_permissions(self):
+#         if self.action == 'list' or self.action == 'retrieve':
+#             return [AllowAny()]
+#         return [IsAuthenticated()]
+
+FLASK_API_URL = "http://ml:5000/recommend_all"
+# FLASK_API_RELOAD = "http://ml:5000/reload"
+
+def get_ml_prediction(request):
+    try:
+        response = requests.get(FLASK_API_URL)
+        print(response.json())
+        if response.status_code == 200:
+            data = response.json()
+            return JsonResponse(data, safe=False)
+        else:
+            return JsonResponse({"error": "Failed to get prediction"}, status=response.status_code)
+    except requests.exceptions.RequestException as e:
+        return JsonResponse({"error": str(e)}, status=500)
+        
+    
+
+import csv
+from django.http import HttpResponse
+from .models import Venue  # Ensure Venue is correctly imported
+
+def export_venues_to_csv(request):
+    # กำหนดชื่อไฟล์ที่ต้องการบันทึก
+    file_name = "venues_data.csv"
+    file_path = os.path.join(settings.MEDIA_ROOT, file_name)
+
+    # ตรวจสอบและลบไฟล์เก่า ถ้ามี
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
+    # สร้างและบันทึกไฟล์ CSV ใหม่
+    with open(file_path, mode="w", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file)
+        headers = [
+            'ID', 'Venue Name', 'Location', 'Category Event', 'Price', 
+            'Area Size', 'Capacity', 'Number of Rooms', 'Parking Space',
+            'Outdoor Spaces', 'Additional Information', 'Venue Type',
+            'Venue Owner', 'Status'
+        ]
+        writer.writerow(headers)
+
+        venues = Venue.objects.all()
+        for venue in venues:
+            venue_type_name = getattr(venue.venue_type, "type_name", "")
+            venue_owner_name = getattr(venue.venue_owner, "username", "")
+            status_name = getattr(venue.status, "status", "")
+
+            row = [
+                venue.id,
+                venue.venue_name,
+                venue.location,
+                venue.category_event,
+                venue.price,
+                venue.area_size,
+                venue.capacity,
+                venue.number_of_rooms,
+                venue.parking_space,
+                venue.outdoor_spaces,
+                venue.additional_information,
+                venue_type_name,
+                venue_owner_name,
+                status_name
+            ]
+            writer.writerow(row)
+
+
+    # สร้าง URL สำหรับดาวน์โหลดไฟล์
+    file_url = f"{settings.MEDIA_URL}{file_name}"
+    
+    return JsonResponse({"message": "CSV file created successfully", "file_url": file_url})

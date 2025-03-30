@@ -13,6 +13,16 @@ services:
     networks:
       - my_network
 
+  ml:
+    container_name: ml
+    build: ./ML
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./ML:/app
+    networks:
+      - my_network
+
   db:
     container_name: db
     image: postgres:15.5
@@ -40,6 +50,7 @@ services:
     user: "1000:1000"
     depends_on:
       - db
+      - ml
     networks:
       - my_network
     environment:

@@ -12,6 +12,8 @@ class UserDetail(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE,null=True, blank=True,related_name="userdetail")
     first_name = models.CharField(max_length=30,null=True, blank=True)
     last_name = models.CharField(max_length=30,null=True, blank=True)
+    age = models.IntegerField(null=True, blank=True)
+    gender = models.CharField(max_length=10,null=True, blank=True)
     phone_number = models.CharField(max_length=10,null=True, blank=True)
     email = models.EmailField(max_length=45,null=True, blank=True)
     province = models.CharField(max_length=45,null=True, blank=True)
@@ -20,6 +22,13 @@ class UserDetail(models.Model):
     address = models.CharField(max_length=255,null=True, blank=True)
     dob = models.DateField(null=True, blank=True)
     role = models.ForeignKey(Role, on_delete=models.CASCADE,null=True, blank=True)
+    interested = models.JSONField(default=list, null=True, blank=True) 
+    interested_check = models.BooleanField(default=False)
+
+# class Interested(models.Model):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)
+#     interested = models.CharField(max_length=45,null=True, blank=True)
+#     done = models.BooleanField(default=False)
 
 class TypeOfVenue(models.Model):
     type_name = models.CharField(max_length=45,null=True)
@@ -52,15 +61,14 @@ class VenueImage(models.Model):
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE, related_name="venue_images")
     image = models.ImageField(upload_to="images/venues/")
 
-class VenueFile(models.Model):
-    venue = models.ForeignKey(Venue, on_delete=models.CASCADE, related_name="files")
-    file = models.FileField(upload_to="pdfs/venues/")
+class VenueCategory(models.Model):
+    venue = models.ForeignKey(Venue, on_delete=models.CASCADE, related_name="venue_category")
+    category_event = models.CharField(max_length=50, null=True, blank=True)
 
 class VenueRequest(models.Model):
     venue_type = models.ForeignKey(TypeOfVenue,on_delete=models.CASCADE,null=True, blank=True) 
     venue_name = models.CharField(max_length=50,null=True, blank=True)
     location = models.CharField(max_length=100, null=True, blank=True)
-    category_event = models.CharField(max_length=50, null=True, blank=True)
     price = models.IntegerField(null=True, blank=True)
     area_size = models.CharField(max_length=50, null=True, blank=True) 
     capacity = models.IntegerField(null=True, blank=True)
@@ -80,9 +88,9 @@ class VenueRequestImage(models.Model):
     venue_request = models.ForeignKey(VenueRequest, on_delete=models.CASCADE, related_name="venueRequest_images")
     image = models.ImageField(upload_to="images/venue_Requests/")
 
-class VenueRequestFile(models.Model):
-    venue_request = models.ForeignKey(VenueRequest, on_delete=models.CASCADE, related_name="files")
-    file = models.FileField(upload_to="pdfs/venues/")
+class VenueRequestCategory(models.Model):
+    venue_request = models.ForeignKey(VenueRequest, on_delete=models.CASCADE, related_name="venueRequest_category")
+    category_event = models.CharField(max_length=50, null=True, blank=True)
 
 class Booking(models.Model):
     check_in = models.DateTimeField(null=True,blank=True)
@@ -93,23 +101,14 @@ class Booking(models.Model):
     status_booking = models.ForeignKey(StatusBooking, on_delete=models.CASCADE, null=True,blank=True)
     isReview = models.BooleanField(default=False)
 
-class CategoryOfEvent(models.Model):
-    category_name = models.CharField(max_length=45)
-    category_detail = models.CharField(max_length=45)
+# class CategoryOfEvent(models.Model):
+#     category_name = models.CharField(max_length=45)
+#     category_detail = models.CharField(max_length=45)
 
 class EventOfVenue(models.Model):
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE,null=True, blank=True)
     venue_request = models.ForeignKey(VenueRequest, on_delete=models.CASCADE,null=True, blank=True)
-    CategoryOfEvent = models.ForeignKey(CategoryOfEvent, on_delete=models.CASCADE)
-
-# class Review(models.Model):
-#     user = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)
-#     venue = models.ForeignKey(Venue, on_delete=models.CASCADE, null=True,blank=True)
-#     reviewDetail = models.TextField()
-#     createAt = models.DateTimeField()
-#     review_image = models.FileField(upload_to='images/reviews/',null=True, blank=True)
-#     point = models.IntegerField()
-#     booking = models.ForeignKey(Booking, on_delete=models.CASCADE, null=True, blank=True)
+    # CategoryOfEvent = models.ForeignKey(CategoryOfEvent, on_delete=models.CASCADE)
 
 class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
