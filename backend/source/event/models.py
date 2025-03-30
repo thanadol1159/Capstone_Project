@@ -23,6 +23,7 @@ class UserDetail(models.Model):
     dob = models.DateField(null=True, blank=True)
     role = models.ForeignKey(Role, on_delete=models.CASCADE,null=True, blank=True)
     interested = models.JSONField(default=list, null=True, blank=True) 
+    interested_check = models.BooleanField(default=False)
 
 # class Interested(models.Model):
 #     user = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)
