@@ -7,6 +7,8 @@ import { useUserId } from "@/hook/userid";
 import { useSelector } from "react-redux";
 import { RootState } from "@/hook/store";
 import { MapPin } from "lucide-react";
+import { Review } from "@/types/Review";
+import { Star } from "lucide-react";
 
 export default function VenueCard({
   id,
@@ -20,6 +22,8 @@ export default function VenueCard({
   const [isFavorite, setIsFavorite] = useState(false);
   const userId = useUserId();
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [averageRating, setAverageRating] = useState(0);
 
   useEffect(() => {
     if (!userId || !accessToken) return;
@@ -38,6 +42,44 @@ export default function VenueCard({
 
     fetchFavoriteStatus();
   }, [userId, id, accessToken]);
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const { data } = await apiJson.get(`/reviews/?venue=${id}`);
+        setReviews(data);
+      } catch (error) {
+        console.error("API Error:", error);
+      }
+    };
+
+    fetchReviews();
+  }, [id]);
+
+  useEffect(() => {
+    if (reviews.length > 0) {
+      const avg =
+        reviews.reduce((sum, review) => {
+          return sum + calculateReviewScore(review);
+        }, 0) / reviews.length;
+      setAverageRating(avg);
+    } else {
+      setAverageRating(0);
+    }
+  }, [reviews]);
+
+  const calculateReviewScore = (review: Review) => {
+    return (
+      (review.clean +
+        review.service +
+        review.value_for_money +
+        review.matches_expectations +
+        review.facilities +
+        review.environment +
+        review.location) /
+      7
+    );
+  };
 
   const toggleFavorite = async () => {
     if (!userId || !accessToken)
@@ -75,9 +117,10 @@ export default function VenueCard({
   const categoryStyle = categoryColors[category_event || "Default"];
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border-[2.5px] border-[#3F6B96]">
-      <div className="p-4 relative">
-        <div className="relative">
+    <div className="bg-white rounded-lg shadow-sm border-[2.5px] border-[#3F6B96] overflow-hidden">
+      <div className="relative">
+        {/* Image with Star Rating Badge */}
+        <div className="relative p-2">
           <img
             src={
               venue_images.length > 0
@@ -88,46 +131,68 @@ export default function VenueCard({
             className="w-full h-36 object-cover rounded-t-lg"
           />
 
-          {/* Show heart icon only if logged in */}
+          {/* Star Rating Badge - Top Left */}
+          {/* ส่วนที่ปรับแล้ว */}
+          <div className="absolute top-2 left-2 bg-white bg-opacity-90 rounded-md px-2 py-1 flex items-center shadow-sm text-xs">
+            <Star
+              className={`w-3 h-3 mr-1 ${
+                reviews.length > 0
+                  ? "text-[#335473] fill-[#335473]"
+                  : "text-gray-400 fill-gray-100"
+              }`}
+            />
+            <span
+              className={`font-medium ${
+                reviews.length > 0 ? "text-gray-800" : "text-gray-500"
+              }`}
+            >
+              {reviews.length > 0 ? averageRating.toFixed(1) : "ยังไม่มีรีวิว"}
+            </span>
+          </div>
+
+          {/* Favorite Heart - Top Right */}
           {accessToken && (
             <button
               onClick={toggleFavorite}
-              className="absolute top-0 right-0 p-1 hover:scale-110 transition"
+              className="absolute top-2 right-2 p-1 hover:scale-110 transition bg-white bg-opacity-70 rounded-full"
             >
               <Heart
-                size={24}
+                size={20}
                 className={`transition ${
                   isFavorite
                     ? "text-[#335473] stroke-[#335473] fill-[#335473]"
-                    : "text-black stroke-black"
+                    : "text-gray-700 stroke-gray-700"
                 }`}
               />
             </button>
           )}
         </div>
 
-        <div className="flex items-center py-2 mt-2 gap-2 ">
-          <p className="text-black font-bold">{venue_name}</p>
-          {category_event && (
-            <div
-              className={`text-xs font-semibold px-3 py-1 rounded-md ${categoryStyle} opacity-70`}
-            >
-              {category_event}
-            </div>
-          )}
-        </div>
+        {/* Venue Info */}
+        <div className="p-4">
+          <div className="flex justify-between items-start mb-2">
+            <h3 className="text-lg font-bold text-gray-900">{venue_name}</h3>
+            {category_event && (
+              <div
+                className={`text-xs font-semibold px-2 py-1 rounded-md ${categoryStyle}`}
+              >
+                {category_event}
+              </div>
+            )}
+          </div>
 
-        <div className="flex items-center gap-1 text-black mb-4">
-          <MapPin size={20} color="#000000" strokeWidth={1} />
-          <span className="text-sm my-auto">{location}</span>
-        </div>
+          <div className="flex items-center gap-1 text-gray-700 mb-3">
+            <MapPin size={16} className="text-gray-600" />
+            <span className="text-sm">{location}</span>
+          </div>
 
-        <button
-          onClick={() => onDetailClick?.(id)}
-          className="w-full py-2 bg-[#3F6B96] text-white rounded"
-        >
-          Detail
-        </button>
+          <button
+            onClick={() => onDetailClick?.(id)}
+            className="w-full py-2 bg-[#3F6B96] hover:bg-[#335473] text-white rounded-lg transition-colors"
+          >
+            {reviews.length === 0 ? "Be first to reviews!" : "Views Details"}
+          </button>
+        </div>
       </div>
     </div>
   );

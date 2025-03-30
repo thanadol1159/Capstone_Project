@@ -310,6 +310,7 @@ export default function VenueRental() {
             <VenueCard
               key={venue.id}
               {...venue}
+              id={venue.id}
               onDetailClick={handleDetailClick}
             />
           ))

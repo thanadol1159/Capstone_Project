@@ -10,7 +10,7 @@ import { apiJson } from "@/hook/api";
 import { RootState } from "@/hook/store";
 import Reviews from "@/components/ui/ReviewsBox";
 import { Review } from "@/types/Review";
-import { Star, StarHalf } from "lucide-react";
+import { Star } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";

@@ -398,6 +398,19 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     parser_classes = [MultiPartParser, FormParser]
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        venue_id = self.request.query_params.get('venue')
+        
+        if venue_id:
+            try:
+                venue_id = int(venue_id)
+                queryset = queryset.filter(venue_id=venue_id)
+            except ValueError:
+                pass 
+        
+        return queryset
+
     def create(self, request):
         try:
             user = request.user
