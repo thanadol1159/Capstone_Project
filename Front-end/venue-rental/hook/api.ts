@@ -46,6 +46,14 @@ const apiFormData = axios.create({
   },
 });
 
+const apiML = axios.create({
+  baseURL: "http://localhost:8080/",
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+
 // Function to refresh the access token 
 // production
 // const refreshAccessToken = async () => {
@@ -175,5 +183,6 @@ const addAuthorizationInterceptor = (instance: any) => {
 
 addAuthorizationInterceptor(apiJson);
 addAuthorizationInterceptor(apiFormData);
+addAuthorizationInterceptor(apiML)
 
-export { apiJson, apiFormData };
+export { apiJson, apiFormData,apiML };

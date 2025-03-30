@@ -123,7 +123,7 @@ export default function VenueCard({
         <div className="relative p-2">
           <img
             src={
-              venue_images.length > 0
+              venue_images?.length > 0
                 ? venue_images[0].image
                 : "/placeholder-image.jpg"
             }

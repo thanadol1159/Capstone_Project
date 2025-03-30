@@ -524,19 +524,24 @@ FLASK_API_URL = "http://ml:5000/predict_category"
 # FLASK_API_RELOAD = "http://ml:5000/reload"
 
 
+
+
 def get_ml_prediction(request):
     try:
+        # รับ user_id จากพารามิเตอร์
+        user_id = request.GET.get('user_id')
+        if not user_id:
+            return JsonResponse({"error": "user_id parameter is required"}, status=400)
+        
         response = requests.get(FLASK_API_URL)
         if response.status_code == 200:
             data = response.json()
             results = data.get("results", [])
             print("Results:", results)
-            user_id = request.user.id
-            print(request.user)
-            print("User ID:", user_id)
+            print("User ID from params:", user_id)
 
             # ค้นหา predicted_category ของ user นี้
-            predict_category = next((item["predicted_category"] for item in results if item["user_id"] == user_id), None)
+            predict_category = next((item["predicted_category"] for item in results if str(item["user_id"]) == str(user_id)), None)
 
             if not predict_category:
                 return JsonResponse({"error": "No predicted category found for this user"}, status=404)

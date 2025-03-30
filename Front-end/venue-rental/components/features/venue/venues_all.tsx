@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import useFetchVenues from "@/hook/Venue";
 import VenueCard from "@/components/ui/Venuecards";
-import { apiJson } from "@/hook/api";
+import { apiJson, apiML } from "@/hook/api";
 import { useRouter } from "next/navigation";
 import { Filter } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -111,10 +111,11 @@ export default function VenueRental() {
 
   useEffect(() => {
     const fetchRecommendedVenues = async () => {
+      console.log(userId);
       try {
         if (!userId) return;
-        const response = await axios.get(`http://localhost:8080/ml-predict/`);
-        setRecommendedVenues(response.data.results || []);
+        const response = await apiML.get(`/ml-predict/?user_id=${userId}`);
+        setRecommendedVenues(response.data);
       } catch (error) {
         console.error("Error fetching recommended venues:", error);
       }
@@ -240,23 +241,6 @@ export default function VenueRental() {
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
-
-      {recommendedVenues.length > 0 && (
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4 text-black">
-            Recommended for You
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {recommendedVenues.map((venue: any) => (
-              <VenueCard
-                key={venue.id}
-                {...venue}
-                onDetailClick={handleDetailClick}
-              />
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Category Section */}
       <div className="mb-8">
@@ -457,6 +441,23 @@ export default function VenueRental() {
                 Apply
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {recommendedVenues.length > 0 && (
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4 text-black">
+            Recommended for You
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {recommendedVenues.map((venue: any) => (
+              <VenueCard
+                key={venue.id}
+                {...venue}
+                onDetailClick={handleDetailClick}
+              />
+            ))}
           </div>
         </div>
       )}
