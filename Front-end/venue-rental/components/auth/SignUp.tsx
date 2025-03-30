@@ -54,6 +54,7 @@ const SignUpPage = () => {
         password,
         age,
         gender,
+        interested: [],
       });
 
       if (registerResponse.status === 201) {
