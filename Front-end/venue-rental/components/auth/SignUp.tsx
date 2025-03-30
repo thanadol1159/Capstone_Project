@@ -14,6 +14,8 @@ const SignUpPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [age, setAge] = useState("");
+  const [gender, setGender] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUserRegistered, setIsUserRegistered] = useState(false);
   const router = useRouter();
@@ -23,36 +25,6 @@ const SignUpPage = () => {
 
   useEffect(() => {
     if (isUserRegistered && userId) {
-      // const postUserDetails = async () => {
-      //   const today = new Date();
-      //   const formattedDate = today.toISOString().split("T")[0];
-
-      //   try {
-      //     const userDetailResponse = await apiJson.post("/user-details/", {
-      //       first_name: "-",
-      //       last_name: "-",
-      //       phone_number: "-",
-      //       email,
-      //       province: "-",
-      //       district: "-",
-      //       sub_district: "-",
-      //       address: "-",
-      //       dob: formattedDate,
-      //       user: userId,
-      //       role: 2,
-      //     });
-
-      //     if (userDetailResponse.status === 201) {
-      //       console.log("User details created successfully");
-      //       router.push("/");
-      //     }
-      //   } catch (error: any) {
-      //     console.error("Failed to create user details:", error);
-      //     alert("Failed to create user details. Please try again.");
-      //   }
-      // };
-
-      // postUserDetails();
       if (userRole) {
         Cookies.set("role", userRole, {
           expires: 365,
@@ -80,6 +52,8 @@ const SignUpPage = () => {
         username,
         email,
         password,
+        age,
+        gender,
       });
 
       if (registerResponse.status === 201) {
@@ -163,7 +137,7 @@ const SignUpPage = () => {
           </div>
 
           {/* Confirm Password Field */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4 mb-4">
             <label className="text-sm font-medium text-gray-700 whitespace-nowrap w-40">
               Confirm Password :
             </label>
@@ -180,16 +154,54 @@ const SignUpPage = () => {
             />
           </div>
 
+          {/* Age Field */}
+          <div className="flex items-center space-x-4 mb-4">
+            <label className="text-sm font-medium text-gray-700 whitespace-nowrap w-40">
+              Age :
+            </label>
+            <input
+              id="age"
+              type="number"
+              value={age}
+              onChange={(e) => setAge(e.target.value)}
+              className="flex-grow px-4 py-2 border rounded-lg focus:ring focus:ring-indigo-300 focus:outline-none text-gray-700"
+              placeholder="Enter your age"
+              required
+              min="1"
+              max="120"
+              disabled={isSubmitting}
+            />
+          </div>
+
+          {/* Gender Field */}
+          <div className="flex items-center space-x-4 mb-4">
+            <label className="text-sm font-medium text-gray-700 whitespace-nowrap w-40">
+              Gender :
+            </label>
+            <select
+              id="gender"
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+              className="flex-grow px-4 py-2 border rounded-lg focus:ring focus:ring-indigo-300 focus:outline-none text-gray-700"
+              required
+              disabled={isSubmitting}
+            >
+              <option value="">Select gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+              <option value="prefer_not_to_say">Prefer not to say</option>
+            </select>
+          </div>
+
           <div className="border-t border-gray-300 my-4"></div>
 
           <div className="text-center">
             <span className="text-gray-700">
               Already have an account?{" "}
               <Link
-                // onClick={handleLogin}
                 href="/nk1/login"
                 className="text-[#1A9DB8] font-semibold hover:underline"
-                // disabled={isSubmitting}
               >
                 Log in
               </Link>
