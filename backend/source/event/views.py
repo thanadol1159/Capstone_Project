@@ -231,9 +231,9 @@ class VenueViewSet(viewsets.ModelViewSet):
             for image in venue_images:
                 VenueImage.objects.create(venue=venue, image=image)
 
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=drf_status.HTTP_200_OK)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=drf_status.HTTP_400_BAD_REQUEST)
 
     
     def create(self, request, *args, **kwargs):
@@ -311,9 +311,9 @@ class VenueRequestViewSet(viewsets.ModelViewSet):
                 for image in venueRequest_images:
                     VenueRequestImage.objects.create(venue_request=venue_request, image=image)
 
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=drf_status.HTTP_200_OK)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=drf_status.HTTP_400_BAD_REQUEST)
 
         
     def create(self, request, *args, **kwargs):
@@ -338,7 +338,7 @@ class VenueRequestViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=drf_status.HTTP_201_CREATED)
 
         print("Serializer Errors:", serializer.errors)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=drf_status.HTTP_400_BAD_REQUEST)
         
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
@@ -411,30 +411,30 @@ class ReviewViewSet(viewsets.ModelViewSet):
             review_images = request.FILES.getlist("review_images")
 
             if not venue_id or not booking_id:
-                return Response({"error": "Venue ID and Booking ID are required."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"error": "Venue ID and Booking ID are required."}, status=drf_status.HTTP_400_BAD_REQUEST)
 
             approved_status = StatusBooking.objects.filter(status="approved").first()
             if not approved_status:
-                return Response({"error": "Approved status not found."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"error": "Approved status not found."}, status=drf_status.HTTP_400_BAD_REQUEST)
 
             booking = Booking.objects.filter(
                 id=booking_id, user=user, venue_id=venue_id, status_booking=approved_status
             ).first()
 
             if not booking:
-                return Response({"error": "No completed booking found for this venue."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"error": "No completed booking found for this venue."}, status=drf_status.HTTP_400_BAD_REQUEST)
 
             zones = pytz.timezone("Asia/Jakarta")
             current_time = datetime.now(zones)
 
             if not booking.check_out:
-                return Response({"error": "Booking check-out time is missing."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"error": "Booking check-out time is missing."}, status=drf_status.HTTP_400_BAD_REQUEST)
 
             if booking.check_out >= current_time:
-                return Response({"error": "Cannot proceed, checkout time has not passed yet."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"error": "Cannot proceed, checkout time has not passed yet."}, status=drf_status.HTTP_400_BAD_REQUEST)
 
             if booking.isReview:
-                return Response({"error": "This booking has already been reviewed."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"error": "This booking has already been reviewed."}, status=drf_status.HTTP_400_BAD_REQUEST)
 
             serializer = self.get_serializer(data=request.data)
             if serializer.is_valid():
@@ -446,12 +446,12 @@ class ReviewViewSet(viewsets.ModelViewSet):
                 booking.isReview = True
                 booking.save()
 
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+                return Response(serializer.data, status=drf_status.HTTP_201_CREATED)
             else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response(serializer.errors, status=drf_status.HTTP_400_BAD_REQUEST)
 
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"error": str(e)}, status=drf_status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 class NotificationViewset(viewsets.ModelViewSet):
     queryset = Notifications.objects.all()
@@ -575,31 +575,24 @@ from django.http import HttpResponse
 from .models import Venue  # Ensure Venue is correctly imported
 
 def export_venues_to_csv(request):
-    # กำหนดชื่อไฟล์ที่ต้องการบันทึก
     file_name = "test_precategory.csv"
     file_path = os.path.join(settings.MEDIA_ROOT, file_name)
 
-    # ตรวจสอบและลบไฟล์เก่า ถ้ามี
     if os.path.exists(file_path):
         os.remove(file_path)
 
-    # สร้างและบันทึกไฟล์ CSV ใหม่
     with open(file_path, mode="w", newline="", encoding="utf-8") as file:
         writer = csv.writer(file)
-        
         writer.writerow(["user_id", "age", "gender", "interested"])
 
-        user_detail = UserDetail.objects.all()
-        for user in user_detail:
+        user_details = UserDetail.objects.all()  # เปลี่ยนชื่อตัวแปรเป็นพหูพจน์เพื่อความชัดเจน
+        for user in user_details:
             writer.writerow([
-                user["user"],
-                user["age"],
-                user["gender"],
-                user["interested"]
+                user.user.id if hasattr(user, 'user') else '',  # ตรวจสอบก่อนว่ามีฟิลด์ user หรือไม่
+                user.age,
+                user.gender,
+                user.interested
             ])
 
-
-    # สร้าง URL สำหรับดาวน์โหลดไฟล์
     file_url = f"{settings.MEDIA_URL}{file_name}"
-    
     return JsonResponse({"message": "CSV file created successfully", "file_url": file_url})

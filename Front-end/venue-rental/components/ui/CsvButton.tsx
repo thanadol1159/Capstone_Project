@@ -12,7 +12,7 @@ export default function ExportCSVButton() {
 
     try {
       const response = await axios.get(
-        "http://localhost:8080/api/export-venues/"
+        "http://localhost:8080/export-venues/"
       );
       if (response.data.file_url) {
         setFileUrl(`http://localhost:8080${response.data.file_url}`);
