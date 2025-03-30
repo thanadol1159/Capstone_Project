@@ -27,21 +27,21 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from event.views import (
     RoleViewSet,
-    # AccountViewSet,
     UserDetailViewSet,
     UserViewSet,
     VenueViewSet,
     TypeOfvanueViewSet,
     VenueRequestViewSet,
     BookingViewSet,
-    # VenueApprovalViewSet,
-    CategoryOfEventViewSet,
     EventOfVenueViewSet,
     StatusBookingViewSet,
     ReviewViewSet,
     NotificationViewset,
     CustomTokenObtainPairView,
     FavoriteVenueViewSet,
+    VenueCategoryViewSet,
+    VenueRequestCategoryViewSet,
+    # InterestedViewSet,
 )
 
 from event.views import export_venues_to_csv
@@ -56,12 +56,15 @@ router.register(r'types-of-venue', TypeOfvanueViewSet)
 router.register(r'venue-requests', VenueRequestViewSet)
 router.register(r'bookings', BookingViewSet)
 # router.register(r'venue-approvals', VenueApprovalViewSet)
-router.register(r'categories-of-event', CategoryOfEventViewSet)
+# router.register(r'categories-of-event', CategoryOfEventViewSet)
 router.register(r'event-of-venues', EventOfVenueViewSet)
 router.register(r'status-bookings', StatusBookingViewSet, basename='status-booking')
 router.register(r'reviews',ReviewViewSet)
 router.register(r'notifications',NotificationViewset)
 router.register(r'favorites', FavoriteVenueViewSet, basename='favorite')
+router.register(r'venue-categories', VenueCategoryViewSet, basename='venue-category')
+router.register(r'venue-request-categories', VenueRequestCategoryViewSet, basename='venue-request-category')
+# router.register(r'interested', InterestedViewSet, basename='interested')
 
 
 schema_view = get_schema_view(

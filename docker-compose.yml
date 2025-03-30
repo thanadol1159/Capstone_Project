@@ -14,9 +14,12 @@ services:
       - my_network
 
   ml:
+    container_name: ml
     build: ./ML
     ports:
       - "5000:5000"
+    volumes:
+      - ./ML:/app
     networks:
       - my_network
 
