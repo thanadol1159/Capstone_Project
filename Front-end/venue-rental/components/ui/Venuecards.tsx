@@ -14,11 +14,12 @@ export default function VenueCard({
   id,
   venue_name,
   venue_images,
+  imagerec,
   location,
-  category_event,
+  venue_category,
   onDetailClick,
   onRemoveFavorite,
-}: Venue & { onRemoveFavorite?: () => void }) {
+}: Venue & { imagerec?: string[]; onRemoveFavorite?: () => void }) {
   const [isFavorite, setIsFavorite] = useState(false);
   const userId = useUserId();
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
@@ -27,6 +28,9 @@ export default function VenueCard({
 
   useEffect(() => {
     if (!userId || !accessToken) return;
+
+    console.log(venue_images);
+    console.log("category :", venue_category);
 
     const fetchFavoriteStatus = async () => {
       try {
@@ -108,13 +112,14 @@ export default function VenueCard({
   };
 
   const categoryColors: Record<string, string> = {
-    Meeting: "bg-[#E5D59B] text-[#5E4444] bg-opacity-70",
-    Studio: "bg-[#AADEE5] text-[#5E4444] bg-opacity-70",
-    Party: "bg-[#E59BB1] text-[#5E4444] bg-opacity-50",
+    party: "bg-[#E59BB1] text-[#5E4444] bg-opacity-50",
+    wedding: "bg-[#D8A7E5] text-[#5E4444] bg-opacity-70",
+    film: "bg-[#9BCAE5] text-[#5E4444] bg-opacity-70",
+    staycation: "bg-[#A5E59B] text-[#5E4444] bg-opacity-70",
     Default: "bg-gray-200 text-gray-600",
   };
 
-  const categoryStyle = categoryColors[category_event || "Default"];
+  // const categoryStyle = categoryColors[category_event || "Default"];
 
   return (
     <div className="bg-white rounded-lg shadow-sm border-[2.5px] border-[#3F6B96] overflow-hidden">
@@ -123,9 +128,11 @@ export default function VenueCard({
         <div className="relative p-2">
           <img
             src={
-              venue_images?.length > 0
+              imagerec && imagerec.length > 0
+                ? imagerec[0] // Use the first image from imagerec if available
+                : venue_images?.length > 0
                 ? venue_images[0].image
-                : "/placeholder-image.jpg"
+                : "/placeholder-image.jpg" // Default placeholder if no images
             }
             alt={venue_name}
             className="w-full h-36 object-cover rounded-t-lg"
@@ -172,13 +179,11 @@ export default function VenueCard({
         <div className="p-4">
           <div className="flex justify-between items-start mb-2">
             <h3 className="text-lg font-bold text-gray-900">{venue_name}</h3>
-            {category_event && (
-              <div
-                className={`text-xs font-semibold px-2 py-1 rounded-md ${categoryStyle}`}
-              >
-                {category_event}
+            {/* {venue_category && venue_category.length > 0 && (
+              <div className="text-xs font-semibold px-2 py-1 rounded-md text-black">
+                {venue_category.map((cat) => cat.category_event).join(", ")}
               </div>
-            )}
+            )} */}
           </div>
 
           <div className="flex items-center gap-1 text-gray-700 mb-3">

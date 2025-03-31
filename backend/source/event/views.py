@@ -569,7 +569,7 @@ def get_ml_prediction(request):
                     "venue_owner": venue.venue_owner.username if venue.venue_owner else None,
                     "status": venue.status.status if venue.status else None,
                     "categories": [cat.category_event for cat in venue.venue_category.all()], 
-                    "venue_images": [img.image.url if img.image else None for img in venue.venue_images.all()]
+                    "venue_images": [request.build_absolute_uri(img.image.url) if img.image else None for img in venue.venue_images.all()]
                 })
 
             return JsonResponse(venue_list, safe=False)

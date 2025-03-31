@@ -13,7 +13,7 @@ export default function VenueRental() {
   const router = useRouter();
   const { venues } = useFetchVenues();
   const userId = useUserId();
-  const categories = ["All", "Meeting", "Studio", "Party"," Wedding", "Event"];
+  const categories = ["All", "party", " wedding", "film", "staycation"];
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -28,9 +28,7 @@ export default function VenueRental() {
     setFileUrl(null);
 
     try {
-      const response = await axios.get(
-        "http://localhost:8080/export-venues/"
-      );
+      const response = await axios.get("http://localhost:8080/export-venues/");
       if (response.data.file_url) {
         setFileUrl(`http://localhost:8080${response.data.file_url}`);
       }
@@ -119,7 +117,7 @@ export default function VenueRental() {
         interested: selectedInterests,
         interested_check: true,
       });
-      
+
       if (response.data) {
         setShowInterestModal(false);
       }
@@ -135,7 +133,10 @@ export default function VenueRental() {
       try {
         if (!userId) return;
         const response = await apiML.get(`/ml-predict/?user_id=${userId}`);
-        setRecommendedVenues(response.data);
+        const filteredVenues = response.data.filter(
+          (venue: { status: string }) => venue.status === "approved"
+        );
+        setRecommendedVenues(filteredVenues);
       } catch (error) {
         console.error("Error fetching recommended venues:", error);
       }
@@ -174,8 +175,9 @@ export default function VenueRental() {
 
   const filteredVenues = venues.filter((venue: any) => {
     const matchesCategory =
-      selectedCategory === "All" || venue.category_event === selectedCategory;
-    // const matchesSearch = venue.venue_name.toLowerCase().includes(searchQuery);
+      selectedCategory === "All" ||
+      venue.venue_category[0].category_event === selectedCategory;
+    const matchesSearch = venue.venue_name.toLowerCase().includes(searchQuery);
     const matchesStatus = venue.status === 3;
 
     const matchesAreaSize =
@@ -203,7 +205,7 @@ export default function VenueRental() {
 
     return (
       matchesCategory &&
-      // matchesSearch &&
+      matchesSearch &&
       matchesStatus &&
       matchesAreaSize &&
       matchesCapacity &&
@@ -230,20 +232,20 @@ export default function VenueRental() {
             </Dialog.Description>
 
             {interests.map((interest) => (
-        <label
-          key={interest}
-          className="flex items-center space-x-2 cursor-pointer"
-        >
-          <input
-            type="radio"
-            name="interest"
-            checked={selectedInterests.includes(interest)}
-            onChange={() => handleInterestToggle(interest)}
-            className="h-5 w-5 text-[#335473] rounded"
-          />
-          <span>{interest}</span>
-        </label>
-      ))}
+              <label
+                key={interest}
+                className="flex items-center space-x-2 cursor-pointer"
+              >
+                <input
+                  type="radio"
+                  name="interest"
+                  checked={selectedInterests.includes(interest)}
+                  onChange={() => handleInterestToggle(interest)}
+                  className="h-5 w-5 text-[#335473] rounded"
+                />
+                <span>{interest}</span>
+              </label>
+            ))}
 
             <div className="flex justify-end gap-2">
               {/* <Dialog.Close asChild>
@@ -474,6 +476,8 @@ export default function VenueRental() {
               <VenueCard
                 key={venue.id}
                 {...venue}
+                imagerec={venue.venue_images}
+                categories={venue.categories[0]}
                 onDetailClick={handleDetailClick}
               />
             ))}
@@ -482,9 +486,7 @@ export default function VenueRental() {
       )}
 
       {/* Venue Cards */}
-      <h2 className="text-xl font-semibold mb-4 text-black">
-        All Venues
-      </h2>
+      <h2 className="text-xl font-semibold mb-4 text-black">All Venues</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {filteredVenues.length > 0 ? (
           filteredVenues.map((venue: any) => (
