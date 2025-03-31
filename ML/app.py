@@ -120,8 +120,9 @@ def upload_csv():
 
 
 # กำหนด path ไปยังไฟล์ SSL (ใช้ os.path เพื่อความเข้ากันได้ข้ามระบบปฏิบัติการ)
-SSL_CERT_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'ssl', 'cert.pem')
-SSL_KEY_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'ssl', 'key.pem')
+
+SSL_CERT_PATH = "../ssl/fullchain.pem"
+SSL_KEY_PATH = "../ssl/privkey.pem"
 
 # ตรวจสอบว่าไฟล์ SSL มีอยู่จริง
 if not os.path.exists(SSL_CERT_PATH) or not os.path.exists(SSL_KEY_PATH):
