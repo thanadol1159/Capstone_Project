@@ -200,6 +200,9 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
+ML_API_URL = "https://capstone24.sit.kmutt.ac.th/nk1/ml-api/predict_category"
+ML_UPLOAD_URL = "https://capstone24.sit.kmutt.ac.th/nk1/ml-api/upload_csv"
+
 # Ensure proper handling of reverse proxy
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_COOKIE_SECURE = True
