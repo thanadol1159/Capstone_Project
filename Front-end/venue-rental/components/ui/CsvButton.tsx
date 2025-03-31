@@ -12,10 +12,10 @@ export default function ExportCSVButton() {
 
     try {
       const response = await axios.get(
-        "http://capstone24.sit.kmutt.ac.th:8080/nk1/export-venues/"
+        "https://capstone24.sit.kmutt.ac.th/nk1/export-venues/"
       );
       if (response.data.file_url) {
-        setFileUrl(`http://capstone24.sit.kmutt.ac.th:8080/nk1/export-venues/${response.data.file_url}`);
+        setFileUrl(`https://capstone24.sit.kmutt.ac.th/nk1/export-venues/${response.data.file_url}`);
       }
     } catch (error) {
       console.error("Error exporting CSV:", error);
