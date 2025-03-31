@@ -53,10 +53,10 @@ const FavoritesPage = () => {
 
   const filteredVenues = venues.filter((venue: any) => {
     const isFavorite = favoriteVenueIds.includes(venue.id);
-    const matchesCategory =
-      selectedCategory === "All" || venue.category_event === selectedCategory;
+    // const matchesCategory =
+    //   selectedCategory === "All" || venue.category_event === selectedCategory;
     const matchesSearch = venue.venue_name.toLowerCase().includes(searchQuery);
-    return isFavorite && matchesCategory && matchesSearch;
+    return isFavorite && matchesSearch;
   });
 
   return (

@@ -151,9 +151,9 @@ const ApproveVenue = () => {
 
             {expanded === venue.id && (
               <div className="mt-4 p-3 border rounded bg-gray-50">
-                <p>
+                {/* <p>
                   <strong>Category:</strong> {venue.category_event}
-                </p>
+                </p> */}
                 <p>
                   <strong>Rooms:</strong> {venue.number_of_rooms}
                 </p>

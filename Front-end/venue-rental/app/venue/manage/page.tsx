@@ -310,7 +310,7 @@ const AddVenuePage = () => {
                   {ownerNames[venue.id] || "Loading..."}
                 </p>
                 <p>รายละเอียด: {venue.additional_information}</p>
-                <p>ประเภทกิจกรรม: {venue.category_event}</p>
+                {/* <p>ประเภทกิจกรรม: {venue.category_event}</p> */}
                 <div className="flex gap-1">
                   <p>Status:</p>
                   {venue.status === 3 ? (
