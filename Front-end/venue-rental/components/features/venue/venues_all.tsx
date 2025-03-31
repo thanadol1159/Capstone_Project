@@ -13,14 +13,33 @@ export default function VenueRental() {
   const router = useRouter();
   const { venues } = useFetchVenues();
   const userId = useUserId();
-  const categories = ["All", "Meeting", "Studio", "Party"];
+  const categories = ["All", "Meeting", "Studio", "Party"," Wedding", "Event"];
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [showInterestModal, setShowInterestModal] = useState(false);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [recommendedVenues, setRecommendedVenues] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [fileUrl, setFileUrl] = useState<string | null>(null);
+
+  const handleExport = async () => {
+    setLoading(true);
+    setFileUrl(null);
+
+    try {
+      const response = await axios.get(
+        "http://localhost:8080/export-venues/"
+      );
+      if (response.data.file_url) {
+        setFileUrl(`http://localhost:8080${response.data.file_url}`);
+      }
+    } catch (error) {
+      console.error("Error exporting CSV:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filters = {
     minAreaSize: "",
@@ -100,13 +119,14 @@ export default function VenueRental() {
         interested: selectedInterests,
         interested_check: true,
       });
-
+      
       if (response.data) {
         setShowInterestModal(false);
       }
     } catch (error) {
       console.error("Error submitting interests:", error);
     }
+    handleExport();
   };
 
   useEffect(() => {
@@ -155,7 +175,7 @@ export default function VenueRental() {
   const filteredVenues = venues.filter((venue: any) => {
     const matchesCategory =
       selectedCategory === "All" || venue.category_event === selectedCategory;
-    const matchesSearch = venue.venue_name.toLowerCase().includes(searchQuery);
+    // const matchesSearch = venue.venue_name.toLowerCase().includes(searchQuery);
     const matchesStatus = venue.status === 3;
 
     const matchesAreaSize =
@@ -183,7 +203,7 @@ export default function VenueRental() {
 
     return (
       matchesCategory &&
-      matchesSearch &&
+      // matchesSearch &&
       matchesStatus &&
       matchesAreaSize &&
       matchesCapacity &&
@@ -209,22 +229,21 @@ export default function VenueRental() {
               experience.
             </Dialog.Description>
 
-            <div className="space-y-2 mb-6">
-              {interests.map((interest) => (
-                <label
-                  key={interest}
-                  className="flex items-center space-x-2 cursor-pointer"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedInterests.includes(interest)}
-                    onChange={() => handleInterestToggle(interest)}
-                    className="h-5 w-5 text-[#335473] rounded"
-                  />
-                  <span>{interest}</span>
-                </label>
-              ))}
-            </div>
+            {interests.map((interest) => (
+        <label
+          key={interest}
+          className="flex items-center space-x-2 cursor-pointer"
+        >
+          <input
+            type="radio"
+            name="interest"
+            checked={selectedInterests.includes(interest)}
+            onChange={() => handleInterestToggle(interest)}
+            className="h-5 w-5 text-[#335473] rounded"
+          />
+          <span>{interest}</span>
+        </label>
+      ))}
 
             <div className="flex justify-end gap-2">
               {/* <Dialog.Close asChild>
@@ -251,7 +270,7 @@ export default function VenueRental() {
               <button
                 key={category}
                 onClick={() => handleCategoryClick(category)}
-                className={`px-12 py-1 rounded-lg ${
+                className={`px-8 py-1 rounded-lg ${
                   category === selectedCategory
                     ? "bg-[#335473] text-white font-semibold"
                     : "bg-[#BCCFE1] text-[#7397BB] font-semibold"
@@ -463,6 +482,9 @@ export default function VenueRental() {
       )}
 
       {/* Venue Cards */}
+      <h2 className="text-xl font-semibold mb-4 text-black">
+        All Venues
+      </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {filteredVenues.length > 0 ? (
           filteredVenues.map((venue: any) => (
