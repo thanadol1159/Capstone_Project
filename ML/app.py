@@ -111,6 +111,6 @@ def upload_csv():
 
     return jsonify({"message": "CSV uploaded successfully", "file_path": file_path})
 
-if __name__ == "__main__":
-    print("\n🚀 กำลังเริ่มต้น API server สำหรับทำนายหมวดหมู่...")
-    app.run(host="0.0.0.0", port=5000, debug=True)
+# if __name__ == "__main__":
+#     print("\n🚀 กำลังเริ่มต้น API server สำหรับทำนายหมวดหมู่...")
+#     app.run(host="0.0.0.0", port=5000, debug=True)
