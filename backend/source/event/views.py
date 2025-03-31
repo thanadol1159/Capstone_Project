@@ -520,7 +520,8 @@ class VenueRequestCategoryViewSet(viewsets.ModelViewSet):
 #             return [AllowAny()]
 #         return [IsAuthenticated()]
 
-FLASK_API_URL = "https://ml:5000/predict_category"
+# FLASK_API_URL = "https://ml:5000/predict_category"
+FLASK_API_URL = "/ml-api/predict_category"
 # FLASK_API_RELOAD = "http://ml:5000/reload"
 
 
@@ -583,7 +584,10 @@ from django.http import HttpResponse
 from .models import Venue  # Ensure Venue is correctly imported
 
 
-FLASK_UPLOAD_URL = "https://ml:5000/upload_csv"  # ใช้ชื่อ container ของ ML
+# FLASK_UPLOAD_URL = "https://ml:5000/upload_csv"  # ใช้ชื่อ container ของ ML
+FLASK_UPLOAD_URL = "/ml-api/upload_csv"
+
+
 
 def export_venues_to_csv(request):
     file_name = "test_precategory.csv"
