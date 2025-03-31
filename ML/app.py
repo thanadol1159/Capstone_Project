@@ -121,17 +121,17 @@ def upload_csv():
 
 # กำหนด path ไปยังไฟล์ SSL (ใช้ os.path เพื่อความเข้ากันได้ข้ามระบบปฏิบัติการ)
 
-SSL_CERT_PATH = "../ssl/fullchain.pem"
-SSL_KEY_PATH = "../ssl/privkey.pem"
+# SSL_CERT_PATH = "../ssl/fullchain.pem"
+# SSL_KEY_PATH = "../ssl/privkey.pem"
 
-# ตรวจสอบว่าไฟล์ SSL มีอยู่จริง
-if not os.path.exists(SSL_CERT_PATH) or not os.path.exists(SSL_KEY_PATH):
-    raise FileNotFoundError("❌ ไม่พบไฟล์ SSL certificate หรือ private key")
+# # ตรวจสอบว่าไฟล์ SSL มีอยู่จริง
+# if not os.path.exists(SSL_CERT_PATH) or not os.path.exists(SSL_KEY_PATH):
+#     raise FileNotFoundError("❌ ไม่พบไฟล์ SSL certificate หรือ private key")
 
-# สร้าง SSL context
-context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
-context.load_cert_chain(SSL_CERT_PATH, SSL_KEY_PATH)
+# # สร้าง SSL context
+# context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+# context.load_cert_chain(SSL_CERT_PATH, SSL_KEY_PATH)
 
 if __name__ == "__main__":
     print("\n🚀 กำลังเริ่มต้น API server สำหรับทำนายหมวดหมู่...")
-    app.run(host="0.0.0.0", port=5000, debug=False,ssl_context=context)
+    app.run(host="0.0.0.0", port=5000, debug=False)
