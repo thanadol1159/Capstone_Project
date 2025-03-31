@@ -28,9 +28,9 @@ export default function VenueRental() {
     setFileUrl(null);
 
     try {
-      const response = await axios.get("http://localhost:8080/export-venues/");
+      const response = await axios.get("https://capstone24.sit.kmutt.ac.th/nk1/export-venues/");
       if (response.data.file_url) {
-        setFileUrl(`http://localhost:8080${response.data.file_url}`);
+        setFileUrl(`https://capstone24.sit.kmutt.ac.th/nk1/export-venues/${response.data.file_url}`);
       }
     } catch (error) {
       console.error("Error exporting CSV:", error);
