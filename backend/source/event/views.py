@@ -521,7 +521,7 @@ class VenueRequestCategoryViewSet(viewsets.ModelViewSet):
 #         return [IsAuthenticated()]
 
 # FLASK_API_URL = "https://capstone24.sit.kmutt.ac.th/nk1/ml-api/predict_category"
-FLASK_API_URL = "https://ml:5000/predict_category"
+FLASK_API_URL = "http://ml:5000/predict_category"
 # FLASK_API_URL = "/ml-api/predict_category"
 # FLASK_API_RELOAD = "http://ml:5000/reload"
 
@@ -586,7 +586,7 @@ from .models import Venue  # Ensure Venue is correctly imported
 
 
 # FLASK_UPLOAD_URL = "https://capstone24.sit.kmutt.ac.th/nk1/ml-api/upload_csv"  # ใช้ชื่อ container ของ ML
-FLASK_UPLOAD_URL = "https://ml:5000/upload_csv"  # ใช้ชื่อ container ของ ML
+FLASK_UPLOAD_URL = "http://ml:5000/upload_csv"  # ใช้ชื่อ container ของ ML
 # FLASK_UPLOAD_URL = "/ml-api/upload_csv"
 
 

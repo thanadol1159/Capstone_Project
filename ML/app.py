@@ -96,6 +96,8 @@ def predict_category():
     
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+    
+    
 @app.route("/upload_csv", methods=["POST"])
 def upload_csv():
     if "file" not in request.files:
