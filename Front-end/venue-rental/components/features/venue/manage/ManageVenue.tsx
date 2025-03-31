@@ -19,7 +19,7 @@ export default function ManageVenue() {
     location: "",
     latitude: 0,
     longitude: 0,
-    category_event: "",
+    venue_category: [],
     price: 0,
     area_size: null,
     capacity: 0,
@@ -64,6 +64,10 @@ export default function ManageVenue() {
       }));
     }
   };
+
+  useEffect(() => {
+    console.log(venueData.venue_category);
+  });
 
   // Handle multiple image uploads
   const handleImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -135,6 +139,10 @@ export default function ManageVenue() {
     try {
       // Create venue first
       const venueFormData = new FormData();
+
+      venueData.venue_category?.forEach((category, index) => {
+        venueFormData.append(`venue_category[${index}]`, category);
+      });
 
       // Add venue data
       Object.entries(venueData).forEach(([key, value]) => {
@@ -210,10 +218,10 @@ export default function ManageVenue() {
           requestFormData
         );
 
-        console.log(requestFormData)
+        console.log(requestFormData);
 
         if (requestResponse.status === 201 || requestResponse.status === 200) {
-          router.push("/nk1/venue/manage");
+          // router.push("/nk1/venue/manage");
         } else {
           console.error("Error creating venue request:", requestResponse);
         }
@@ -368,16 +376,21 @@ export default function ManageVenue() {
             <span className="w-32 font-medium">Category :</span>
             <div className="flex gap-2 items-center">
               <select
-                name="category_event"
-                value={venueData.category_event || ""}
-                onChange={handleInputChange}
+                value={venueData.venue_category?.[0] || ""} // ตรงนี้ใช้ string โดยตรง
+                onChange={(e) => {
+                  setVenueData((prev) => ({
+                    ...prev,
+                    venue_category: [e.target.value], // เก็บเป็น array ของ string
+                  }));
+                }}
                 className="p-2 border border-gray-300 rounded-md"
                 required
               >
                 <option value="">Select</option>
-                <option value="Party">Party</option>
-                <option value="Meeting">Meeting</option>
-                <option value="Studio">Studio</option>
+                <option value="party">Party</option>
+                <option value="film">Film</option>
+                <option value="staycation">Staycation</option>
+                <option value="wedding">Wedding</option>
               </select>
             </div>
           </div>

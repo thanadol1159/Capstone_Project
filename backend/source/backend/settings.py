@@ -233,6 +233,5 @@ if os.getenv("DJANGO_ENV") == "production":
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
 DATA_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024  
 FILE_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024 

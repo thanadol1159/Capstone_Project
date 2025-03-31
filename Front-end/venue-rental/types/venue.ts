@@ -25,7 +25,7 @@ export interface Venue {
   latitude: number;
   location: string | null;
   longitude: number;
-  category_event: string | null;
+  venue_category: string[];
   price: number;
   area_size: number | null;
   capacity: number;

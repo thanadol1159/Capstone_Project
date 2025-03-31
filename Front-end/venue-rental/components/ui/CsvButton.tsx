@@ -27,13 +27,13 @@ export default function ExportCSVButton() {
 
   return (
     <div>
-      <button
+      {/* <button
         onClick={handleExport}
         disabled={loading}
         className="bg-blue-500 text-white px-4 py-2 rounded"
       >
         {loading ? "Generating..." : "Export CSV"}
-      </button>
+      </button> */}
     </div>
   );
 }

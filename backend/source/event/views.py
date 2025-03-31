@@ -527,7 +527,6 @@ FLASK_API_URL = "https://capstone24.sit.kmutt.ac.th/nk1/ml-api/predict_category"
 
 
 
-
 def get_ml_prediction(request):
     try:
         # รับ user_id จากพารามิเตอร์
@@ -550,7 +549,9 @@ def get_ml_prediction(request):
 
             # ค้นหา Venue ที่มี category_event ตรงกับ predicted_category
             venue_ids = VenueCategory.objects.filter(category_event=predict_category).values_list('venue_id', flat=True)
-            venues = Venue.objects.filter(id__in=venue_ids).select_related('venue_type', 'venue_owner', 'status').prefetch_related('venue_category')
+            venues = Venue.objects.filter(id__in=venue_ids) \
+                .select_related('venue_type', 'venue_owner', 'status') \
+                .prefetch_related('venue_category', 'venue_images')
 
             # แปลงข้อมูล Venue เป็น JSON response
             venue_list = []
@@ -569,7 +570,8 @@ def get_ml_prediction(request):
                     "venue_type": venue.venue_type.type_name if venue.venue_type else None,
                     "venue_owner": venue.venue_owner.username if venue.venue_owner else None,
                     "status": venue.status.status if venue.status else None,
-                    "categories": [cat.category_event for cat in venue.venue_category.all()]  # ดึง category ทั้งหมดของ Venue นี้
+                    "categories": [cat.category_event for cat in venue.venue_category.all()], 
+                    "venue_images": [request.build_absolute_uri(img.image.url) if img.image else None for img in venue.venue_images.all()]
                 })
 
             return JsonResponse(venue_list, safe=False)
