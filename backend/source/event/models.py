@@ -50,8 +50,8 @@ class Venue(models.Model):
     parking_space = models.IntegerField(null=True, blank=True)
     outdoor_spaces = models.IntegerField(null=True, blank=True)
     additional_information = models.TextField(null=True, blank=True)
-    venue_certification = models.FileField(upload_to='media/pdfs/venue/',null=True, blank=True)
-    personal_identification = models.FileField(upload_to='media/pdfs/personal/',null=True, blank=True)
+    venue_certification = models.FileField(upload_to='pdfs/venue/',null=True, blank=True)
+    personal_identification = models.FileField(upload_to='pdfs/personal/',null=True, blank=True)
     venue_owner = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)
     status = models.ForeignKey(StatusBooking, on_delete=models.CASCADE,null=True, blank=True)
     latitude = models.FloatField(null=True, blank=True)
@@ -59,7 +59,7 @@ class Venue(models.Model):
 
 class VenueImage(models.Model):
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE, related_name="venue_images")
-    image = models.ImageField(upload_to="media/images/venues/")
+    image = models.ImageField(upload_to="images/venues/")
 
 class VenueCategory(models.Model):
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE, related_name="venue_category")
@@ -76,8 +76,8 @@ class VenueRequest(models.Model):
     parking_space = models.IntegerField(null=True, blank=True)
     outdoor_spaces = models.IntegerField(null=True, blank=True)
     additional_information = models.TextField(null=True, blank=True)
-    venue_certification = models.FileField(upload_to='media/pdfs/venue/',null=True, blank=True)
-    personal_identification = models.FileField(upload_to='media/pdfs/personal/',null=True, blank=True)
+    venue_certification = models.FileField(upload_to='pdfs/venue/',null=True, blank=True)
+    personal_identification = models.FileField(upload_to='pdfs/personal/',null=True, blank=True)
     venue_owner = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)
     status = models.ForeignKey(StatusBooking, on_delete=models.CASCADE,null=True, blank=True)
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE,null=True, blank=True)
@@ -86,7 +86,7 @@ class VenueRequest(models.Model):
 
 class VenueRequestImage(models.Model):
     venue_request = models.ForeignKey(VenueRequest, on_delete=models.CASCADE, related_name="venueRequest_images")
-    image = models.ImageField(upload_to="media/images/venue_Requests/")
+    image = models.ImageField(upload_to="images/venue_Requests/")
 
 class VenueRequestCategory(models.Model):
     venue_request = models.ForeignKey(VenueRequest, on_delete=models.CASCADE, related_name="venueRequest_category")
