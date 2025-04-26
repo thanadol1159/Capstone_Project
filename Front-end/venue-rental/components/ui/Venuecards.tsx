@@ -9,6 +9,7 @@ import { RootState } from "@/hook/store";
 import { MapPin } from "lucide-react";
 import { Review } from "@/types/Review";
 import { Star } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function VenueCard({
   id,
@@ -87,7 +88,7 @@ export default function VenueCard({
 
   const toggleFavorite = async () => {
     if (!userId || !accessToken)
-      return alert("Please log in to favorite venues.");
+      return toast.error("Please log in to favorite venues.");
 
     const previousFavoriteState = isFavorite;
     setIsFavorite(!previousFavoriteState);

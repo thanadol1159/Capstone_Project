@@ -5,6 +5,7 @@ import { apiFormData } from "@/hook/api";
 import { Star } from "lucide-react";
 import { useUserId } from "@/hook/userid";
 import { Booking } from "@/types/booking";
+import toast from "react-hot-toast";
 
 export default function ReviewCreate() {
   const params = useParams();
@@ -67,7 +68,7 @@ export default function ReviewCreate() {
 
   const handleSubmitReview = async () => {
     if (!reviewText.trim() || !selectedBookingId) {
-      alert("Please provide a review, rating, and select a booking.");
+      toast.error("Please provide a review, rating, and select a booking.");
       return;
     }
 
@@ -110,7 +111,7 @@ export default function ReviewCreate() {
       router.push("/nk1");
     } catch (error) {
       console.error("Error submitting review:", error);
-      alert("Failed to submit review");
+      toast.error("Failed to submit review");
     }
   };
 

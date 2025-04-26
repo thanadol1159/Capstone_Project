@@ -9,6 +9,7 @@ import { format, differenceInDays } from "date-fns";
 // import { RootState } from "@/hook/store";
 // import { useSelector } from "react-redux";
 import { useUserId } from "@/hook/userid";
+import toast from "react-hot-toast";
 
 interface BookingFormData {
   check_in: string;
@@ -118,7 +119,7 @@ export default function BookingPage() {
       router.push(`/nk1/venue/booking`);
     } catch (error) {
       console.error("Error creating booking:", error);
-      alert("Failed to create booking. Please try again later.");
+      toast.error("Failed to create booking. Please try again later.");
     } finally {
       setIsSubmitting(false);
     }

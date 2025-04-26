@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useUserId } from "@/hook/userid";
 import { useRole } from "@/hook/role";
 import Cookies from "js-cookie";
+import toast from "react-hot-toast";
 
 const SignUpPage = () => {
   const [username, setUsername] = useState("");
@@ -43,7 +44,7 @@ const SignUpPage = () => {
 
     try {
       if (password !== confirmPassword) {
-        alert("Passwords do not match");
+        toast.error("Passwords do not match");
         setIsSubmitting(false);
         return;
       }
@@ -58,7 +59,7 @@ const SignUpPage = () => {
       });
 
       if (registerResponse.status === 201) {
-        alert(registerResponse.data.message);
+        toast.error(registerResponse.data.message);
 
         const tokenResponse = await apiJson.post("/token/", {
           username,
@@ -74,7 +75,7 @@ const SignUpPage = () => {
       }
     } catch (error: any) {
       console.error("Registration error:", error);
-      alert(
+      toast.error(
         error.response?.data?.error || "Registration failed. Please try again."
       );
       setIsSubmitting(false);

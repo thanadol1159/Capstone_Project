@@ -6,6 +6,7 @@ import { login } from "@/hook/action";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { useRole } from "@/hook/role";
+import toast from "react-hot-toast";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
@@ -52,19 +53,19 @@ const LoginPage = () => {
     } catch (error: any) {
       if (error.response) {
         if (error.response.status === 401) {
-          alert("Username or password incorrect");
+          toast.error("Username or password incorrect");
         } else {
           console.error(`Error: ${error.response.statusText}`);
-          alert("An error occurred. Please try again.");
+          toast.error("An error occurred. Please try again.");
         }
       } else if (error.request) {
         console.error("No response received:", error.request);
-        alert(
+        toast.error(
           "Unable to connect to the server. Please check your internet connection."
         );
       } else {
         console.error("Unexpected error:", error.message);
-        alert("Username or password incorrect");
+        toast.error("Username or password incorrect");
       }
     }
   };
