@@ -97,7 +97,7 @@ class UserViewSet(viewsets.ModelViewSet):
         if User.objects.filter(username=username).exists():
             return Response(
                 {"error": "Username already exists"},
-                status=drf_status.HTTP_400_BAD_REQUEST
+                status=drf_status.HTTP_409_CONFLICT
             )
         
         if len(password) < 8:
