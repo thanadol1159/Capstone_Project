@@ -27,5 +27,6 @@ jobs:
         run: python manage.py test
 
       - name: Build Docker image
+        working-directory: backend/
         run: docker build -t myapp .
 
