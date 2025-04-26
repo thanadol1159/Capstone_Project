@@ -26,7 +26,7 @@ jobs:
         working-directory: backend/source
         run: python manage.py test
 
-      - name: Build Docker image
-        working-directory: backend/
-        run: docker build -t myapp .
+      - name: Build Docker Compose services
+        run: docker compose build
+
 
