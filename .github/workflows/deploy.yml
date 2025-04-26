@@ -19,11 +19,11 @@ jobs:
           python-version: '3.9'
 
       - name: Install dependencies
-        working-directory: capstone/backend/source
+        working-directory: capstone_project/backend/source
         run: pip install -r requirements.txt
 
       - name: Run Django tests
-        working-directory: capstone/backend/source
+        working-directory: capstone_project/backend/source
         run: python manage.py test
 
       - name: Build Docker image
