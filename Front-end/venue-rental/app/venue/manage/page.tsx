@@ -68,7 +68,7 @@ const AddVenuePage = () => {
       await apiJson.delete(`/venues/${venueId}/`);
       const response = await apiJson.get("/venues/my_venues/");
       setVenues(response.data);
-      toast.success("สถานที่ที่เลือกถูกลบเรียบร้อยแล้ว", {
+      toast.success("Delete successful", {
         id: "delete-successes",
       });
     } catch (error) {
@@ -78,13 +78,13 @@ const AddVenuePage = () => {
 
   const handleDeleteSelected = async () => {
     if (selectedVenues.length === 0) {
-      toast.error("กรุณาเลือกสถานที่ที่ต้องการลบ", { id: "no-selection" });
+      toast.error("please select venues to delete", { id: "no-selection" });
 
       return;
     }
 
     const confirmed = window.confirm(
-      "คุณแน่ใจหรือไม่ว่าต้องการลบสถานที่ที่เลือกทั้งหมด?"
+      "Are you sure you want to delete all of venue?"
     );
     if (!confirmed) return;
 
@@ -96,7 +96,7 @@ const AddVenuePage = () => {
       setVenues(response.data);
       setSelectedVenues([]);
       setIsCheckAll(false);
-      toast.success("สถานที่ที่เลือกทั้งหมดถูกลบเรียบร้อยแล้ว", {
+      toast.success("Delete successful", {
         id: "delete-success",
       });
     } catch (error) {
@@ -161,7 +161,7 @@ const AddVenuePage = () => {
           onClick={toggleCheckboxMode}
           className="px-4 py-2 rounded-lg font-semibold bg-gray-100 hover:bg-gray-200 transition text-black"
         >
-          {isCheckboxMode ? "ยกเลิก" : "แก้ไขทั้งหมด"}
+          {isCheckboxMode ? "Cancel" : "Edit All"}
         </button>
       </div>
 
@@ -173,12 +173,12 @@ const AddVenuePage = () => {
             onChange={handleSelectAll}
             className="h-5 w-5 text-blue-600 rounded border-gray-300"
           />
-          <p className="text-lg text-gray-600">เลือกทั้งหมด</p>
+          <p className="text-lg text-gray-600 font-bold">Check All</p>
           <button
             onClick={handleDeleteSelected}
             className="ml-4 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg"
           >
-            ลบที่เลือกทั้งหมด
+            Delete all selected
           </button>
         </div>
       )}
@@ -187,7 +187,7 @@ const AddVenuePage = () => {
         <div className="flex items-center justify-center bg-[#7397BB] hover:bg-[#E6F3FF] text-white hover:text-black transition rounded-xl p-12 cursor-pointer">
           <Plus size={80} />
           <span className="ml-4 text-2xl font-semibold">
-            เพิ่มสถานที่ของคุณ
+            Add your Venue Places
           </span>
         </div>
       </Link>
@@ -234,15 +234,16 @@ const AddVenuePage = () => {
                   {venue.venue_name}
                 </h2>
                 <p className="text-sm text-gray-600">
-                  <span className="font-semibold">Owner:</span>{" "}
+                  <span className="font-semibold text-black">Owner:</span>{" "}
                   {ownerNames[venue.id] || "Loading..."}
                 </p>
-                <p className="text-sm text-gray-600 truncate">
-                  รายละเอียด: {venue.additional_information}
+                <p className="text-sm text-gray-600 text-ellipsis">
+                  <span className="text-black font-semibold">Detail:</span>{" "}
+                  {venue.additional_information}
                 </p>
 
                 <div className="flex items-center gap-2 text-sm">
-                  <span className="text-gray-600">Status:</span>
+                  <span className="text-black font-semibold">Status:</span>
                   {venue.status === 3 ? (
                     <span className="text-green-600 font-semibold">
                       Approved
@@ -260,18 +261,29 @@ const AddVenuePage = () => {
 
             {/* Buttons */}
             <div className="flex justify-end gap-4">
-              <Link
-                href={`/nk1/venue/${venue.id}/edit`}
-                className="px-4 py-2 bg-[#3F6B96] hover:bg-[#335473] text-white rounded-lg text-sm transition"
-              >
-                Edit
-              </Link>
-              <button
-                onClick={() => handleDelete(venue.id)}
-                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm transition"
-              >
-                Delete
-              </button>
+              {venue.status === 3 ? (
+                <button
+                  onClick={() => handleDelete(venue.id)}
+                  className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm transition"
+                >
+                  Delete
+                </button>
+              ) : (
+                <>
+                  <Link
+                    href={`/nk1/venue/${venue.id}/edit`}
+                    className="px-4 py-2 bg-[#3F6B96] hover:bg-[#335473] text-white rounded-lg text-sm transition"
+                  >
+                    Edit
+                  </Link>
+                  <button
+                    onClick={() => handleDelete(venue.id)}
+                    className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm transition"
+                  >
+                    Delete
+                  </button>
+                </>
+              )}
             </div>
           </div>
         ))}

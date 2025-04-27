@@ -97,7 +97,11 @@ const Navigation = () => {
         {/* Left Side: Logo + NavItems + Hamburger in same group */}
         <div className="flex items-center space-x-10">
           <Link href="/nk1">
-            <img src="/nk1/logo/reallogo.png" alt="EVENT Logo" className="h-12 w-auto" />
+            <img
+              src="/nk1/logo/reallogo.png"
+              alt="EVENT Logo"
+              className="h-12 w-auto"
+            />
           </Link>
 
           {/* Desktop Menu */}
@@ -269,9 +273,13 @@ const Navigation = () => {
 
             <div className="mt-4 flex flex-col items-center space-y-2">
               <ExportCSVButton />
-              <Link href="/nk1/login" className="text-white">
-                Login
-              </Link>
+              {accessToken ? (
+                <Logout />
+              ) : (
+                <Link href="/nk1/login" className="text-white">
+                  Login
+                </Link>
+              )}
             </div>
           </div>
         </div>

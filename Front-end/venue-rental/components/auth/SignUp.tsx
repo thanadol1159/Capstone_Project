@@ -59,7 +59,7 @@ const SignUpPage = () => {
       });
 
       if (registerResponse.status === 201) {
-        toast.error(registerResponse.data.message);
+        toast.success(registerResponse.data.message);
 
         const tokenResponse = await apiJson.post("/token/", {
           username,
@@ -83,8 +83,8 @@ const SignUpPage = () => {
   };
 
   return (
-    <div className="flex items-center justify-center w-full h-[calc(100vh-64px)]">
-      <div className="w-[50%] max-w-full p-8 bg-white">
+    <div className="flex items-center justify-center w-full h-[calc(100vh-64px)] px-4">
+      <div className="w-full max-w-md p-8 rounded-2xl shadow-2xl bg-white">
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Username Field */}
           <div className="flex items-center space-x-4 mb-4">
@@ -141,7 +141,9 @@ const SignUpPage = () => {
           {/* Confirm Password Field */}
           <div className="flex items-center space-x-4 mb-4">
             <label className="text-sm font-medium text-gray-700 whitespace-nowrap w-40">
-              Confirm Password :
+              Confirm
+              <br />
+              Password :
             </label>
             <input
               id="confirm-password"
@@ -191,8 +193,6 @@ const SignUpPage = () => {
               <option value="">Select gender</option>
               <option value="male">Male</option>
               <option value="female">Female</option>
-              <option value="other">Other</option>
-              <option value="prefer_not_to_say">Prefer not to say</option>
             </select>
           </div>
 
