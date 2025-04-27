@@ -1,4 +1,4 @@
-name: Django Deployment
+name: Deploy to Server
 
 on:
   push:
@@ -6,27 +6,26 @@ on:
       - main
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
+    - name: SSH and Deploy
+      uses: appleboy/ssh-action@v0.1.6
+      with:
+        host: cp24nk1.sit.kmutt.ac.th
+        username: sysadmin
+        key: b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZWQyNTUxOQAAACBRjRaS7uZ5kFLFZXdwoM+t+cx0A4iK+GyhO5Qt4t9cpgAAAJiqUyrvqlMq7wAAAAtzc2gtZWQyNTUxOQAAACBRjRaS7uZ5kFLFZXdwoM+t+cx0A4iK+GyhO5Qt4t9cpgAAAED0AmBXQP2acJObAgDhwBVu9rY6dPk0PrvexYP7bdZhVlGNFpLu5nmQUsVld3Cgz635zHQDiIr4bKE7lC3i31ymAAAAFW9hdF9vYXQxOUBob3RtYWlsLmNvbQ==
+        script: |
+          cd /capstoneProject/Capstone_Project
+          
+          git pull origin main
+          
+          docker compose down
+          
+          docker compose up -d --build
 
-      - name: Install dependencies
-        working-directory: backend/source
-        run: pip install -r requirements.txt
-
-      - name: Run Django tests
-        working-directory: backend/source
-        run: python manage.py test
-
-      - name: Build Docker Compose services
-        run: docker compose build
-
-
+          docker image prune -af
