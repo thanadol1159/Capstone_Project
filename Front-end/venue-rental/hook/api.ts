@@ -153,7 +153,7 @@ const addAuthorizationInterceptor = (instance: any) => {
       if (error.response && error.response.status === 401) {
         store.dispatch(logout());
         persistor.purge();
-        window.location.assign("/login");
+        window.location.assign("/nk1/login");
       }
       return Promise.reject(error);
     }
