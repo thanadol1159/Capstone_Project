@@ -51,9 +51,15 @@ const LoginPage = () => {
       }
     } catch (error: any) {
       if (error.response) {
-        if (error.response.status === 401) {
-          toast.error("Username or password incorrect");
-          router.push("/nk1/login");
+        if (error.response) {
+          if (error.response.status === 400) {
+            toast.error("Please enter both username and password");
+          } else if (error.response.status === 401) {
+            toast.error("Username or password incorrect");
+            router.push("/nk1/login");
+          } else {
+            toast.error("An error occurred. Please try again.");
+          }
         } else {
           toast.error("An error occurred. Please try again.");
         }
