@@ -230,9 +230,6 @@ export default function VenueRental() {
 
   return (
     <div className="flex flex-col">
-      {/* {Top section} */}
-      {/* <Toppage/> */}
-
       <div className="max-w-7xl pt-6 md:ml-14">
         {/* Radix UI Interest Selection Modal */}
         <Dialog.Root
@@ -281,6 +278,35 @@ export default function VenueRental() {
             </Dialog.Content>
           </Dialog.Portal>
         </Dialog.Root>
+
+        {/* {Top section} */}
+
+        <div className="relative mb-4">
+          {/* Mobile version */}
+          <div className="md:hidden h-[100px]  flex flex-col justify-center items-center text-center p-4">
+            <div className="bg-[#335473]  p-4 rounded-lg">
+              <h1 className="text-2xl font-bold text-white mb-3">
+                Book Venues Easily
+              </h1>
+              <p className="text-sm text-white max-w-md">
+                Find perfect venues for your events
+              </p>
+            </div>
+          </div>
+
+          {/* Desktop */}
+          <div className="hidden md:block h-[400px]">
+            <div className="absolute inset-0 bg-[#335473] rounded-lg  flex flex-col justify-center items-center text-center p-4">
+              <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">
+                Book and Rent Event Venues Effortlessly
+              </h1>
+              <p className="text-md md:text-lg text-white max-w-2xl">
+                Seamlessly connect with venue owners and bring your events to
+                life with ease.
+              </p>
+            </div>
+          </div>
+        </div>
 
         {/* Category Section */}
         <div className="mb-8 bg-white p-6 rounded-xl shadow-md">
@@ -439,20 +465,20 @@ export default function VenueRental() {
                 <div className="mt-8 flex justify-between">
                   <button
                     onClick={resetFilters}
-                    className="px-6 py-2 text-[#335473] font-medium rounded-lg border border-[#335473] hover:bg-[#335473]/10 transition"
+                    className=" sm:px-6 sm:py-2 px-2 py-2 text-[#335473] font-medium rounded-lg border border-[#335473] hover:bg-[#335473]/10 transition"
                   >
                     Reset All
                   </button>
                   <div className="flex gap-3">
                     <button
                       onClick={() => setIsFilterOpen(false)}
-                      className="px-6 py-2 bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 transition"
+                      className="sm:px-6 sm:py-2 px-2 py-2 bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 transition"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={applyFilters}
-                      className="px-6 py-2 bg-[#335473] text-white font-medium rounded-lg hover:bg-[#27415f] transition"
+                      className="sm:px-6 sm:py-2 px-2 py-2 bg-[#335473] text-white font-medium rounded-lg hover:bg-[#27415f] transition"
                     >
                       Apply Filters
                     </button>
@@ -493,7 +519,11 @@ export default function VenueRental() {
               Available Venues
             </h2>
             <div className="text-sm text-gray-500">
-              Showing {filteredVenues.length} venues
+              {filteredVenues.length === 0
+                ? "No venue available"
+                : `Showing ${filteredVenues.length} ${
+                    filteredVenues.length === 1 ? "venue" : "venues"
+                  }`}
             </div>
           </div>
 

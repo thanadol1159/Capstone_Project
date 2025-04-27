@@ -17,9 +17,6 @@ import "swiper/css/pagination";
 import { Pagination } from "swiper/modules";
 import "swiper/css/navigation";
 import MapComponent from "../../../components/common/Map";
-// const addNk1ToUrl = (url: string): string => {
-//   return url ? url.replace(/(\/images\/)/, "$1/nk1$2") : "";
-// };
 
 export default function VenuePage() {
   const params = useParams();
@@ -121,24 +118,23 @@ export default function VenuePage() {
   };
 
   if (!venue) {
-    return <div>Venue not found</div>;
+    return <div className="p-4 text-center">Venue not found</div>;
   }
 
-  // const imageUrl = venue.image ? venue.image : "/placeholder-image.jpg";
   const venueType = typeVenue?.type_name || "Unknown Type";
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 text-black ">
-      {/* <MapComponent /> */}
-      <h1 className="text-2xl font-semibold text-center mb-4 mt-2">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 text-black">
+      <h1 className="text-xl sm:text-2xl font-semibold text-center mb-4 mt-2">
         {venue.venue_name}
       </h1>
-      <div className="relative w-full aspect-[30/10]">
+
+      {/* Image Gallery */}
+      <div className="relative w-full aspect-[16/9] sm:aspect-[30/10]">
         {venue.venue_images.length > 1 ? (
           <Swiper
             pagination={{ clickable: true }}
             modules={[Pagination]}
-            className="w-[80%] mx-auto rounded-lg overflow-hidden custom-swiper"
-            // style={{ "--swiper-pagination-color": "#304B84" }}
+            className="w-full sm:w-[80%] mx-auto rounded-lg overflow-hidden custom-swiper"
           >
             {venue.venue_images.map((img) => (
               <SwiperSlide key={img.id}>
@@ -154,26 +150,26 @@ export default function VenuePage() {
           <img
             src={venue.venue_images[0]?.image || "/placeholder-image.jpg"}
             alt={venue.venue_name}
-            className="rounded-lg object-cover w-[80%] mx-auto h-96"
+            className="rounded-lg object-cover w-full sm:w-[80%] mx-auto h-full"
           />
         )}
       </div>
-      <div className="mt-8 bg-[#E6F3FF] relative rounded-md p-2">
-        {/* Details header */}
-        <div className="absolute top-0 left-0 bg-[#3F6B96] px-6 py-2 text-white rounded-tl-md rounded-br-md">
-          <p className="text-xl font-semibold">Details</p>
+
+      {/* Details Section */}
+      <div className="mt-6 sm:mt-8 bg-[#E6F3FF] relative rounded-md p-2 sm:p-4">
+        <div className="absolute top-0 left-0 bg-[#3F6B96] px-4 sm:px-6 py-1 sm:py-2 text-white rounded-tl-md rounded-br-md text-sm sm:text-base">
+          <p className="font-semibold">Details</p>
         </div>
 
-        {/* Main content */}
-        <div className="pt-20 px-6 pb-6">
-          <div className="bg-gray-50 p-6 rounded-lg space-y-4">
-            <div className="flex items-center gap-4">
-              <span className="font-semibold w-32">Venue Name:</span>
+        <div className="pt-16 sm:pt-20 px-4 sm:px-6 pb-4 sm:pb-6">
+          <div className="bg-gray-50 p-4 sm:p-6 rounded-lg space-y-3 sm:space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4">
+              <span className="font-semibold sm:w-32">Venue Name:</span>
               <span>{venue.venue_name}</span>
             </div>
 
-            <div className="flex items-center gap-4">
-              <span className="font-semibold w-32">Price:</span>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4">
+              <span className="font-semibold sm:w-32">Price:</span>
               <span>
                 {new Intl.NumberFormat("en-US", {
                   style: "currency",
@@ -182,70 +178,70 @@ export default function VenuePage() {
               </span>
             </div>
 
-            <div className="flex items-center gap-4">
-              <span className="font-semibold w-32">Capacity:</span>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4">
+              <span className="font-semibold sm:w-32">Capacity:</span>
               <span>{venue.capacity} people</span>
             </div>
 
-            <div className="flex items-center gap-4">
-              <span className="font-semibold w-32">Parking Space:</span>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4">
+              <span className="font-semibold sm:w-32">Parking Space:</span>
               <span>{venue.parking_space} spots</span>
             </div>
 
             {venue.additional_information && (
-              <div className="flex gap-4">
-                <span className="font-semibold w-32">
+              <div className="flex flex-col sm:flex-row gap-1 sm:gap-4">
+                <span className="font-semibold sm:w-32">
                   Additional Information:
                 </span>
-                <p className="text-gray-600 flex-1">
-                  {venue.additional_information}
-                </p>
+                <p className="flex-1">{venue.additional_information}</p>
               </div>
             )}
 
-            <div className="flex items-center gap-4">
-              <span className="font-semibold w-32">Type:</span>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4">
+              <span className="font-semibold sm:w-32">Type:</span>
               <span>{venueType}</span>
             </div>
           </div>
         </div>
-        <div className="flex justify-end mt-6 space-x-7">
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row justify-end mt-4 sm:mt-6 space-y-3 sm:space-y-0 sm:space-x-4">
           <button
             type="button"
             onClick={handleBack}
-            className="py-2 px-12 border border-[#304B84] rounded-lg text-[#304B84] bg-white hover:bg-gray-200 transition duration-200"
+            className="py-2 px-4 sm:px-12 border border-[#304B84] rounded-lg text-[#304B84] bg-white hover:bg-gray-200 transition duration-200"
           >
             Back
           </button>
           <button
             onClick={handleBooking}
-            className="py-2 px-12 bg-[#304B84] text-white font-semibold rounded-lg hover:bg-gray-800 transition duration-200"
+            className="py-2 px-4 sm:px-12 bg-[#304B84] text-white font-semibold rounded-lg hover:bg-gray-800 transition duration-200"
           >
             {accessToken ? "Book" : "Login to Book"}
           </button>
           <button
             onClick={handleCreateReview}
-            className="py-2 px-12 bg-white text-[#7A90A4] font-semibold rounded-lg border border-[#3F6B96]"
+            className="py-2 px-4 sm:px-12 bg-white text-[#7A90A4] font-semibold rounded-lg border border-[#3F6B96]"
           >
             {accessToken ? "Write a Review" : "Login to Review"}
           </button>
         </div>
       </div>
 
-      <div className="mt-8 bg-[#E6F3FF] relative rounded-md">
-        <div className="absolute top-0 left-0 bg-[#3F6B96] px-6 py-2 text-white rounded-tl-md rounded-br-md">
-          <p className="text-xl font-semibold">Reviews</p>
+      {/* Reviews Section */}
+      <div className="mt-6 sm:mt-8 bg-[#E6F3FF] relative rounded-md">
+        <div className="absolute top-0 left-0 bg-[#3F6B96] px-4 sm:px-6 py-1 sm:py-2 text-white rounded-tl-md rounded-br-md text-sm sm:text-base">
+          <p className="font-semibold">Reviews</p>
         </div>
 
-        {/* Main content - Added padding to prevent overlap with header */}
-        <div className="pt-20 px-6 pb-6">
+        <div className="pt-16 sm:pt-20 px-4 sm:px-6 pb-4 sm:pb-6">
           {/* Rating summary box */}
-          <div className="bg-gray-50 p-6 rounded-lg mb-6">
-            <div className="flex flex-row justify-between space-x-10">
+          <div className="bg-gray-50 p-4 sm:p-6 rounded-lg mb-4 sm:mb-6">
+            <div className="flex flex-col sm:flex-row justify-between space-y-4 sm:space-y-0 sm:space-x-4">
               {/* Left side */}
-              <div className="flex flex-col justify-center items-center pl-4">
-                <div className="flex space-x-2 items-center ">
-                  <span className="text-3xl font-bold">
+              <div className="flex flex-col justify-center items-center">
+                <div className="flex space-x-2 items-center">
+                  <span className="text-2xl sm:text-3xl font-bold">
                     {reviews.length > 0
                       ? (
                           reviews.reduce(
@@ -265,18 +261,18 @@ export default function VenuePage() {
                       : "0.0"}
                   </span>
                   <Star
-                    className="w-7 h-7 text-[#335473]"
+                    className="w-6 h-6 sm:w-7 sm:h-7 text-[#335473]"
                     fill={"currentColor"}
                   />
                 </div>
                 <div>
-                  <span className="text-gray-600">
+                  <span className="text-gray-600 text-sm sm:text-base">
                     {reviews.length} ratings
                   </span>
                 </div>
               </div>
 
-              <div className="border border-[#C9D9EB]"></div>
+              <div className="border border-[#C9D9EB] sm:block hidden"></div>
 
               {/* Right side */}
               <div className="space-y-2 right-side flex-1">
@@ -302,7 +298,7 @@ export default function VenuePage() {
                         {[...Array(star)].map((_, i) => (
                           <Star
                             key={i}
-                            className="w-4 h-4 text-[#335473]"
+                            className="w-3 h-3 sm:w-4 sm:h-4 text-[#335473]"
                             fill="currentColor"
                           />
                         ))}
@@ -313,7 +309,7 @@ export default function VenuePage() {
                           style={{ width: `${percentage}%` }}
                         ></div>
                       </div>
-                      <span className="w-10 text-gray-600 text-right">
+                      <span className="w-6 sm:w-10 text-gray-600 text-right text-xs sm:text-base">
                         {count}
                       </span>
                     </div>
@@ -360,7 +356,7 @@ export default function VenuePage() {
                   );
                 })
             ) : (
-              <div className="text-center text-[#7397BB] py-4">
+              <div className="text-center text-[#7397BB] py-4 text-sm sm:text-base">
                 -- No reviews yet. Be the first to write one! --
               </div>
             )}
@@ -368,41 +364,49 @@ export default function VenuePage() {
         </div>
       </div>
 
-      {/* <MapComponent /> */}
+      {/* Map Section */}
+      {venue.latitude && venue.longitude ? (
+        <div className="mt-6 sm:mt-8 h-64 sm:h-96 w-full">
+          <MapComponent latitude={venue.latitude} longitude={venue.longitude} />
+        </div>
+      ) : (
+        <p className="text-center text-gray-500 mt-6 sm:mt-8">
+          No location data available
+        </p>
+      )}
+
+      {/* Login Modal */}
       {showLoginModal && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
           onClick={() => setShowLoginModal(false)}
         >
           <div
-            className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full mx-4"
+            className="bg-white p-4 sm:p-6 rounded-lg shadow-lg max-w-md w-full mx-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-xl font-semibold mb-4">Login Required</h2>
-            <p className="text-gray-600 mb-6">
+            <h2 className="text-lg sm:text-xl font-semibold mb-4">
+              Login Required
+            </h2>
+            <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">
               Please login or create an account to book this venue.
             </p>
-            <div className="flex justify-end space-x-4">
+            <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4">
               <button
                 onClick={() => setShowLoginModal(false)}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100"
+                className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 text-sm sm:text-base"
               >
                 Cancel
               </button>
               <button
                 onClick={handleLogin}
-                className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800"
+                className="px-3 sm:px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 text-sm sm:text-base"
               >
                 Login
               </button>
             </div>
           </div>
         </div>
-      )}
-      {venue.latitude && venue.longitude ? (
-        <MapComponent latitude={venue.latitude} longitude={venue.longitude}/>
-      ) : (
-        <p className="text-center text-gray-500">No location data available</p>
       )}
     </div>
   );

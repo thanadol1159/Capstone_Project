@@ -352,7 +352,7 @@ export default function ManageVenue() {
                 value={venueData.venue_name}
                 onChange={handleInputChange}
                 placeholder="e.g. Grand Ballroom"
-                className="w-full p-2 rounded-md focus-ring focus:ring-[#3F6B96]"
+                className="w-full p-2 rounded-md border focus-ring-3 focus:ring-[#3F6B96]"
                 required
               />
             </div>
