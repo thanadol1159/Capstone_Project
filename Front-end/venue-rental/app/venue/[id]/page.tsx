@@ -209,7 +209,7 @@ export default function VenuePage() {
             </div>
           </div>
         </div>
-        <div className="flex justify-end mt-6 space-x-10">
+        <div className="flex justify-end mt-6 space-x-7">
           <button
             type="button"
             onClick={handleBack}

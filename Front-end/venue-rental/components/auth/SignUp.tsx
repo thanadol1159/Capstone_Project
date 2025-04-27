@@ -83,7 +83,7 @@ const SignUpPage = () => {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen">
+    <div className="flex items-center justify-center w-full h-[calc(100vh-64px)]">
       <div className="w-[50%] max-w-full p-8 bg-white">
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Username Field */}
@@ -96,7 +96,7 @@ const SignUpPage = () => {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="flex-grow px-4 py-2 border rounded-lg focus:ring focus:ring-indigo-300 focus:outline-none text-gray-700"
+              className="flex-grow px-4 py-2 border rounded-lg focus:ring focus:ring-[#3F6B96] focus:outline-none text-gray-700"
               placeholder="Choose a username"
               required
               disabled={isSubmitting}
@@ -113,7 +113,7 @@ const SignUpPage = () => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="flex-grow px-4 py-2 border rounded-lg focus:ring focus:ring-indigo-300 focus:outline-none text-gray-700"
+              className="flex-grow px-4 py-2 border rounded-lg focus:ring focus:ring-[#3F6B96] focus:outline-none text-gray-700"
               placeholder="Enter your email"
               required
               disabled={isSubmitting}
@@ -130,7 +130,7 @@ const SignUpPage = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="flex-grow px-4 py-2 border rounded-lg focus:ring focus:ring-indigo-300 focus:outline-none text-gray-700"
+              className="flex-grow px-4 py-2 border rounded-lg focus:ring focus:ring-[#3F6B96] focus:outline-none text-gray-700"
               placeholder="Password must be at least 8 characters"
               required
               minLength={8}
@@ -148,7 +148,7 @@ const SignUpPage = () => {
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="flex-grow px-4 py-2 border rounded-lg focus:ring focus:ring-indigo-300 focus:outline-none text-gray-700"
+              className="flex-grow px-4 py-2 border rounded-lg focus:ring focus:ring-[#3F6B96] focus:outline-none text-gray-700"
               placeholder="Repeat your password"
               required
               minLength={8}
@@ -166,7 +166,7 @@ const SignUpPage = () => {
               type="number"
               value={age}
               onChange={(e) => setAge(e.target.value)}
-              className="flex-grow px-4 py-2 border rounded-lg focus:ring focus:ring-indigo-300 focus:outline-none text-gray-700"
+              className="flex-grow px-4 py-2 border rounded-lg focus:ring focus:ring-[#3F6B96] focus:outline-none text-gray-700"
               placeholder="Enter your age"
               required
               min="1"
@@ -184,7 +184,7 @@ const SignUpPage = () => {
               id="gender"
               value={gender}
               onChange={(e) => setGender(e.target.value)}
-              className="flex-grow px-4 py-2 border rounded-lg focus:ring focus:ring-indigo-300 focus:outline-none text-gray-700"
+              className="flex-grow px-4 py-2 border rounded-lg focus:ring focus:ring-[#3F6B96] focus:outline-none text-gray-700"
               required
               disabled={isSubmitting}
             >
@@ -203,7 +203,7 @@ const SignUpPage = () => {
               Already have an account?{" "}
               <Link
                 href="/nk1/login"
-                className="text-[#1A9DB8] font-semibold hover:underline"
+                className="text-[#3F6B96] font-semibold hover:underline"
               >
                 Log in
               </Link>
@@ -221,7 +221,7 @@ const SignUpPage = () => {
             </button>
             <button
               type="submit"
-              className="py-2 px-12 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="py-2 px-12  text-white font-semibold rounded-lg bg-[#3F6B96] hover:bg-[#335473] transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={isSubmitting}
             >
               {isSubmitting ? "Signing up..." : "Sign Up"}
