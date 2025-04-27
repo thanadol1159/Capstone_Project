@@ -361,7 +361,7 @@ const FavoritesPage = () => {
               No venues found
             </h3>
             <p className="text-gray-500 max-w-md">
-              Please Add Your Favourite Veneus First!
+              Please Add Your Favourite Venues First!
             </p>
           </motion.div>
         )}
