@@ -13,7 +13,7 @@ const FavoritesPage = () => {
   const router = useRouter();
   const userId = useUserId();
   const { venues } = useFetchVenues();
-  const categories = ["All", "meeting", "wedding", "party", "staycation"];
+  const categories = ["All", "party", "wedding", "film", "staycation"];
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");

@@ -10,6 +10,8 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { useUserId } from "@/hook/userid";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSelector } from "react-redux";
+import { RootState } from "@/hook/store";
 
 export default function VenueRental() {
   const router = useRouter();
@@ -24,6 +26,7 @@ export default function VenueRental() {
   const [recommendedVenues, setRecommendedVenues] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
+  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
 
   const handleExport = async () => {
     setLoading(true);
@@ -234,11 +237,16 @@ export default function VenueRental() {
         {/* Radix UI Interest Selection Modal */}
         <Dialog.Root
           open={showInterestModal}
-          onOpenChange={setShowInterestModal}
+          onOpenChange={(open) => {
+            if (!accessToken) {
+              setShowInterestModal(!!accessToken && open);
+            }
+          }}
+          // onOpenChange={setShowInterestModal}
         >
           <Dialog.Portal>
-            <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-50" />
-            <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white text-black p-6 rounded-lg w-full max-w-md">
+            <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-50 z-[9999]" />
+            <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white text-black p-6 rounded-lg w-full max-w-md z-[9999]">
               <Dialog.Title className="text-xl font-semibold mb-4">
                 Select Your Interests
               </Dialog.Title>
