@@ -1,10 +1,13 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import useFetchVenues from "@/hook/Venue";
 import VenueCard from "@/components/ui/Venuecards";
 import { apiJson } from "@/hook/api";
 import { useUserId } from "@/hook/userid";
+import { motion, AnimatePresence } from "framer-motion";
+import { Frown } from "lucide-react";
+import gsap from "gsap";
 
 const FavoritesPage = () => {
   const router = useRouter();
@@ -14,6 +17,7 @@ const FavoritesPage = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [favoriteVenueIds, setFavoriteVenueIds] = useState<string[]>([]);
+  const venueRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   useEffect(() => {
     if (!userId) return;
@@ -45,16 +49,35 @@ const FavoritesPage = () => {
     setSearchQuery(event.target.value.toLowerCase());
   };
 
+  // const removeFavoriteVenue = (venueId: string) => {
+  //   setTimeout(() => {
+  //     setFavoriteVenueIds((prevIds) => prevIds.filter((id) => id !== venueId));
+  //   }, 500);
+  // };
+
   const removeFavoriteVenue = (venueId: string) => {
-    setTimeout(() => {
+    const element = venueRefs.current[venueId];
+
+    if (element) {
+      gsap.to(element, {
+        opacity: 0,
+        y: 100,
+        scale: 0.8,
+        duration: 0.5,
+        ease: "power2.in",
+        onComplete: () => {
+          setFavoriteVenueIds((prevIds) =>
+            prevIds.filter((id) => id !== venueId)
+          );
+        },
+      });
+    } else {
       setFavoriteVenueIds((prevIds) => prevIds.filter((id) => id !== venueId));
-    }, 500);
+    }
   };
 
   const filteredVenues = venues.filter((venue: any) => {
     const isFavorite = favoriteVenueIds.includes(venue.id);
-    // const matchesCategory =
-    //   selectedCategory === "All" || venue.category_event === selectedCategory;
     const matchesSearch = venue.venue_name.toLowerCase().includes(searchQuery);
     return isFavorite && matchesSearch;
   });
@@ -97,15 +120,71 @@ const FavoritesPage = () => {
         </div>
       </div>
 
+      <motion.section
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        className="bg-white p-6 rounded-xl shadow-sm"
+      >
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold text-[#335473]">
+            Available Venues
+          </h2>
+          <div className="text-sm text-gray-500">
+            Showing {filteredVenues.length} venues
+          </div>
+        </div>
+
+        {filteredVenues.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {filteredVenues.map((venue: any) => (
+              <div
+                key={venue.id}
+                ref={(el) => {
+                  venueRefs.current[venue.id] = el;
+                }}
+              >
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  whileHover={{ scale: 1.02 }}
+                >
+                  <VenueCard
+                    {...venue}
+                    onDetailClick={handleDetailClick}
+                    onRemoveFavorite={() => removeFavoriteVenue(venue.id)}
+                  />
+                </motion.div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex flex-col items-center justify-center py-12 text-center"
+          >
+            <Frown size={48} color="black" />
+            <h3 className="text-lg font-medium text-[#335473] mb-2">
+              No venues found
+            </h3>
+            <p className="text-gray-500 max-w-md">
+              Pls Add Your Favourtie Veneus First!
+            </p>
+          </motion.div>
+        )}
+      </motion.section>
+
       {/* Venue Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {filteredVenues.length > 0 ? (
           filteredVenues.map((venue: any) => (
             <VenueCard
               key={venue.id}
               {...venue}
               onDetailClick={handleDetailClick}
-              onRemoveFavorite={() => removeFavoriteVenue(venue.id)} 
+              onRemoveFavorite={() => removeFavoriteVenue(venue.id)}
             />
           ))
         ) : (
@@ -113,7 +192,7 @@ const FavoritesPage = () => {
             No favorite venues found.
           </p>
         )}
-      </div>
+      </div> */}
     </div>
   );
 };

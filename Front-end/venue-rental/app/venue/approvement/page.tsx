@@ -4,6 +4,7 @@ import { apiJson } from "@/hook/api";
 import { VenueRequest } from "@/types/venuerequest";
 import { useUserId } from "@/hook/userid";
 import gsap from "gsap";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 const ShowVenueRequest = () => {
   const [venueRequests, setVenueRequests] = useState<VenueRequest[]>([]);
@@ -90,7 +91,7 @@ const ShowVenueRequest = () => {
 
         {venueRequests.length === 0 ? (
           <div className="bg-white rounded-xl shadow-md border border-[#AC978A] p-6 text-center">
-            <p className="text-gray-500">You have no venue requests</p>
+            <p className="text-[#3F6B96]">You have no venue requests</p>
           </div>
         ) : (
           venueRequests.map((venueRequest) => {
@@ -111,7 +112,10 @@ const ShowVenueRequest = () => {
                       {venueRequest.location}
                     </p>
                     <p className="text-sm text-[#304B84]">
-                      Category: {venueRequest.category_event}
+                      <strong>Category:</strong>{" "}
+                      {venueRequest.venueRequest_category
+                        .map((cat) => cat.category_event)
+                        .join(", ")}
                     </p>
                   </div>
                   <div className="flex items-center gap-4">
@@ -126,7 +130,7 @@ const ShowVenueRequest = () => {
                       onClick={() => toggleDropdown(venueRequest.id)}
                       className="text-[#304B84] font-semibold underline hover:text-[#492b26] text-sm"
                     >
-                      {isOpen ? "Hide" : "Details"}
+                      {isOpen ? <ChevronUp /> : <ChevronDown />}
                     </button>
                   </div>
                 </div>
@@ -146,7 +150,10 @@ const ShowVenueRequest = () => {
                         <strong>Location:</strong> {venueRequest.location}
                       </p>
                       <p>
-                        <strong>Category:</strong> {venueRequest.category_event}
+                        <strong>Category:</strong>{" "}
+                        {venueRequest.venueRequest_category
+                          .map((cat) => cat.category_event)
+                          .join(", ")}
                       </p>
                       <p>
                         <strong>Number of Rooms:</strong>{" "}

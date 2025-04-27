@@ -4,7 +4,11 @@ export interface VenueRequest {
   venueRequest_images: { id: number; image: string }[];
   image: string;
   location: string;
-  category_event: string;
+  venueRequest_category: {
+    id: number;
+    category_event: string;
+    venue_request: number;
+  }[];
   price: number;
   number_of_rooms: number;
   additional_information: string;

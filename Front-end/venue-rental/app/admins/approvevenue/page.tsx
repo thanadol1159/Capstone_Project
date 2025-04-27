@@ -391,8 +391,8 @@ const ApproveVenue = () => {
       {/* Image Viewer Modal */}
       <Dialog.Root open={isImageModalOpen} onOpenChange={setIsImageModalOpen}>
         <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-50" />
-          <Dialog.Content className="fixed inset-0 flex items-center justify-center">
+          <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-50 z-[9999]" />
+          <Dialog.Content className="fixed inset-0 flex items-center justify-center z-[9999]">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}

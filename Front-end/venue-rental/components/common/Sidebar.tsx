@@ -75,10 +75,10 @@ const Sidebar: React.FC = () => {
     flex flex-col items-center pt-2`}
       >
         {/* Sidebar Toggle Button */}
-        <button
+        {/* <button
           onClick={toggleSidebar}
           className="p-2 mb-4 text-[#6B86A0] hover:bg-[#D1E3FF] rounded-lg transition-all duration-300 hidden md:block"
-        ></button>
+        ></button> */}
 
         {/* Close button on Mobile */}
         <div className="md:hidden w-full px-2 pb-2">

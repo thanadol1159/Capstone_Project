@@ -8,6 +8,7 @@ import { X } from "lucide-react";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface ReviewProps {
   date: string;
@@ -132,9 +133,14 @@ const Review: React.FC<ReviewProps> = ({
       {/* Radix UI Modal */}
       <Dialog.Root open={isOpen} onOpenChange={setIsOpen}>
         <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-50" />
-          <Dialog.Content className="fixed inset-0 flex items-center justify-center">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-2xl relative">
+          <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-50 z-[9999]" />
+          <Dialog.Content className="fixed inset-0 flex items-center justify-center z-[9999]">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-2xl relative"
+            >
               <Dialog.Title className="sr-only">Review Images</Dialog.Title>
               <Dialog.Close asChild>
                 <button className="absolute top-3 right-3 text-gray-500">
@@ -160,7 +166,7 @@ const Review: React.FC<ReviewProps> = ({
                   </SwiperSlide>
                 ))}
               </Swiper>
-            </div>
+            </motion.div>
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
