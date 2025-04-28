@@ -34,11 +34,10 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    'django.contrib.messages',
     'rest_framework',
-    # 'rest_framework.authtoken',
+    'rest_framework.authtoken',
     'rest_framework_simplejwt',
     'corsheaders',
     'drf_yasg',
@@ -50,10 +49,8 @@ INSTALLED_APPS = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ]
 }
 
 SWAGGER_SETTINGS = {
@@ -65,12 +62,41 @@ SWAGGER_SETTINGS = {
         }
     }
 }
+# SIMPLE_JWT = {
+#     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
+#     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=30),
+#     'SLIDING_TOKEN_LIFETIME': timedelta(days=30),
+#     'SLIDING_TOKEN_REFRESH_LIFETIME_LATE_USER': timedelta(days=1),
+#     'SLIDING_TOKEN_LIFETIME_LATE_USER': timedelta(days=30),
+#     'TOKEN_OBTAIN_SERIALIZER': 'event.serializers.CustomTokenObtainPairSerializer',
+# }
+
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
-    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=30),
-    'SLIDING_TOKEN_LIFETIME': timedelta(days=30),
-    'SLIDING_TOKEN_REFRESH_LIFETIME_LATE_USER': timedelta(days=1),
-    'SLIDING_TOKEN_LIFETIME_LATE_USER': timedelta(days=30),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=50),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': False,
+
+    'ALGORITHM': 'HS256',
+    # 'SIGNING_KEY': settings.SECRET_KEY,
+    'VERIFYING_KEY': None,
+    'AUDIENCE': None,
+    'ISSUER': None,
+
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+
+    'JTI_CLAIM': 'jti',
+
+    'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
+    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
 MIDDLEWARE = [
@@ -84,14 +110,17 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-
 CORS_ALLOW_ALL_ORIGINS = True
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:3000",
-#     "http://cp24nk1.sit.kmutt.ac.th/",
+#CORS_ALLOWED_ORIGINS = [
+   # "http://localhost:3000",
+  #  "http://cp24nk1.sit.kmutt.ac.th/",
+ #   "https://capstone24.sit.kmutt.ac.th/"
 # ]
 ALLOWED_HOSTS = ['cp24nk1.sit.kmutt.ac.th', 'localhost', '127.0.0.1','capstone24.sit.kmutt.ac.th']
 ROOT_URLCONF = 'backend.urls'
+CSRF_TRUSTED_ORIGINS = ['https://capstone24.sit.kmutt.ac.th/']
+SECURE_SSL_REDIRECT = False
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 TEMPLATES = [
     {
@@ -161,10 +190,32 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+# STATIC_URL = 'static/'
+
+# Static files configuration
+STATIC_URL = '/static/'
+# STATIC_URL = 'https://capstone24.sit.kmutt.ac.th/nk1/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+ML_API_URL = "https://capstone24.sit.kmutt.ac.th/nk1/ml-api/predict_category"
+ML_UPLOAD_URL = "https://capstone24.sit.kmutt.ac.th/nk1/ml-api/upload_csv"
+
+# Ensure proper handling of reverse proxy
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE =  True
+
+USE_X_FORWARDED_HOST = True
 
 # MEDIA_URL = '/media/'
-# MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+if os.getenv("DJANGO_ENV") == "production":
+    MEDIA_URL = "https://capstone24.sit.kmutt.ac.th/nk1/media/"
+    # MEDIA_URL = "https://capstone24.sit.kmutt.ac.th/media/"
 
 # MINIO_STORAGE_MEDIA_BUCKET_NAME = 'media'
 # MINIO_STORAGE_STATIC_BUCKET_NAME = 'static'
@@ -181,3 +232,6 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024  
+FILE_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024 

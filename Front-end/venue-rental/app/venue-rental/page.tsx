@@ -4,6 +4,7 @@ import useFetchVenues from "@/hook/Venue";
 import VenueCard from "@/components/ui/Venuecards";
 import { useRouter } from "next/navigation";
 import { apiJson } from "@/hook/api";
+import { Filter } from "lucide-react";
 
 export default function VenueRental() {
   const router = useRouter();
@@ -13,7 +14,7 @@ export default function VenueRental() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleDetailClick = (id: string) => {
-    router.push(`/venue/${id}`);
+    router.push(`/nk1/venue/${id}`);
   };
 
   const handleCategoryClick = (category: string) => {
@@ -25,13 +26,12 @@ export default function VenueRental() {
     setSearchQuery(event.target.value.toLowerCase());
   };
 
-  // Filter venues based on the selected category and search query
-  const filteredVenues = venues.filter((venue: any) => {
-    const matchesCategory =
-      selectedCategory === "All" || venue.category_event === selectedCategory;
-    const matchesSearch = venue.venue_name.toLowerCase().includes(searchQuery);
-    return matchesCategory && matchesSearch;
-  });
+  // const filteredVenues = venues.filter((venue: any) => {
+  //   const matchesCategory =
+  //     // selectedCategory === "All" || venue.category_event === selectedCategory;
+  //   const matchesSearch = venue.venue_name.toLowerCase().includes(searchQuery);
+  //   return matchesCategory && matchesSearch;
+  // });
 
   return (
     <div className="max-w-6xl mx-auto p-6">
@@ -46,8 +46,8 @@ export default function VenueRental() {
                 onClick={() => handleCategoryClick(category)}
                 className={`px-12 py-1 rounded-lg ${
                   category === selectedCategory
-                    ? "bg-[#AC978A] text-black font-bold"
-                    : "bg-gray-200 text-black font-bold"
+                    ? "bg-[#335473] text-white font-bold"
+                    : "bg-[#BCCFE1] text-[#7397BB] font-bold"
                 }`}
               >
                 {category}
@@ -55,7 +55,7 @@ export default function VenueRental() {
             ))}
           </div>
 
-          <div className="relative flex-1 max-w-md">
+          <div className="relative flex-1">
             <input
               type="text"
               placeholder="Search"
@@ -69,7 +69,7 @@ export default function VenueRental() {
 
       {/* Venue Card */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {filteredVenues.length > 0 ? (
+        {/* {filteredVenues.length > 0 ? (
           filteredVenues.map((venue: any) => (
             <VenueCard
               key={venue.id}
@@ -81,7 +81,7 @@ export default function VenueRental() {
           <p className="col-span-full text-center text-black text-[20px]">
             No venues found.
           </p>
-        )}
+        )} */}
       </div>
     </div>
   );

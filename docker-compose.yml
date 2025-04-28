@@ -2,12 +2,24 @@ services:
   reverse-proxy:
     image: nginx:latest
     ports:
-    - "80:80"
-    - "443:443"
+      - "80:80"
+      - "443:443"
     volumes:
-    - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./ssl:/ssl/
+      - ./backend/source/media:/backend/source/media
     depends_on:
       - next
+    networks:
+      - my_network
+
+  ml:
+    container_name: ml
+    build: ./ML
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./ML:/app
     networks:
       - my_network
 
@@ -19,19 +31,11 @@ services:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: dbpass
     ports:
-      - 5173:5432
+      - "5173:5432"
     networks:
       - my_network
     volumes:
       - db:/var/lib/postgresql/data/
-
-  # adminer:
-  #   container_name: adminer
-  #   image: adminer
-  #   networks:
-  #     - my_network
-  #   ports:
-  #     - 8000:8000
 
   django:
     container_name: django
@@ -39,55 +43,46 @@ services:
       context: backend
       dockerfile: Dockerfile.Dev
     ports:
-      - 8080:8080
+      - "8080:8080"
     volumes:
       - .:/app
-    user: 1000:1000
+      - ./backend/source/media:/backend/source/media
+    user: "1000:1000"
     depends_on:
       - db
-      # - minio
+      - ml
     networks:
       - my_network
     environment:
-      - SQL_ENGINE=django.db.backends.postgresql
-      - SQL_DATABASE=postgres
-      - SQL_USER=root
-      - SQL_PASSWORD=dbpass
-      - SQL_HOST=db
-      - SQL_PORT=5432
-      - DATABASE=postgres
+      SQL_ENGINE: django.db.backends.postgresql
+      SQL_DATABASE: postgres
+      SQL_USER: root
+      SQL_PASSWORD: dbpass
+      SQL_HOST: db
+      SQL_PORT: 5432
+      DATABASE: postgres
+      DJANGO_ENV: production
     command: "python manage.py runserver 0.0.0.0:8080"
 
   next:
     container_name: next
     build:
-      context: Front-end
+      context: ./Front-end/venue-rental
       dockerfile: Dockerfile
     ports:
-      - 3000:3000
-    volumes:
-      - ./Front-end/venue-rental/:/app
+      - "3000:3000"
     depends_on:
       - django
-    user: 1000:1000
     networks:
       - my_network
-    command: sh -c "npm install && npm run dev"
 
-  # minio:
-  #   image: minio/minio
-  #   container_name: minio
-  #   command: server /data --console-address ":9001"
-  #   ports:
-  #     - "9000:9000"
-  #     - "9001:9001"
-  #   environment:
-  #     MINIO_ROOT_USER: admin
-  #     MINIO_ROOT_PASSWORD: password123
-  #   volumes:
-  #     - minio_data:/data
-  #   networks:
-  #     - my_network
+  adminer:
+    container_name: adminer
+    image: adminer
+    networks:
+      - my_network
+    ports:
+      - 8900:8080
 
 networks:
   my_network:
@@ -96,6 +91,3 @@ networks:
 volumes:
   db:
     driver: local
-  minio_data:
-    driver: local
-  data:

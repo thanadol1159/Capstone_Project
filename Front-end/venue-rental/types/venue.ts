@@ -21,9 +21,11 @@ export interface Venue {
   id: number;
   venue_type: number;
   venue_name: string;
-  image: string;
+  venue_images: { id: number; image: string }[];
+  latitude: number;
   location: string | null;
-  category_event: string | null;
+  longitude: number;
+  venue_category: string[];
   price: number;
   area_size: number | null;
   capacity: number;
@@ -34,5 +36,6 @@ export interface Venue {
   venue_certification: string;
   personal_identification: string;
   venue_owner: number;
+  status: number;
   onDetailClick?: (id: number) => void;
 }
