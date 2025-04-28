@@ -261,29 +261,18 @@ const AddVenuePage = () => {
 
             {/* Buttons */}
             <div className="flex justify-end gap-4">
-              {venue.status === 3 ? (
-                <button
-                  onClick={() => handleDelete(venue.id)}
-                  className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm transition"
-                >
-                  Delete
-                </button>
-              ) : (
-                <>
-                  <Link
-                    href={`/nk1/venue/${venue.id}/edit`}
-                    className="px-4 py-2 bg-[#3F6B96] hover:bg-[#335473] text-white rounded-lg text-sm transition"
-                  >
-                    Edit
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(venue.id)}
-                    className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm transition"
-                  >
-                    Delete
-                  </button>
-                </>
-              )}
+              <Link
+                href={`/nk1/venue/${venue.id}/edit`}
+                className="px-4 py-2 bg-[#3F6B96] hover:bg-[#335473] text-white rounded-lg text-sm transition"
+              >
+                Edit
+              </Link>
+              <button
+                onClick={() => handleDelete(venue.id)}
+                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm transition"
+              >
+                Delete
+              </button>
             </div>
           </div>
         ))}
