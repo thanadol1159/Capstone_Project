@@ -18,7 +18,7 @@ jobs:
       with:
         host: cp24nk1.sit.kmutt.ac.th
         username: sysadmin
-        key: b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZWQyNTUxOQAAACBRjRaS7uZ5kFLFZXdwoM+t+cx0A4iK+GyhO5Qt4t9cpgAAAJiqUyrvqlMq7wAAAAtzc2gtZWQyNTUxOQAAACBRjRaS7uZ5kFLFZXdwoM+t+cx0A4iK+GyhO5Qt4t9cpgAAAED0AmBXQP2acJObAgDhwBVu9rY6dPk0PrvexYP7bdZhVlGNFpLu5nmQUsVld3Cgz635zHQDiIr4bKE7lC3i31ymAAAAFW9hdF9vYXQxOUBob3RtYWlsLmNvbQ==
+        key: /home/sysadmin/.ssh/id_ed25519
         script: |
           cd /capstoneProject/Capstone_Project
           
