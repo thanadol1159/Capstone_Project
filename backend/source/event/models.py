@@ -25,11 +25,6 @@ class UserDetail(models.Model):
     interested = models.JSONField(default=list, null=True, blank=True) 
     interested_check = models.BooleanField(default=False, null=True,blank=True)
 
-# class Interested(models.Model):
-#     user = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)
-#     interested = models.CharField(max_length=45,null=True, blank=True)
-#     done = models.BooleanField(default=False)
-
 class TypeOfVenue(models.Model):
     type_name = models.CharField(max_length=45,null=True)
     type_description = models.CharField(max_length=45,null=True)
@@ -42,7 +37,6 @@ class Venue(models.Model):
     venue_type = models.ForeignKey(TypeOfVenue,on_delete=models.CASCADE,null=True, blank=True) 
     venue_name = models.CharField(max_length=50,null=True, blank=True)  
     location = models.CharField(max_length=100, null=True, blank=True)
-    # category_event = models.CharField(max_length=50, null=True, blank=True)
     price = models.IntegerField(null=True, blank=True)
     area_size = models.CharField(max_length=50, null=True, blank=True)  
     capacity = models.IntegerField(null=True, blank=True)
@@ -101,14 +95,9 @@ class Booking(models.Model):
     status_booking = models.ForeignKey(StatusBooking, on_delete=models.CASCADE, null=True,blank=True)
     isReview = models.BooleanField(default=False)
 
-# class CategoryOfEvent(models.Model):
-#     category_name = models.CharField(max_length=45)
-#     category_detail = models.CharField(max_length=45)
-
 class EventOfVenue(models.Model):
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE,null=True, blank=True)
     venue_request = models.ForeignKey(VenueRequest, on_delete=models.CASCADE,null=True, blank=True)
-    # CategoryOfEvent = models.ForeignKey(CategoryOfEvent, on_delete=models.CASCADE)
 
 class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)

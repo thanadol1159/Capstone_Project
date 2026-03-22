@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import os
+import dj_database_url
 from pathlib import Path
 from datetime import timedelta
 
@@ -145,15 +146,19 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        "ENGINE": os.getenv('DB_ENGINE','django.db.backends.postgresql') ,
-        "NAME": "postgres",
-        "USER": os.getenv('DB_USER','root'),
-        "PASSWORD": os.getenv('DB_PASSWORD','dbpass'),
-        "HOST": os.getenv('DB_NAME','db'),
-        "PORT": os.getenv('DB_PORT','5432'),
-    }
+    'default': dj_database_url.parse(os.environ.get("DATABASE_URL"))
 }
+
+# DATABASES = {
+#     'default': {
+#         "ENGINE": os.getenv('DB_ENGINE','django.db.backends.postgresql') ,
+#         "NAME": "postgres",
+#         "USER": os.getenv('DB_USER','root'),
+#         "PASSWORD": os.getenv('DB_PASSWORD','dbpass'),
+#         "HOST": os.getenv('DB_NAME','db'),
+#         "PORT": os.getenv('DB_PORT','5432'),
+#     }
+# }
 
 
 # Password validation
