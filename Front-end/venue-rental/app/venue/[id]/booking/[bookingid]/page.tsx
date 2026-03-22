@@ -8,7 +8,8 @@ import { format, differenceInDays } from "date-fns";
 // import { JwtPayload } from "jwt-decode";
 // import { RootState } from "@/hook/store";
 // import { useSelector } from "react-redux";
-import { useAccountId } from "@/hook/userid";
+import { useUserId } from "@/hook/userid";
+import toast from "react-hot-toast";
 
 interface BookingFormData {
   check_in: string;
@@ -33,9 +34,9 @@ export default function BookingPage() {
     check_out?: string;
   }>({});
 
-  const accountId = useAccountId();
+  const userId = useUserId();
 
-  console.log(accountId);
+  console.log(userId);
 
   useEffect(() => {
     const fetchVenueDetail = async () => {
@@ -53,7 +54,7 @@ export default function BookingPage() {
   }, [params.id]);
 
   const handleBack = () => {
-    router.push(`/venue/${params.id}`);
+    router.push(`/nk1/venue/${params.id}`);
   };
 
   const validateDates = () => {
@@ -82,21 +83,6 @@ export default function BookingPage() {
       [name]: value,
     }));
   };
-
-  // const accessToken = useSelector((state: RootState) => state.auth.accessToken);
-
-  // const accountId = useMemo(() => {
-  //   if (!accessToken) return null;
-
-  //   try {
-  //     const decoded = jwtDecode<CustomJwtPayload>(accessToken);
-  //     return decoded.user_id;
-  //   } catch (error) {
-  //     console.error("Failed to decode token", error);
-  //     return null;
-  //   }
-  // }, [accessToken]);
-
   // Calculate total nights and total price
   const totalNights = useMemo(() => {
     if (!venue) return 0;
@@ -120,19 +106,20 @@ export default function BookingPage() {
     try {
       setIsSubmitting(true);
       const bookingData = {
-        account: accountId,
+        user: userId,
         venue: params.id,
         check_in: new Date(formData.check_in).toISOString(),
         check_out: new Date(formData.check_out).toISOString(),
         total_price: totalPrice,
+        status_booking: 2,
       };
 
       await apiJson.post("/bookings/", bookingData);
 
-      router.push(`/dashboard`);
+      router.push(`/nk1/venue/booking`);
     } catch (error) {
       console.error("Error creating booking:", error);
-      alert("Failed to create booking. Please try again later.");
+      toast.error("Failed to create booking. Please try again later.");
     } finally {
       setIsSubmitting(false);
     }

@@ -1,0 +1,22 @@
+user_id,age,gender,interested,category
+300,40,male,Sports,staycation
+301,22,female,Food & Lifestyle,film
+302,37,female,Arts & Culture,party
+303,35,female,Technology & Innovation,party
+304,28,female,Sports,party
+305,24,male,Food & Lifestyle,film
+306,74,female,Arts & Culture,party
+307,75,male,Food & Lifestyle,party
+308,20,male,Sports,party
+309,20,female,Technology & Innovation,staycation
+310,56,female,Sports,staycation
+311,56,female,Technology & Innovation,wedding
+312,30,female,Arts & Culture,film
+313,24,male,Arts & Culture,party
+314,39,male,Arts & Culture,staycation
+315,22,male,Food & Lifestyle,film
+316,62,female,Arts & Culture,staycation
+317,32,female,Arts & Culture,party
+318,48,female,Technology & Innovation,staycation
+319,34,male,Technology & Innovation,wedding
+320,65,female,Arts & Culture,wedding

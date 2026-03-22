@@ -14,3 +14,4 @@ gunicorn
 djangorestframework-simplejwt
 drf_yasg
 Pillow
+requests

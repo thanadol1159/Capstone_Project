@@ -1,0 +1,43 @@
+server {
+    listen 80;
+    server_name cp24nk1.sit.kmutt.ac.th;
+
+    location / {
+        proxy_pass http://next:3000/;
+        proxy_read_timeout 60;
+        proxy_connect_timeout 60;
+        proxy_redirect off;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+
+server {
+    listen    443 ssl; 
+    server_name  cp24nk1.sit.kmutt.ac.th; 
+    ssl_certificate /ssl/fullchain.pem; 
+    ssl_certificate_key /ssl/privkey.pem; 
+    ssl_session_cache    shared:SSL:1m; 
+    ssl_session_timeout  5m; 
+    ssl_dhparam /ssl/dhparam-2048.pem; 
+    # Specify the password as a format supported by openssl 
+    ssl_protocols  SSLv3 TLSv1.2 TLSv1.3; 
+    ssl_ciphers  HIGH:!aNULL:!MD5; 
+    ssl_prefer_server_ciphers  on;
+
+    location / {
+        proxy_pass http://next:3000/;
+        proxy_read_timeout 60;
+        proxy_connect_timeout 60;
+        proxy_redirect off;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }  
+}
+

@@ -1,50 +1,76 @@
 "use client";
-import React, { useState, useEffect } from "react";
+
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import useFetchVenues from "@/hook/Venue";
-import { Venue } from "@/types/venue";
-// import axios from "axios";
 import { apiJson } from "@/hook/api";
+import { useSelector } from "react-redux";
+import { RootState } from "@/hook/store";
+import { useRouter } from "next/navigation";
+import { Venue } from "@/types/venue";
+import { Plus, ArrowRight } from "lucide-react";
+import toast from "react-hot-toast";
 
 interface SlidingStates {
   [key: number]: boolean;
 }
 
 const AddVenuePage = () => {
-  const { venues } = useFetchVenues();
+  const [venues, setVenues] = useState<Venue[] | null>(null);
+  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
+  const router = useRouter();
   const [isCheckboxMode, setIsCheckboxMode] = useState(false);
   const [isCheckAll, setIsCheckAll] = useState(false);
   const [isButtonMode, setIsButtonMode] = useState(false);
+  const [ownerNames, setOwnerNames] = useState<{ [key: number]: string }>({});
   const [selectedVenues, setSelectedVenues] = useState<number[]>([]);
   const [slidingButtonStates, setSlidingButtonStates] = useState<SlidingStates>(
     {}
   );
   const [slidingCheckboxStates, setSlidingCheckboxStates] =
     useState<SlidingStates>({});
+  const venueRefs = useRef<(HTMLDivElement | null)[]>([]); // For GSAP
+
+  useEffect(() => {
+    const fetchVenues = async () => {
+      if (!accessToken) {
+        router.push("/nk1/login");
+        return;
+      }
+      try {
+        const response = await apiJson.get("/venues/my_venues/");
+        setVenues(response.data.length === 0 ? [] : response.data);
+      } catch (error) {
+        console.error("Error fetching venues:", error);
+        setVenues([]);
+      }
+    };
+    fetchVenues();
+  }, []);
 
   useEffect(() => {
     if (venues) {
-      const newButtonStates: SlidingStates = {};
-      const newCheckboxStates: SlidingStates = {};
+      const buttonStates: SlidingStates = {};
+      const checkboxStates: SlidingStates = {};
       venues.forEach((venue) => {
-        newButtonStates[venue.id] = isButtonMode;
-        newCheckboxStates[venue.id] = isCheckboxMode;
+        buttonStates[venue.id] = isButtonMode;
+        checkboxStates[venue.id] = isCheckboxMode;
       });
-      setSlidingButtonStates(newButtonStates);
-      setSlidingCheckboxStates(newCheckboxStates);
+      setSlidingButtonStates(buttonStates);
+      setSlidingCheckboxStates(checkboxStates);
     }
-  }, [isCheckboxMode, isButtonMode, venues]);
+  }, [isButtonMode, isCheckboxMode, venues]);
 
   const handleDelete = async (venueId: number) => {
-    const isConfirmed = window.confirm("จะลบจริงหรอมันหายน้า");
-
-    if (!isConfirmed) {
-      return;
-    }
+    const confirmed = window.confirm("จะลบจริงหรอมันหายน้า");
+    if (!confirmed) return;
 
     try {
       await apiJson.delete(`/venues/${venueId}/`);
-      window.location.reload();
+      const response = await apiJson.get("/venues/my_venues/");
+      setVenues(response.data);
+      toast.success("Delete successful", {
+        id: "delete-successes",
+      });
     } catch (error) {
       console.error("Error deleting venue:", error);
     }
@@ -52,61 +78,69 @@ const AddVenuePage = () => {
 
   const handleDeleteSelected = async () => {
     if (selectedVenues.length === 0) {
-      alert("กรุณาเลือกสถานที่ที่ต้องการลบ");
+      toast.error("please select venues to delete", { id: "no-selection" });
+
       return;
     }
 
-    const isConfirmed = window.confirm(
-      "คุณแน่ใจหรือไม่ว่าต้องการลบสถานที่ที่เลือกทั้งหมด?"
+    const confirmed = window.confirm(
+      "Are you sure you want to delete all of venue?"
     );
-
-    if (!isConfirmed) {
-      return;
-    }
+    if (!confirmed) return;
 
     try {
-      const deletePromises = selectedVenues.map((venueId) =>
-        apiJson.delete(`/venues/${venueId}/`)
+      await Promise.all(
+        selectedVenues.map((id) => apiJson.delete(`/venues/${id}/`))
       );
-
-      const responses = await Promise.all(deletePromises);
-
-      const failedDeletes = responses.filter(
-        (response) => response.status !== 200
-      );
-
-      alert("สถานที่ที่เลือกทั้งหมดถูกลบเรียบร้อยแล้ว");
-
-      // Reload the page or update the venue state
-      window.location.reload();
+      const response = await apiJson.get("/venues/my_venues/");
+      setVenues(response.data);
+      setSelectedVenues([]);
+      setIsCheckAll(false);
+      toast.success("Delete successful", {
+        id: "delete-success",
+      });
     } catch (error) {
       console.error("Error deleting venues:", error);
-      alert("เกิดข้อผิดพลาดในการลบสถานที่");
+      toast.error("เกิดข้อผิดพลาดในการลบสถานที่", { id: "delete-error" });
     }
   };
 
-  const Buttonmode = () => {
+  useEffect(() => {
+    const fetchOwnerNames = async () => {
+      if (venues) {
+        const results = await Promise.all(
+          venues.map(async (venue) => {
+            try {
+              const res = await apiJson.get(`/users/${venue.venue_owner}/`);
+              return { venueId: venue.id, ownerName: res.data.username };
+            } catch {
+              return { venueId: venue.id, ownerName: "Unknown" };
+            }
+          })
+        );
+        const ownerMap = results.reduce((acc: any, curr) => {
+          acc[curr.venueId] = curr.ownerName;
+          return acc;
+        }, {});
+        setOwnerNames(ownerMap);
+      }
+    };
+    fetchOwnerNames();
+  }, [venues]);
+
+  const toggleButtonMode = () => {
     setIsButtonMode(!isButtonMode);
-    if (isCheckboxMode === true) {
-      setIsCheckboxMode(!isCheckboxMode);
-    }
+    if (isCheckboxMode) setIsCheckboxMode(false);
   };
 
-  const Checkboxmode = () => {
+  const toggleCheckboxMode = () => {
     setIsCheckboxMode(!isCheckboxMode);
-    if (isButtonMode === true) {
-      setIsButtonMode(!isButtonMode);
-    }
+    if (isButtonMode) setIsButtonMode(false);
   };
 
   const handleSelectAll = () => {
     setIsCheckAll(!isCheckAll);
-    if (!isCheckAll) {
-      const allVenueIds = venues?.map((venue) => venue.id) || [];
-      setSelectedVenues(allVenueIds);
-    } else {
-      setSelectedVenues([]);
-    }
+    setSelectedVenues(isCheckAll ? [] : venues?.map((v) => v.id) || []);
   };
 
   const handleSingleVenueSelect = (venueId: number) => {
@@ -118,156 +152,131 @@ const AddVenuePage = () => {
   };
 
   return (
-    <div className="container mx-auto p-14 space-y-6">
-      <div className="flex w-full justify-between my-2">
-        <p className="text-xl font-semibold text-black">Manage & Add Venue</p>
+    <div className="container mx-auto p-8 space-y-8">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-[#3F6B96]">
+          Manage & Add Venue
+        </h1>
         <button
-          onClick={Checkboxmode}
-          className={`text-xl font-semibold transition-colors ${
-            isCheckboxMode ? "text-red-500 hidden" : "text-black"
-          }`}
+          onClick={toggleCheckboxMode}
+          className="px-4 py-2 rounded-lg font-semibold bg-gray-100 hover:bg-gray-200 transition text-black"
         >
-          แก้ไขทั้งหมด
+          {isCheckboxMode ? "Cancel" : "Edit All"}
         </button>
-        <div
-          className={`flex text-black gap-2 ${
-            isCheckboxMode ? "block" : "hidden"
-          } `}
-        >
-          <div
-            className={`flex text-black gap-2 ${
-              isCheckboxMode ? "block" : "hidden"
-            }`}
-          >
-            <button onClick={() => setIsCheckboxMode(false)}>ยกเลิก</button>
-            <button onClick={handleDeleteSelected}>ลบทั้งหมด</button>
-          </div>
-        </div>
       </div>
 
-      {/* Add Venue Card */}
-      <Link href="/venue/manage/add" className="text-xl font-semibold">
-        <div className="bg-gray-100 hover:bg-gray-200 transition-colors cursor-pointer rounded-lg">
-          <div className="flex flex-col items-center justify-center py-12">
-            <span className="text-gray-600">เพิ่มสถานที่ของคุณ</span>
-          </div>
-        </div>
-      </Link>
-
       {isCheckboxMode && (
-        <div className="flex gap-5 font-bold">
+        <div className="flex items-center gap-3 pb-2">
           <input
             type="checkbox"
             checked={isCheckAll}
             onChange={handleSelectAll}
-            className="form-checkbox h-5 w-5 text-blue-600 border-gray-300 rounded"
+            className="h-5 w-5 text-blue-600 rounded border-gray-300"
           />
-          <p className="text-black text-lg underline">เลือกทั้งหมด</p>
+          <p className="text-lg text-gray-600 font-bold">Check All</p>
+          <button
+            onClick={handleDeleteSelected}
+            className="ml-4 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg"
+          >
+            Delete all selected
+          </button>
         </div>
       )}
 
-      {/* Existing Venue Cards */}
-      {venues?.map((venue: Venue) => (
-        <div
-          key={venue.id}
-          className="relative flex items-center space-x-4 transition-all duration-300"
-        >
-          {/* Checkbox */}
-          {isCheckboxMode && (
-            <div
-              className={`transition-transform duration-300 ${
-                slidingCheckboxStates[venue.id]
-                  ? "translate-x-0"
-                  : "-translate-x-10 opacity-0"
-              }`}
-            >
+      <Link href="/nk1/venue/manage/add">
+        <div className="flex items-center justify-center bg-[#7397BB] hover:bg-[#E6F3FF] text-white hover:text-black transition rounded-xl p-12 cursor-pointer">
+          <Plus size={80} />
+          <span className="ml-4 text-2xl font-semibold">
+            Add your Venue Places
+          </span>
+        </div>
+      </Link>
+
+      <Link
+        href="/nk1/venue/approvement"
+        className="flex justify-between items-center p-6 rounded-xl bg-[#E6F3FF] hover:bg-[#7397BB] border border-[#7297BB] transition"
+      >
+        <p className="text-xl text-[#335473] font-semibold">
+          Venue Approvement
+        </p>
+        <ArrowRight size={36} color="#335473" />
+      </Link>
+
+      {/* Venue Cards */}
+      <div className="grid md:grid-cols-2 gap-8">
+        {venues?.map((venue, index) => (
+          <div
+            key={venue.id}
+            className="relative bg-[#E6F3FF] border rounded-xl p-6 flex flex-col gap-4 transition"
+          >
+            {isCheckboxMode && (
               <input
                 type="checkbox"
                 checked={selectedVenues.includes(venue.id)}
                 onChange={() => handleSingleVenueSelect(venue.id)}
-                className="form-checkbox h-5 w-5 text-blue-600 border-gray-300 rounded"
+                className="absolute top-4 left-4 h-5 w-5 text-blue-600 rounded"
               />
-            </div>
-          )}
+            )}
 
-          {/* Sliding Venue Card */}
-          <div
-            className={`relative flex-grow bg-gray-100 p-6 rounded-lg border overflow-hidden transition-transform duration-300 ${
-              slidingCheckboxStates[venue.id]
-                ? "translate-x-10"
-                : "translate-x-0"
-            }`}
-          >
-            <div className="flex justify-between">
-              <p className="font-bold text-black mb-2">{venue.venue_name}</p>
-              <button onClick={Buttonmode} className="text-[#B67373] underline">
-                Edit
-              </button>
-            </div>
-            <div className="flex gap-4 items-start">
-              {/* Venue Image */}
-              <div className="relative w-32 h-32 rounded-lg overflow-hidden">
+            <div className="flex items-start gap-6">
+              <div className="w-32 h-32 overflow-hidden rounded-lg border-4 border-[#3F6B96]">
                 <img
-                  src={venue.image}
+                  src={
+                    venue.venue_images?.[0]?.image || "/placeholder-image.jpg"
+                  }
                   alt={venue.venue_name}
-                  className="object-cover w-full h-full rounded-lg border-4 border-[#B67373]"
+                  className="w-full h-full object-cover"
                 />
               </div>
 
-              {/* Venue Info */}
-              <div className="space-y-2 text-sm text-gray-600">
-                <p>
-                  <span className="font-medium">Owner Name:</span> TEST
+              <div className="flex-1 space-y-2">
+                <h2 className="font-bold text-black text-lg">
+                  {venue.venue_name}
+                </h2>
+                <p className="text-sm text-gray-600">
+                  <span className="font-semibold text-black">Owner:</span>{" "}
+                  {ownerNames[venue.id] || "Loading..."}
                 </p>
-                <p>รายละเอียด: {venue.additional_information}</p>
-                <p>เฟอร์นิเจอร์: TEST</p>
-                <p>ประเภทกิจกรรม: {venue.category}</p>
+                <p className="text-sm text-gray-600 text-ellipsis">
+                  <span className="text-black font-semibold">Detail:</span>{" "}
+                  {venue.additional_information}
+                </p>
+
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="text-black font-semibold">Status:</span>
+                  {venue.status === 3 ? (
+                    <span className="text-green-600 font-semibold">
+                      Approved
+                    </span>
+                  ) : venue.status === 2 ? (
+                    <span className="text-yellow-500 font-semibold">
+                      Pending
+                    </span>
+                  ) : (
+                    <span className="text-red-500 font-semibold">Rejected</span>
+                  )}
+                </div>
               </div>
             </div>
 
-            {/* Edit and Delete Buttons */}
-            <Link
-              href={`/venue/${venue.id}/edit`}
-              className={`absolute right-0 top-0 h-full w-20 bg-[#666666] text-white flex items-center justify-center transition-transform duration-300 ease-in-out rounded-lg ${
-                slidingCheckboxStates[venue.id]
-                  ? "translate-x-0"
-                  : "translate-x-full"
-              }`}
-            >
-              Edit
-            </Link>
-
-            <div
-              className={`absolute right-0 top-0 h-full flex items-center justify-center transition-transform duration-300 ease-in-out rounded-lg ${
-                slidingButtonStates[venue.id]
-                  ? "translate-x-0"
-                  : "translate-x-full"
-              }`}
-            >
-              <button
-                onClick={Buttonmode}
-                className={`text-[#B67373] underline px-6 top-5 absolute left-[-100px]  ${
-                  isButtonMode ? "block" : "hidden"
-                }`}
-              >
-                สำเร็จ
-              </button>
+            {/* Buttons */}
+            <div className="flex justify-end gap-4">
               <Link
-                href={`/venue/${venue.id}/edit`}
-                className={`h-full w-20 bg-[#666666] text-white flex items-center justify-center rounded-l-lg`}
+                href={`/nk1/venue/${venue.id}/edit`}
+                className="px-4 py-2 bg-[#3F6B96] hover:bg-[#335473] text-white rounded-lg text-sm transition"
               >
                 Edit
               </Link>
               <button
                 onClick={() => handleDelete(venue.id)}
-                className="h-full w-20 bg-[#E03030] text-white flex items-center justify-center rounded-r-lg"
+                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm transition"
               >
                 Delete
               </button>
             </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };
